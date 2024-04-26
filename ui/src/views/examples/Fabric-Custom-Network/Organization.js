@@ -21,7 +21,7 @@ import {
 import Header from "components/Headers/Header";
 import AddOrganization from "./AddOrganization";
 export default function Organization() {
-  const orgList = [
+  const [orgList, setOrgList] = useState([
     {
       type: "tets",
       name: "test",
@@ -29,17 +29,32 @@ export default function Organization() {
       numberOfPeers: "test",
       currentStateDb: "tets",
     },
-  ];
+  ]);
 
   const [modal, setModal] = useState(false);
   const toggleModal = () => {
     setModal(!modal);
   };
 
+  const addOrganizationItem = (organization) => {
+    setOrgList([...orgList, organization]);
+    // console.log("++++++++++++", result);
+  };
+
+  // const handleDropdownSelect = (selectedItem) => {
+  //   const result = orgList.push(selectedItem);
+  //   console.log("---dropdown value--", result);
+  // };
+
   return (
     <>
       <Header />
-      <AddOrganization toggle={toggleModal} modal={modal} />
+      <AddOrganization
+        toggle={toggleModal}
+        modal={modal}
+        addOrganizationItem={addOrganizationItem}
+        // handleDropdownSelect={handleDropdownSelect}
+      />
       <Container className="mt--7" fluid>
         <Row>
           <div className="col">
@@ -80,11 +95,11 @@ export default function Organization() {
                     {orgList.map((orgInfo) => {
                       return (
                         <tr>
-                          <td>{orgInfo.type}</td>
-                          <td>{orgInfo.name}</td>
-                          <td>{orgInfo.msp}</td>
-                          <td>{orgInfo.numberOfPeers}</td>
-                          <td>{orgInfo.currentStateDb}</td>
+                          <td>{orgInfo?.type}</td>
+                          <td>{orgInfo?.name}</td>
+                          <td>{orgInfo?.msp}</td>
+                          <td>{orgInfo?.numberOfPeers}</td>
+                          <td>{orgInfo?.currentStateDb}</td>
                         </tr>
                       );
                     })}
