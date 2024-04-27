@@ -5,3 +5,4 @@ module.exports.DeviceController = require('./device.controller');
 module.exports.cattleService = require('./cattle.controller');
 module.exports.slaughterController = require('./slaughter.controller');
 module.exports.sensorDataController = require('./sensorData.controller');
+module.exports.orgController = require('./org.controller');

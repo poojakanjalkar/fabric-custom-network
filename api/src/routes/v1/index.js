@@ -9,7 +9,7 @@ const deviceRoute = require('./device.route');
 const cattleRoute = require('./cattle.route');
 const slaughterRoute = require('./slaughter.route');
 const sensorRoute = require('./sensor.route');
-
+const orgRoute = require('./org.route');
 const router = express.Router();
 
 const defaultRoutes = [
@@ -45,6 +45,10 @@ const defaultRoutes = [
   {
     path: '/slaughter',
     route: slaughterRoute,
+  },
+  {
+    path: '/org',
+    route: orgRoute,
   },
 ];
 
