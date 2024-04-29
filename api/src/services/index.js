@@ -7,3 +7,4 @@ module.exports.DeviceService = require('./device.service');
 module.exports.cattleModel = require('./cattle.service');
 module.exports.SlaughterService = require('./slaughter.service');
 module.exports.sensorReadingService = require('./sensorData.service');
+module.exports.OrgService = require('./org.service');
