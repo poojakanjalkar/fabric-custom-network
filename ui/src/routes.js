@@ -30,6 +30,7 @@ import Device from "views/examples/Trust-Score/Device.js";
 import Cattle from "views/examples/Trust-Score/Cattle.js";
 import SlaughterHouse from "views/examples/Trust-Score/SlaughterHouse.js";
 import Organization from "views/examples/Fabric-Custom-Network/Organization.js";
+import CreateRequest from "views/examples/Fabric-Custom-Network/CreateRequest.js";
 
 var routes = [
   // {
@@ -47,18 +48,25 @@ var routes = [
     component: Device,
     layout: "/admin",
   },
+  // {
+  //   path: "/Cattle",
+  //   name: "cattle",
+  //   icon: "ni ni-single-02 text-yellow",
+  //   component: Cattle,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/Slaughter",
+  //   name: "Slaughter House",
+  //   icon: "ni ni-single-02 text-yellow",
+  //   component: SlaughterHouse,
+  //   layout: "/admin",
+  // },
   {
-    path: "/Cattle",
-    name: "cattle",
+    path: "/create-request",
+    name: "Create Request",
     icon: "ni ni-single-02 text-yellow",
-    component: Cattle,
-    layout: "/admin",
-  },
-  {
-    path: "/Slaughter",
-    name: "Slaughter House",
-    icon: "ni ni-single-02 text-yellow",
-    component: SlaughterHouse,
+    component: CreateRequest,
     layout: "/admin",
   },
   {
