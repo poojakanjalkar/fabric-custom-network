@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   TabContent,
@@ -17,28 +17,64 @@ import {
   CardTitle,
   Row,
   Col,
-} from "reactstrap";
-import Header from "components/Headers/Header";
-import AddOrganization from "./AddOrganization";
+} from 'reactstrap';
+import ReactPaginate from 'react-paginate';
+import axios from 'axios';
+import Header from 'components/Headers/Header';
+import AddOrganization from './AddOrganization';
+import { headers } from 'helper/config';
+import { map } from 'jquery';
 export default function Organization() {
   const [orgList, setOrgList] = useState([
     {
-      type: "tets",
-      name: "test",
-      msp: "tets",
-      numberOfPeers: "test",
-      currentStateDb: "tets",
+      type: 'tets',
+      name: 'test',
+      msp: 'tets',
+      numberOfPeers: 'test',
+      currentStateDb: 'tets',
     },
   ]);
+
+  const [requestList, setRequestList] = useState([]);
+
+  const [pageCount, setPageCount] = useState(0);
+  const [paginationData, setPaginationData] = useState({ selectedPage: 0 });
 
   const [modal, setModal] = useState(false);
   const toggleModal = () => {
     setModal(!modal);
   };
 
+    useEffect(() => {
+    console.log("======total pages=====", requestList?.totalPages);
+    setPageCount(requestList?.totalPages);
+  }, [requestList]);
+
+  const handlePageClick = (page) => {
+    console.log('selected page is@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', page);
+    setPaginationData({
+      ...paginationData,
+      selectedPage: page.selected,
+    });
+  };
+
   const addOrganizationItem = (organization) => {
     setOrgList([...orgList, organization]);
     // console.log("++++++++++++", result);
+  };
+
+  useEffect(() => {
+    getData(0);
+  }, []);
+
+  const getData = async (page) => {
+    let result = await axios.get(
+      `http://localhost:3000/v1/org/?page=${page}&size=10`,
+      headers()
+    );
+    console.log('----------------dsfgdsrfgdfhdfhdhdthdthjjjjjjjjjjjjjj-----------', result.data);
+
+    setRequestList(result?.data?.payload);
   };
 
   // const handleDropdownSelect = (selectedItem) => {
@@ -55,57 +91,74 @@ export default function Organization() {
         addOrganizationItem={addOrganizationItem}
         // handleDropdownSelect={handleDropdownSelect}
       />
-      <Container className="mt--7" fluid>
+      <Container className='mt--7' fluid>
         <Row>
-          <div className="col">
-            <Card className="shadow">
-              <CardHeader className="border-0">
+          <div className='col'>
+            <Card className='shadow'>
+              <CardHeader className='border-0'>
                 <FormGroup row>
                   <Col sm={9}>
-                    <h3 className="mb-0">Organization Data</h3>
+                    <h3 className='mb-0'>Organization Data</h3>
                   </Col>
                   <Col sm={3}>
                     <Button
-                      className="my-1"
-                      color="primary"
+                      className='my-1'
+                      color='primary'
                       onClick={toggleModal}
-                      type="button"
+                      type='button'
                     >
-                      {"Add Organization"}
+                      {'Add Organization'}
                     </Button>
                   </Col>
                 </FormGroup>
                 <Table
-                  className="align-items-center table-flush"
+                  className='align-items-center table-flush'
                   striped
                   bordered
                   hover
                 >
-                  <thead className="thead-light">
+                  <thead className='thead-light'>
                     <tr>
-                      <th>Type</th>
-                      <th>Name</th>
-                      <th>MSP</th>
-                      <th>No. Of Peers</th>
-                      <th>Current State DB</th>
+                      <th>Project Name</th>
+                      <th>Org Count</th>
+                      <th>Channel Count</th>
+                      <th>Status</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
 
                   <tbody>
-                    {orgList.map((orgInfo) => {
+                    {requestList?.docs?.map((request) => {
                       return (
                         <tr>
-                          <td>{orgInfo?.type}</td>
-                          <td>{orgInfo?.name}</td>
-                          <td>{orgInfo?.msp}</td>
-                          <td>{orgInfo?.numberOfPeers}</td>
-                          <td>{orgInfo?.currentStateDb}</td>
+                          <td>{request?.configuration?.projectName}</td>
+                          <td>{request?.configuration?.Organizations?.map(e => e.orgName+ ', ')}</td>
+                          <td>{request?.configuration?.channels?.map(e=> e.channelName + ', ')}</td>
+                          <td>{request?.status}</td>
+                          {/* <td>{request?.configuration?.currentStateDb}</td> */}
                         </tr>
                       );
                     })}
                   </tbody>
                 </Table>
+                
               </CardHeader>
+              <CardBody>
+              <ReactPaginate
+                previousLabel={'Previous'}
+                nextLabel={'Next'}
+                breakLabel={'...'}
+                breakClassName={'break-me'}
+                pageCount={pageCount}
+                marginPagesDisplayed={3}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageClick}
+                containerClassName={'pagination'}
+                subContainerClassName={'pages pagination'}
+                activeClassName={'active'}
+              />
+              </CardBody>
+             
             </Card>
           </div>
         </Row>

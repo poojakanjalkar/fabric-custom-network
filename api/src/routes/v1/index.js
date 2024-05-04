@@ -10,6 +10,7 @@ const cattleRoute = require('./cattle.route');
 const slaughterRoute = require('./slaughter.route');
 const sensorRoute = require('./sensor.route');
 const orgRoute = require('./org.route');
+const paymentRoute = require('./payment.route')
 const router = express.Router();
 
 const defaultRoutes = [
@@ -49,6 +50,10 @@ const defaultRoutes = [
   {
     path: '/org',
     route: orgRoute,
+  },
+  {
+    path: '/razorpay',
+    route: paymentRoute,
   },
 ];
 

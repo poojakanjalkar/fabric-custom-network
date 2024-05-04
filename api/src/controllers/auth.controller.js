@@ -15,6 +15,16 @@ const login = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(getSuccessResponse(httpStatus.OK, 'Successfully Logged in', token))
 });
 
+const loginGoogleAuth = catchAsync(async (req, res) => {
+  const data = req.body;
+
+
+  const user = await authService.loginUserWithGoogleAuth(data);
+  const token = await tokenService.generateAuthTokens(user);
+  console.log("-------------cp333333-------------------", user, token)
+  return res.status(httpStatus.OK).send(getSuccessResponse(httpStatus.OK, 'Successfully Logged in', token))
+});
+
 const logout = catchAsync(async (req, res) => {
   await authService.logout(req.body.refreshToken);
   res.status(httpStatus.NO_CONTENT).send();
@@ -48,5 +58,6 @@ module.exports = {
   refreshTokens,
   forgotPassword,
   resetPassword,
-  test
+  test,
+  loginGoogleAuth
 };

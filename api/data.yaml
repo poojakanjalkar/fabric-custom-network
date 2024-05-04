@@ -1,0 +1,10 @@
+name: John Doe
+age: 30
+email: john.doe@example.com
+hobbies:
+  - reading
+  - hiking
+  - coding
+address:
+  city: New York
+  country: USA

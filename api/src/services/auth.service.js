@@ -1,10 +1,13 @@
 const httpStatus = require('http-status');
+const { OAuth2Client } = require('google-auth-library');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 const { USER_STATUS } = require('../utils/Constants');
+const CLIENT_ID = '199759029626-dgc3280klfq5u5r0o44kho7fnomvgspk.apps.googleusercontent.com'
+
 
 /**
  * Login with username and password
@@ -22,6 +25,55 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   }
   return user;
 };
+
+const loginUserWithGoogleAuth = async (data) => {
+  let token = data.credential
+  const client = new OAuth2Client(CLIENT_ID);
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  // {
+  //   iss: 'https://accounts.google.com',
+  //   azp: '199759029626-dgc3280klfq5u5r0o44kho7fnomvgspk.apps.googleusercontent.com',
+  //   aud: '199759029626-dgc3280klfq5u5r0o44kho7fnomvgspk.apps.googleusercontent.com',
+  //   sub: '118340681702953417606',
+  //   email: 'adhavpavan@gmail.com',
+  //   email_verified: true,
+  //   nbf: 1714530294,
+  //   name: 'Pavan Adhav',
+  //   picture: 'https://lh3.googleusercontent.com/a/ACg8ocK16QmX4KwMErb4nRwG_-RuTfS5txuNZB0ouW7vFEIXWet4iVrc=s96-c',
+  //   given_name: 'Pavan',
+  //   family_name: 'Adhav',
+  //   iat: 1714530594,
+  //   exp: 1714534194,
+  //   jti: 'f9dbc245f4b57e90a80dfd890188873487c14720'
+  // }
+  console.log("--------payload--------------", payload)
+  if(payload?.email_verified){
+    const user = await userService.getUserByEmail(payload?.email);
+    if(!user){
+
+      let u = {
+        name: payload.name,
+        email: payload.email,
+        lastLogin: new Date(),
+      }
+      await userService.createUser(u)
+    }
+
+  return userService.getUserByEmail(payload?.email);
+  // if (!user || !(await user.isPasswordMatch(password))) {
+  //   throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+  // }
+  // if(user && user.status !== USER_STATUS.ACTIVE){
+  //   throw new ApiError(httpStatus.UNAUTHORIZED, 'Please ask admin to activate your account');
+  }
+  // return user;
+};
+
+
 
 /**
  * Logout
@@ -79,5 +131,6 @@ module.exports = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
-  resetPassword
+  resetPassword,
+  loginUserWithGoogleAuth
 };

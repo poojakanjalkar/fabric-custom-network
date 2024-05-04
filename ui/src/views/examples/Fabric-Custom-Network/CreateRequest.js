@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from "axios";
+
 import {
   Button,
   Card,
@@ -25,6 +27,7 @@ import {
   Popconfirm,
   Table,
   Typography,
+  Divider,
   Select,
 } from 'antd';
 
@@ -32,6 +35,7 @@ import Header from 'components/Headers/Header';
 import AddOrganization from './AddOrganization';
 
 import { useToasts } from 'react-toast-notifications';
+import { headers } from 'helper/config';
 
 const { Option } = Select;
 // import type { TableProps } from 'antd';
@@ -71,6 +75,110 @@ const EditableCell = ({
   );
 };
 
+const EditableCellChannel = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  orgNameList,
+  ...restProps
+}) => {
+  const tagRender = (props) => {
+    const { label, value, closable, onClose } = props;
+
+    const color = 'violet'; //getColorForOption(value); // Your function to get color for option value
+
+    return (
+      <div
+        style={{
+          color: 'white',
+          backgroundColor: color, // Apply background color
+          border: `1px solid ${color}`, // Apply border color
+          borderRadius: '4px',
+          padding: '2px 8px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          marginRight: '8px',
+          marginBottom: '8px',
+        }}
+      >
+        <span>{label}</span>
+        {closable && (
+          <span style={{ marginLeft: '8px' }} onClick={onClose}>
+            x
+          </span>
+        )}
+      </div>
+    );
+  };
+  const inputNode =
+    dataIndex === 'orgName' ? (
+      <Select
+        // options={orgNameList}
+        mode='multiple' // Set mode to 'multiple' for multi-select
+        style={{ width: '100%' }} // Set width as per your requirement
+        placeholder='Select orgs'
+        tagRender={tagRender}
+        // value={record.orgName}
+        // onChange={(value) => handleOrgChange(value, record.key)}
+      >
+        {orgNameList?.map((e) => {
+          return (
+            <Option value={e} style={{ color: 'green' }}>
+              {e}
+            </Option>
+          );
+        })}
+      </Select>
+    ) : (
+      <Input />
+    );
+
+  // console.log('-----------ssssssssssssssssssss-----', orgNameList);
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{
+            margin: 0,
+          }}
+          rules={[
+            {
+              required: true,
+              message: `Please Input ${title}!`,
+            },
+          ]}
+        >
+          {inputNode}
+        </Form.Item>
+      ) : dataIndex === 'orgName' ? (
+        <Select
+          mode='tags' // Set mode to 'multiple' for multi-select
+          style={{ width: '100%' }} // Set width as per your requirement
+          placeholder='Select orgs'
+          value={record.orgName}
+          tagRender={tagRender}
+          disabled={true}
+        >
+          {orgNameList?.map((e) => {
+            return (
+              <Option value={e} style={{ color: 'green' }}>
+                {e}
+              </Option>
+            );
+          })}
+        </Select>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
+
 export default function CreateRequest() {
   const [totalOrgs, setTotalOrgs] = useState(0);
 
@@ -94,7 +202,7 @@ export default function CreateRequest() {
   }, [orgNameList]);
 
   useEffect(() => {
-    // console.log('---------------------data changed', data);
+    console.log('----------333333-----------Final Org Data', data);
     let l = [];
     data?.map((e) => {
       if (e.orgType != 'Orderer') {
@@ -104,6 +212,13 @@ export default function CreateRequest() {
     });
     setOrgNameList(l);
   }, [data]);
+
+  useEffect(() => {
+    console.log(
+      '------------333333---------Final Channel Data is',
+      channelData
+    );
+  }, [channelData]);
 
   // console.log('-----------data111111', data);
 
@@ -122,6 +237,11 @@ export default function CreateRequest() {
       setTotalChannel(value);
     }
   };
+  const [projectName, setProjectName] = useState('');
+
+  const projectNameChangeHandler = (value) => {
+    setProjectName(value);
+  };
 
   const createChannelConfig = () => {
     let d = [];
@@ -132,9 +252,9 @@ export default function CreateRequest() {
       d.push({
         key: i.toString(),
 
-        channelName: 'channel1',
-        orgName: ['Org1', 'Org2'],
-        ChaincodeName: `chaincode1`,
+        channelName: `mychannel${i + 1}`,
+        orgName: orgNameList,
+        ChaincodeName: `chaincode${i + 1}`,
         endorsement: 'Org1',
         dataType: 'Channel',
       });
@@ -142,6 +262,27 @@ export default function CreateRequest() {
 
     setChannelData(d);
   };
+
+  const sendRequestDataToServer = async()=> {
+    let payload = {
+
+      projectName,
+      Organizations: data,
+      channels: channelData
+    }
+
+
+
+    let result = await axios.post(
+      "http://localhost:3000/v1/org/",
+      payload,
+      headers()
+    );
+
+    console.log("------------data added successfully--------", result)
+  
+
+  }
 
   const createConfig = () => {
     let d = [];
@@ -155,9 +296,11 @@ export default function CreateRequest() {
 
           orgType: 'Orderer',
           orgName: 'Orderer',
-          MSP: `OrdererMSP`,
-          peerCount: '3',
+          ca: `orderer-ca`,
+          msp: `OrdererMSP`,
+          peerCount: 3,
           stateDB: 'NA',
+          db: 'Not Require',
         });
       } else {
         // console.log('===============inside loop', i, count);
@@ -166,9 +309,10 @@ export default function CreateRequest() {
 
           orgType: 'Peer',
           orgName: `Org${i}`,
-          MSP: `Org${i}MSP`,
+          ca: `org${i}-ca`,
+          msp: `Org${i}MSP`,
           peerCount: '1',
-          stateDB: 'Couchdb',
+          db: 'Couchdb',
         });
       }
     }
@@ -213,8 +357,12 @@ export default function CreateRequest() {
       const row = await form.validateFields();
       const newData = [...data];
       const index = newData.findIndex((item) => key === item.key);
+      console.log('-----rowrowrowrowrow---', row);
       if (index > -1) {
         const item = newData[index];
+        console.log('-----------all info------------', index, item, newData);
+        item.msp = `${row.orgName}MSP`;
+        item.ca = `${row.orgName}-ca`;
         newData.splice(index, 1, {
           ...item,
           ...row,
@@ -272,20 +420,32 @@ export default function CreateRequest() {
     {
       title: 'Org Type',
       dataIndex: 'orgType',
-      width: '10%',
+      width: '15%',
       editable: false,
     },
     {
       title: 'Org Name',
       dataIndex: 'orgName',
-      width: '15%',
+      width: '20%',
       editable: true,
     },
     {
       title: 'MSP',
-      dataIndex: 'MSP',
+      dataIndex: 'msp',
       width: '15%',
-      editable: true,
+      editable: false,
+    },
+    {
+      title: 'Certificate Authority',
+      dataIndex: 'ca',
+      width: '15%',
+      editable: false,
+    },
+    {
+      title: 'Current State DB',
+      dataIndex: 'db',
+      width: '15%',
+      editable: false,
     },
     {
       title: 'Peer count',
@@ -352,85 +512,23 @@ export default function CreateRequest() {
     );
   };
 
-  const handleOrgChange = (value, key) => {
-    console.log('---------handleOrgChange---------', value, key);
-    // setData(prevData =>
-    //   prevData.map(item => {
-    //     if (item.key === key) {
-    //       return { ...item, org: value };
-    //     }
-    //     return item;
-    //   })
-    // );
-  };
-
   const channelColumns = [
     {
       title: 'Channel Name',
       dataIndex: 'channelName',
-      width: '12%',
-      inputType: 'text',
+      width: '25%',
       editable: true,
     },
     {
       title: 'Participating Orgs',
       dataIndex: 'orgName',
       width: '30%',
-      inputType: 'multiSelect',
       editable: true,
-      // render: (text, record) => {
-      //   const editable = isChannelEditing(record);
-      //   console.log("0000000000000000000Rendering started----00000000000000000", record, editable)
-      //   if (editable) {
-      //     return (
-      //       <Select
-      //         mode='tags'
-      //         style={{ width: '100%' }}
-      //         defaultValue={record.orgName}
-      //       >
-      //         {orgNameList?.map((e) => {
-      //           return <Option value={e}>{e}</Option>;
-      //         })}
-      //       </Select>
-      //     );
-      //   } 
-      // },
-      render: (text, record) =>{
-        const editable = isChannelEditing(record);
-        return editable? (
-        <Select
-        options={orgNameList}
-          mode='multiple' // Set mode to 'multiple' for multi-select
-          style={{ width: '100%' }} // Set width as per your requirement
-          placeholder='Select orgs'
-          // value={record.orgName}
-
-          // onChange={(value) => handleOrgChange(value, record.key)}
-        >
-          {/* {orgNameList?.map((e) => {
-            return <Option value={e}>{e}</Option>;
-          })} */}
-          {/* <Option value="Org1">Org1</Option>
-          <Option value="Org2">Org2</Option>
-          <Option value="Org3">Org3</Option> */}
-        </Select>
-        ) :(
-          Array.isArray(record.orgName)?  record?.orgName?.join(', '): record.orgName
-        )
-      },
     },
     {
       title: 'Chaincode Name',
       dataIndex: 'ChaincodeName',
-      width: '15%',
-      inputType: 'text',
-      editable: true,
-    },
-    {
-      title: 'Endorsement Policy',
-      dataIndex: 'endorsement',
-      width: '10%',
-      inputType: 'text',
+      width: '25%',
       editable: true,
     },
     {
@@ -472,7 +570,7 @@ export default function CreateRequest() {
       ...col,
       onCell: (record) => ({
         record,
-        inputType: col.dataIndex === 'orgName' ? 'number' : 'text',
+        inputType: col.dataIndex === 'peerCount' ? 'number' : 'text',
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
@@ -485,17 +583,32 @@ export default function CreateRequest() {
     }
     return {
       ...col,
-      
+
       onCell: (record) => ({
         record,
         inputType: col.dataIndex === 'orgName' ? 'multiSelect' : 'multiSelect',
         dataIndex: col.dataIndex,
+        orgNameList: orgNameList,
         title: col.title,
         editing: isChannelEditing(record),
-        
       }),
     };
   });
+  const { addToast } = useToasts();
+
+  const [isValidating, setIsValidating] = useState(false);
+
+  const validateAndCreateRequest = () => {
+    setIsValidating(true);
+    if (!projectName) {
+      addToast(`Please add projectName `, {
+        appearance: 'error',
+        autoDismiss: true,
+      });
+    }
+
+    sendRequestDataToServer()
+  };
 
   return (
     <>
@@ -515,12 +628,28 @@ export default function CreateRequest() {
                 <Card>
                   <CardBody>
                     <FormGroup row>
+                      <Label sm={2}>Project Name</Label>
+                      <Col sm={10}>
+                        <Input
+                          value={projectName}
+                          invalid={isValidating && projectName == ''}
+                          onChange={(e) => {
+                            projectNameChangeHandler(e.target.value);
+                          }}
+                          placeholder='Enter Project Name'
+                        />
+                        <FormFeedback>*Required</FormFeedback>
+                      </Col>
+                    </FormGroup>
+                    <Divider />
+
+                    <FormGroup row>
                       <Label sm={2}>Number Of Orgs</Label>
-                      <Col sm={1.2}>
+                      <Col sm={2}>
                         <Input
                           value={totalOrgs}
                           type='Number'
-                          // invalid={ name == ''}
+                          invalid={isValidating && data?.length == 0}
                           onChange={(e) => {
                             inputChangeHandler(e.target.value);
                           }}
@@ -536,37 +665,39 @@ export default function CreateRequest() {
                             createConfig();
                           }}
                         >
-                          Create Configuration
+                          Create Org Configuration
                         </Button>
                       </Col>
                     </FormGroup>
+                    {data?.length ? (
+                      <FormGroup>
+                        <Form form={form} component={false}>
+                          <Table
+                            components={{
+                              body: {
+                                cell: EditableCell,
+                              },
+                            }}
+                            bordered
+                            dataSource={data}
+                            columns={mergedColumns}
+                            rowClassName='editable-row'
+                            pagination={false}
+                            // pagination={{
+                            //   onChange: cancel,
+                            // }}
+                          />
+                        </Form>
+                      </FormGroup>
+                    ) : null}
                   </CardBody>
                 </Card>
 
-                <FormGroup>
-                  <Form form={form} component={false}>
-                    <Table
-                      components={{
-                        body: {
-                          cell: EditableCell,
-                        },
-                      }}
-                      bordered
-                      dataSource={data}
-                      columns={mergedColumns}
-                      rowClassName='editable-row'
-                      pagination={false}
-                      // pagination={{
-                      //   onChange: cancel,
-                      // }}
-                    />
-                  </Form>
-                </FormGroup>
                 <Card>
                   <CardBody>
                     <FormGroup row>
-                      <Label sm={2}>Number Of Channels</Label>
-                      <Col sm={1.2}>
+                      <Label sm={2}>Channels Count</Label>
+                      <Col sm={2}>
                         <Input
                           value={totalChannel}
                           type='Number'
@@ -574,7 +705,6 @@ export default function CreateRequest() {
                           onChange={(e) => {
                             inputChangeHandlerChannel(e.target.value);
                           }}
-                          placeholder='please enter name '
                         />
 
                         <FormFeedback>*Required</FormFeedback>
@@ -586,30 +716,41 @@ export default function CreateRequest() {
                             createChannelConfig();
                           }}
                         >
-                          Configure Channel
+                          Configure Channels
                         </Button>
                       </Col>
                     </FormGroup>
-
-                    <FormGroup>
-                      <Form form={form} component={false}>
-                        <Table
-                          components={{
-                            body: {
-                              cell: EditableCell,
-                            },
-                          }}
-                          bordered
-                          dataSource={channelData}
-                          columns={mergedColumnsChannel}
-                          rowClassName='editable-row'
-                          pagination={false}
-                          // pagination={{
-                          //   onChange: cancel,
-                          // }}
-                        />
-                      </Form>
-                    </FormGroup>
+                    {channelData?.length ? (
+                      <FormGroup>
+                        <Form form={form} component={false}>
+                          <Table
+                            components={{
+                              body: {
+                                cell: EditableCellChannel,
+                              },
+                            }}
+                            bordered
+                            dataSource={channelData}
+                            columns={mergedColumnsChannel}
+                            rowClassName='editable-row'
+                            pagination={false}
+                            // pagination={{
+                            //   onChange: cancel,
+                            // }}
+                          />
+                        </Form>
+                      </FormGroup>
+                    ) : null}
+                    <Divider></Divider>
+                    <Button
+                    disabled={data?.length==0 || channelData?.length==0}
+                      color='primary'
+                      onClick={() => {
+                        validateAndCreateRequest();
+                      }}
+                    >
+                      Submit
+                    </Button>{' '}
                   </CardBody>
                 </Card>
               </CardBody>

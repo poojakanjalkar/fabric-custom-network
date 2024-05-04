@@ -7,6 +7,7 @@ const { Token } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 const Organization = require('../models/organization.model');
+const Subscription = require('../models/subscription.model');
 
 /**
  * Generate token
@@ -68,6 +69,7 @@ const verifyToken = async (token, type) => {
  */
 const generateAuthTokens = async (user) => {
   let org = await Organization.findOne({ id: user.orgId });
+  let subscription = await Subscription.findOne({email:user.email}).exec()
 
   let userData = {
     email: user.email,
@@ -75,8 +77,8 @@ const generateAuthTokens = async (user) => {
     orgId: user.orgId,
     name: user.name,
     id: user.id,
-    department: user.department,
-    orgName: org.name,
+    subscription,
+    isSubscribed: subscription? true: false,
   };
 
   const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
@@ -88,6 +90,7 @@ const generateAuthTokens = async (user) => {
       token: accessToken,
       expires: accessTokenExpires.toDate(),
     },
+    
   };
 };
 
