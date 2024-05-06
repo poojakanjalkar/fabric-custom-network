@@ -12,3 +12,5 @@ yarn-error.log
 coverage
 *.log
 *.json
+
+*audit.json
