@@ -28,7 +28,7 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       minlength: 8,
       validate(value) {
@@ -38,13 +38,14 @@ const userSchema = mongoose.Schema(
       },
       private: true, // used by the toJSON plugin
     },
-    status: { type: String, default: USER_STATUS.INACTIVE },
+    status: { type: String, default: USER_STATUS.ACTIVE },
     type: { type: String, default: USER_TYPE.USER },
     orgId: { type: Number },
 
+    lastLogin: { type: Date },
+
     department: { type: String },
-    secret: { type: String, required: false },
-    isVerified: { type: Boolean, required: false, default: false },
+    isVerified: { type: Boolean, required: false, default: true },
   },
   {
     timestamps: true,
@@ -71,18 +72,18 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-userSchema.methods.isPasswordMatch = async function (password) {
-  const user = this;
-  return bcrypt.compare(password, user.password);
-};
+// userSchema.methods.isPasswordMatch = async function (password) {
+//   const user = this;
+//   return bcrypt.compare(password, user.password);
+// };
 
-userSchema.pre('save', async function (next) {
-  const user = this;
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 8);
-  }
-  next();
-});
+// userSchema.pre('save', async function (next) {
+//   const user = this;
+//   if (user.isModified('password')) {
+//     user.password = await bcrypt.hash(user.password, 8);
+//   }
+//   next();
+// });
 userSchema.plugin(mongoosePaginate);
 /**
  * @typedef User

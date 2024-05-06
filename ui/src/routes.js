@@ -41,13 +41,13 @@ var routes = [
   //   layout: "/admin",
   // },
 
-  {
-    path: "/Devices",
-    name: "IOT Devices",
-    icon: "ni ni-single-02 text-yellow",
-    component: Device,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/Devices",
+  //   name: "IOT Devices",
+  //   icon: "ni ni-single-02 text-yellow",
+  //   component: Device,
+  //   layout: "/admin",
+  // },
   // {
   //   path: "/Cattle",
   //   name: "cattle",
@@ -71,7 +71,7 @@ var routes = [
   },
   {
     path: "/Organization",
-    name: "Organization",
+    name: "All Requests",
     icon: "ni ni-single-02 text-yellow",
     component: Organization,
     layout: "/admin",
@@ -83,13 +83,13 @@ var routes = [
     component: Admin,
     layout: "/admin",
   },
-  {
-    path: "/contract-history",
-    name: "Asset History",
-    icon: "ni ni-single-02 text-yellow",
-    component: ContractHistory,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/contract-history",
+  //   name: "Asset History",
+  //   icon: "ni ni-single-02 text-yellow",
+  //   component: ContractHistory,
+  //   layout: "/admin",
+  // },
   {
     path: "/user-profile",
     name: "User Profile",
@@ -104,12 +104,12 @@ var routes = [
     component: Login,
     layout: "/auth",
   },
-  {
-    path: "/register",
-    name: "Register",
-    icon: "ni ni-circle-08 text-pink",
-    component: Register,
-    layout: "/auth",
-  },
+  // {
+  //   path: "/register",
+  //   name: "Register",
+  //   icon: "ni ni-circle-08 text-pink",
+  //   component: Register,
+  //   layout: "/auth",
+  // },
 ];
 export default routes;

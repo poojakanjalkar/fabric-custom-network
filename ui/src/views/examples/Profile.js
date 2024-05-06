@@ -1,5 +1,5 @@
-
-import React from "react";
+import React from 'react';
+// import Razorpay from 'razorpay';
 
 // reactstrap components
 import {
@@ -12,136 +12,197 @@ import {
   Input,
   Container,
   Row,
-  Col
-} from "reactstrap";
+  Col,
+} from 'reactstrap';
 // core components
-import UserHeader from "../../components/Headers/UserHeader.js";
+import UserHeader from '../../components/Headers/UserHeader.js';
 // import { useSelector } from 'react-redux';
 import { connect } from 'react-redux';
+// import Razorpay from 'razorpay';
 
 class Profile extends React.Component {
+  loadScript = (src) => {
+    return new Promise((resovle) => {
+      const script = document.createElement("script");
+      script.src = src;
+
+      script.onload = () => {
+        resovle(true);
+      };
+
+      script.onerror = () => {
+        resovle(false);
+      };
+
+      document.body.appendChild(script);
+    });
+  };
+
+  // razorpay = new Razorpay();
+  startPayment = async()=> {
+
+    const res = await this.loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
+    if (!res) {
+      alert("You are offline... Failed to load Razorpay SDK");
+      return;
+    }
+
+    const options = {
+      key: "rzp_test_0og2WBRWa80vrw",
+      currency: "INR",
+      amount: 1 * 100,
+      name: "Pavan Tech Academy",
+      description: "Thanks for purchasing",
+      customer:{
+        name:JSON.parse(localStorage.getItem('user-data'))
+        .name,
+        email: JSON.parse(localStorage.getItem('user-data'))
+        .email
+      },
+      // image:
+      //   "https://mern-blog-akky.herokuapp.com/static/media/logo.8c649bfa.png",
+
+      handler: function (response) {
+        // alert(response.razorpay_payment_id);
+        // alert("Payment Successfully");
+      },
+      notes:{
+        name:JSON.parse(localStorage.getItem('user-data'))
+        .name,
+        email: JSON.parse(localStorage.getItem('user-data'))
+        .email
+      },
+      prefill: {
+        name: "Pavan Tech Academy",
+      },
+    };
+
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
 
 
+  }
   render() {
     return (
       <>
         <UserHeader />
         {/* Page content */}
-        <Container className="mt--7" fluid>
+        <Container className='mt--7' fluid>
           <Row>
-            <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
-              <Card className="card-profile shadow">
-                <Row className="justify-content-center">
-                  <Col className="order-lg-2" lg="3">
-                    <div className="card-profile-image">
-                      <a href="#pablo" onClick={e => e.preventDefault()}>
+            <Col className='order-xl-2 mb-5 mb-xl-0' xl='4'>
+              <Card className='card-profile shadow'>
+                <Row className='justify-content-center'>
+                  <Col className='order-lg-2' lg='3'>
+                    <div className='card-profile-image'>
+                      {/* <a href="#pablo" onClick={e => e.preventDefault()}>
                         <img
                           alt="..."
                           className="rounded-circle"
                           src={require("../../assets/img/theme/team-4-800x800_1.jpg")}
                         />
-                      </a>
+                      </a> */}
                     </div>
                   </Col>
                 </Row>
-                <CardBody className="pt-0 pt-md-4 mt-5">
-                  <div className="text-center mt-6">
-                    <h3>
-                      {/* {localStorage.getItem("username")} */}
-                      {this.props?.decodedData?.email}
-                      {/* <span className="font-weight-light ">, 27</span> */}
-                    </h3>
-                    <div className="h5 font-weight-300">
-                      <i className="ni location_pin mr-2" />
-                      { ` Department - ${this.props?.decodedData?.department}` }
-                    </div>
-                    <div className="h5 mt-4">
-                      <i className="ni business_briefcase-24 mr-2" />
-                      { ` Role - Approver` }
-                    </div>
-                    <div>
-                      <i className="ni education_hat mr-2" />
-                      { ` Organization - ${this.props?.decodedData?.orgName}` }
-                    </div>
+                <CardBody className='pt-0 pt-md-4 mt-5'>
+                  <Form>
+                    <h6 className='heading-small text-muted mb-4'>
+                      Subscription
+                    </h6>
+                    <h6 className='heading-small text-muted mb-4'>
+                      <div className='h5 font-weight-300'>
+                        <i className='ni location_pin mr-2' />
+                        {` Total Credit - ${(JSON.parse(localStorage.getItem('user-data'))).subscription?.credit}`}
+                      </div>
+                      <div className='h5 font-weight-300'>
+                        <i className='ni location_pin mr-2' />
+                        {` Used Credit - 0`}
+                      </div>
+                      {/* <div className='h5 font-weight-300'>
+                        <i className='ni location_pin mr-2' />
+                        {` Balance Credit - 10`}
+                      </div> */}
+                    </h6>
 
-{/* 
-                    localStorage.setItem("username", payload.username)
-          localStorage.setItem("userType", payload.type)
-          localStorage.setItem("email", payload.email)
-          localStorage.setItem("org", payload.org)
-          localStorage.setItem("department", payload.department) */}
-                    {/* <hr className="my-4" />
-                    <p>
-                      Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                      Nick Murphy — writes, performs and records all of his own
-                      music.
-                    </p>
-                    <a href="#pablo" onClick={e => e.preventDefault()}>
-                      Show more
-                    </a> */}
-                  </div>
+                    <Button
+                      color='info'
+                      href='#pablo'
+                      onClick={(e) => this.startPayment()}
+                    >
+                      Buy Credit
+                    </Button>
+                  </Form>
                 </CardBody>
               </Card>
             </Col>
-            <Col className="order-xl-1" xl="8">
-              <Card className="bg-secondary shadow">
-                <CardHeader className="bg-white border-0">
-                  <Row className="align-items-center">
-                    <Col xs="8">
-                      <h3 className="mb-0">My account</h3>
+            <Col className='order-xl-1' xl='8'>
+              <Card className='bg-secondary shadow'>
+                <CardHeader className='bg-white border-0'>
+                  <Row className='align-items-center'>
+                    <Col xs='8'>
+                      <h3 className='mb-0'>My account</h3>
                     </Col>
-                    <Col className="text-right" xs="4">
-                      <Button
+                    <Col className='text-right' xs='4'>
+                      {/* <Button
                         color="primary"
                         href="#pablo"
                         onClick={e => e.preventDefault()}
                         size="sm"
                       >
                         Settings
-                      </Button>
+                      </Button> */}
                     </Col>
                   </Row>
                 </CardHeader>
                 <CardBody>
                   <Form>
-                    <h6 className="heading-small text-muted mb-4">
+                    <h6 className='heading-small text-muted mb-4'>
                       User information
                     </h6>
-                    <div className="pl-lg-4">
+                    <div className='pl-lg-4'>
                       <Row>
-                        <Col lg="6">
+                        <Col lg='6'>
                           <FormGroup>
                             <label
-                              className="form-control-label"
-                              htmlFor="input-username"
+                              className='form-control-label'
+                              htmlFor='input-username'
                             >
-                              Username
+                              Name
                             </label>
                             <Input
-                              className="form-control-alternative"
-                              defaultValue="lucky.jesse"
-                              id="input-username"
-                              placeholder="Username"
-                              type="text"
-                              value={this.props?.decodedData?.email}
+                              className='form-control-alternative'
+                              defaultValue='lucky.jesse'
+                              id='input-username'
+                              placeholder='Username'
+                              type='text'
+                              value={
+                                JSON.parse(localStorage.getItem('user-data'))
+                                  .name
+                              }
                               disabled={true}
                             />
                           </FormGroup>
                         </Col>
-                        <Col lg="6">
+                        <Col lg='6'>
                           <FormGroup>
                             <label
-                              className="form-control-label"
-                              htmlFor="input-email"
+                              className='form-control-label'
+                              htmlFor='input-email'
                             >
                               Email address
                             </label>
                             <Input
-                              className="form-control-alternative"
-                              id="input-email"
-                              placeholder="jesse@example.com"
-                              type="email"
-                              value={this.props?.decodedData?.email}
+                              className='form-control-alternative'
+                              id='input-email'
+                              placeholder='jesse@example.com'
+                              type='email'
+                              value={
+                                JSON.parse(localStorage.getItem('user-data'))
+                                  .email
+                              }
                               disabled={true}
                             />
                           </FormGroup>
@@ -184,9 +245,9 @@ class Profile extends React.Component {
                         </Col>
                       </Row> */}
                     </div>
-                    <hr className="my-4" />
+                    <hr className='my-4' />
                     {/* Address */}
-                   </Form>
+                  </Form>
                 </CardBody>
               </Card>
             </Col>

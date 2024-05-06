@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   TabContent,
@@ -18,8 +18,17 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import ReactPaginate from "react-paginate";
+import axios from "axios";
 import Header from "components/Headers/Header";
 import AddOrganization from "./AddOrganization";
+import { headers } from "helper/config";
+import { map } from "jquery";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faEye, faDownload } from "@fortawesome/free-solid-svg-icons";
+import "@fortawesome/fontawesome-free/css/all.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faDownload } from "@fortawesome/free-solid-svg-icons";
 export default function Organization() {
   const [orgList, setOrgList] = useState([
     {
@@ -31,9 +40,27 @@ export default function Organization() {
     },
   ]);
 
+  const [requestList, setRequestList] = useState([]);
+
+  const [pageCount, setPageCount] = useState(0);
+  const [paginationData, setPaginationData] = useState({ selectedPage: 0 });
+
   const [modal, setModal] = useState(false);
   const toggleModal = () => {
     setModal(!modal);
+  };
+
+  useEffect(() => {
+    console.log("======total pages=====", requestList?.totalPages);
+    setPageCount(requestList?.totalPages);
+  }, [requestList]);
+
+  const handlePageClick = (page) => {
+    console.log("selected page is@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", page);
+    setPaginationData({
+      ...paginationData,
+      selectedPage: page.selected,
+    });
   };
 
   const addOrganizationItem = (organization) => {
@@ -41,10 +68,40 @@ export default function Organization() {
     // console.log("++++++++++++", result);
   };
 
+  useEffect(() => {
+    getData(0);
+  }, []);
+
+  const getData = async (page) => {
+    let result = await axios.get(
+      `http://localhost:3000/v1/org/?page=${page}&size=10`,
+      headers()
+    );
+    console.log(
+      "----------------dsfgdsrfgdfhdfhdhdthdthjjjjjjjjjjjjjj-----------",
+      result.data
+    );
+
+    setRequestList(result?.data?.payload);
+  };
+
   // const handleDropdownSelect = (selectedItem) => {
   //   const result = orgList.push(selectedItem);
   //   console.log("---dropdown value--", result);
   // };
+
+  const [selectedItem, setSelectedItem] = useState();
+
+  useEffect(() => {
+    console.log("0000000000-----", selectedItem);
+  }, [selectedItem]);
+
+  const ItemView = (item) => {
+    console.log("^%^^%&&^^&%^&%^$^&$^&$-----------", item);
+    setSelectedItem(item);
+
+    toggleModal();
+  };
 
   return (
     <>
@@ -52,6 +109,7 @@ export default function Organization() {
       <AddOrganization
         toggle={toggleModal}
         modal={modal}
+        selectedItem={selectedItem}
         addOrganizationItem={addOrganizationItem}
         // handleDropdownSelect={handleDropdownSelect}
       />
@@ -70,9 +128,7 @@ export default function Organization() {
                       color="primary"
                       onClick={toggleModal}
                       type="button"
-                    >
-                      {"Add Organization"}
-                    </Button>
+                    ></Button>
                   </Col>
                 </FormGroup>
                 <Table
@@ -83,29 +139,63 @@ export default function Organization() {
                 >
                   <thead className="thead-light">
                     <tr>
-                      <th>Type</th>
-                      <th>Name</th>
-                      <th>MSP</th>
-                      <th>No. Of Peers</th>
-                      <th>Current State DB</th>
+                      <th>Project Name</th>
+                      <th>Org Count</th>
+                      <th>Channel Count</th>
+                      <th>Status</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
 
                   <tbody>
-                    {orgList.map((orgInfo) => {
+                    {requestList?.docs?.map((request) => {
                       return (
                         <tr>
-                          <td>{orgInfo?.type}</td>
-                          <td>{orgInfo?.name}</td>
-                          <td>{orgInfo?.msp}</td>
-                          <td>{orgInfo?.numberOfPeers}</td>
-                          <td>{orgInfo?.currentStateDb}</td>
+                          <td>{request?.configuration?.projectName}</td>
+                          <td>
+                            {request?.configuration?.Organizations?.map(
+                              (e) => e.orgName + ", "
+                            )}
+                          </td>
+                          <td>
+                            {request?.configuration?.channels?.map(
+                              (e) => e.channelName + ", "
+                            )}
+                          </td>
+                          <td>{request?.status}</td>
+                          {/* <td>{request?.configuration?.currentStateDb}</td> */}
+                          <td>
+                            <Button onClick={() => ItemView(request)}>
+                              <FontAwesomeIcon icon={faEye} />
+                            </Button>
+                            <span style={{ marginRight: "15px" }}></span>
+
+                            <FontAwesomeIcon icon={faDownload} />
+                          </td>
+                          {/* <Button color="success" onClick={""}>
+                           
+                          </Button> */}
                         </tr>
                       );
                     })}
                   </tbody>
                 </Table>
               </CardHeader>
+              <CardBody>
+                <ReactPaginate
+                  previousLabel={"Previous"}
+                  nextLabel={"Next"}
+                  breakLabel={"..."}
+                  breakClassName={"break-me"}
+                  pageCount={pageCount}
+                  marginPagesDisplayed={3}
+                  pageRangeDisplayed={5}
+                  onPageChange={handlePageClick}
+                  containerClassName={"pagination"}
+                  subContainerClassName={"pages pagination"}
+                  activeClassName={"active"}
+                />
+              </CardBody>
             </Card>
           </div>
         </Row>

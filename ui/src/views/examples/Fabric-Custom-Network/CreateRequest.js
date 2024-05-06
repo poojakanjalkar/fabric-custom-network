@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 import {
   Button,
   Card,
@@ -17,7 +19,7 @@ import {
   CardTitle,
   Row,
   Col,
-} from 'reactstrap';
+} from "reactstrap";
 import {
   Form,
   Input as antDInput,
@@ -25,13 +27,15 @@ import {
   Popconfirm,
   Table,
   Typography,
+  Divider,
   Select,
-} from 'antd';
+} from "antd";
 
-import Header from 'components/Headers/Header';
-import AddOrganization from './AddOrganization';
+import Header from "components/Headers/Header";
+import AddOrganization from "./AddOrganization";
 
-import { useToasts } from 'react-toast-notifications';
+import { useToasts } from "react-toast-notifications";
+import { headers } from "helper/config";
 
 const { Option } = Select;
 // import type { TableProps } from 'antd';
@@ -46,7 +50,7 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
   return (
     <td {...restProps}>
       {editing ? (
@@ -71,7 +75,111 @@ const EditableCell = ({
   );
 };
 
-export default function CreateRequest() {
+const EditableCellChannel = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  orgNameList,
+  ...restProps
+}) => {
+  const tagRender = (props) => {
+    const { label, value, closable, onClose } = props;
+
+    const color = "violet"; //getColorForOption(value); // Your function to get color for option value
+
+    return (
+      <div
+        style={{
+          color: "white",
+          backgroundColor: color, // Apply background color
+          border: `1px solid ${color}`, // Apply border color
+          borderRadius: "4px",
+          padding: "2px 8px",
+          display: "inline-flex",
+          alignItems: "center",
+          marginRight: "8px",
+          marginBottom: "8px",
+        }}
+      >
+        <span>{label}</span>
+        {closable && (
+          <span style={{ marginLeft: "8px" }} onClick={onClose}>
+            x
+          </span>
+        )}
+      </div>
+    );
+  };
+  const inputNode =
+    dataIndex === "orgName" ? (
+      <Select
+        // options={orgNameList}
+        mode="multiple" // Set mode to 'multiple' for multi-select
+        style={{ width: "100%" }} // Set width as per your requirement
+        placeholder="Select orgs"
+        tagRender={tagRender}
+        // value={record.orgName}
+        // onChange={(value) => handleOrgChange(value, record.key)}
+      >
+        {orgNameList?.map((e) => {
+          return (
+            <Option value={e} style={{ color: "green" }}>
+              {e}
+            </Option>
+          );
+        })}
+      </Select>
+    ) : (
+      <Input />
+    );
+
+  // console.log('-----------ssssssssssssssssssss-----', orgNameList);
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{
+            margin: 0,
+          }}
+          rules={[
+            {
+              required: true,
+              message: `Please Input ${title}!`,
+            },
+          ]}
+        >
+          {inputNode}
+        </Form.Item>
+      ) : dataIndex === "orgName" ? (
+        <Select
+          mode="tags" // Set mode to 'multiple' for multi-select
+          style={{ width: "100%" }} // Set width as per your requirement
+          placeholder="Select orgs"
+          value={record.orgName}
+          tagRender={tagRender}
+          disabled={true}
+        >
+          {orgNameList?.map((e) => {
+            return (
+              <Option value={e} style={{ color: "green" }}>
+                {e}
+              </Option>
+            );
+          })}
+        </Select>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
+
+export default function CreateRequest(props) {
   const [totalOrgs, setTotalOrgs] = useState(0);
 
   const [totalChannel, setTotalChannel] = useState(0);
@@ -79,8 +187,8 @@ export default function CreateRequest() {
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [channelData, setChannelData] = useState([]);
-  const [editingKey, setEditingKey] = useState('');
-  const [channelEditKey, setChannelEditKey] = useState('');
+  const [editingKey, setEditingKey] = useState("");
+  const [channelEditKey, setChannelEditKey] = useState("");
   const isEditing = (record) => record.key === editingKey;
   const isChannelEditing = (record) => record.key === channelEditKey;
   const [orgNameList, setOrgNameList] = useState([]);
@@ -94,10 +202,10 @@ export default function CreateRequest() {
   }, [orgNameList]);
 
   useEffect(() => {
-    // console.log('---------------------data changed', data);
+    console.log("----------333333-----------Final Org Data", data);
     let l = [];
     data?.map((e) => {
-      if (e.orgType != 'Orderer') {
+      if (e.orgType != "Orderer") {
         // orgNameList.push(e.orgName)
         l.push(e.orgName);
       }
@@ -105,11 +213,18 @@ export default function CreateRequest() {
     setOrgNameList(l);
   }, [data]);
 
+  useEffect(() => {
+    console.log(
+      "------------333333---------Final Channel Data is",
+      channelData
+    );
+  }, [channelData]);
+
   // console.log('-----------data111111', data);
 
   const inputChangeHandler = (value) => {
     if (value > 0) {
-      console.log('-------input changed--------', value);
+      console.log("-------input changed--------", value);
 
       setTotalOrgs(value);
     }
@@ -117,35 +232,56 @@ export default function CreateRequest() {
 
   const inputChangeHandlerChannel = (value) => {
     if (value > 0) {
-      console.log('-------input changed--------', value);
+      console.log("-------input changed--------", value);
 
       setTotalChannel(value);
     }
   };
+  const [projectName, setProjectName] = useState("");
+
+  const projectNameChangeHandler = (value) => {
+    setProjectName(value);
+  };
 
   const createChannelConfig = () => {
     let d = [];
-    console.log('---total orgs---------', totalOrgs);
+    console.log("---total orgs---------", totalOrgs);
     let count = parseInt(totalChannel);
     for (let i = 0; i < count; i++) {
       // console.log('===============inside loop', i, count);
       d.push({
         key: i.toString(),
 
-        channelName: 'channel1',
-        orgName: ['Org1', 'Org2'],
-        ChaincodeName: `chaincode1`,
-        endorsement: 'Org1',
-        dataType: 'Channel',
+        channelName: `mychannel${i + 1}`,
+        orgName: orgNameList,
+        ChaincodeName: `chaincode${i + 1}`,
+        endorsement: "Org1",
+        dataType: "Channel",
       });
     }
 
     setChannelData(d);
   };
 
+  const sendRequestDataToServer = async () => {
+    let payload = {
+      projectName,
+      Organizations: data,
+      channels: channelData,
+    };
+
+    let result = await axios.post(
+      "http://localhost:3000/v1/org/",
+      payload,
+      headers()
+    );
+
+    console.log("------------data added successfully--------", result);
+  };
+
   const createConfig = () => {
     let d = [];
-    console.log('---total orgs---------', totalOrgs);
+    console.log("---total orgs---------", totalOrgs);
     let count = parseInt(totalOrgs) + 1;
     for (let i = 0; i < count; i++) {
       if (i === 0) {
@@ -153,22 +289,25 @@ export default function CreateRequest() {
         d.push({
           key: i.toString(),
 
-          orgType: 'Orderer',
-          orgName: 'Orderer',
-          MSP: `OrdererMSP`,
-          peerCount: '3',
-          stateDB: 'NA',
+          orgType: "Orderer",
+          orgName: "Orderer",
+          ca: `orderer-ca`,
+          msp: `OrdererMSP`,
+          peerCount: 3,
+          stateDB: "NA",
+          db: "Not Require",
         });
       } else {
         // console.log('===============inside loop', i, count);
         d.push({
           key: i.toString(),
 
-          orgType: 'Peer',
+          orgType: "Peer",
           orgName: `Org${i}`,
-          MSP: `Org${i}MSP`,
-          peerCount: '1',
-          stateDB: 'Couchdb',
+          ca: `org${i}-ca`,
+          msp: `Org${i}MSP`,
+          peerCount: "1",
+          db: "Couchdb",
         });
       }
     }
@@ -178,10 +317,10 @@ export default function CreateRequest() {
 
   const editChannel = (record) => {
     form.setFieldsValue({
-      channelName: '',
-      orgName: '',
-      ChaincodeName: '',
-      endorsement: '',
+      channelName: "",
+      orgName: "",
+      ChaincodeName: "",
+      endorsement: "",
 
       ...record,
     });
@@ -190,11 +329,11 @@ export default function CreateRequest() {
 
   const edit = (record) => {
     form.setFieldsValue({
-      orgType: '',
-      orgName: '',
-      MSP: '',
-      peerCount: '',
-      stateDB: '',
+      orgType: "",
+      orgName: "",
+      MSP: "",
+      peerCount: "",
+      stateDB: "",
 
       ...record,
     });
@@ -202,10 +341,10 @@ export default function CreateRequest() {
   };
 
   const cancel = () => {
-    setEditingKey('');
+    setEditingKey("");
   };
   const cancelChannel = () => {
-    setChannelEditKey('');
+    setChannelEditKey("");
   };
 
   const save = async (key) => {
@@ -213,21 +352,25 @@ export default function CreateRequest() {
       const row = await form.validateFields();
       const newData = [...data];
       const index = newData.findIndex((item) => key === item.key);
+      console.log("-----rowrowrowrowrow---", row);
       if (index > -1) {
         const item = newData[index];
+        console.log("-----------all info------------", index, item, newData);
+        item.msp = `${row.orgName}MSP`;
+        item.ca = `${row.orgName}-ca`;
         newData.splice(index, 1, {
           ...item,
           ...row,
         });
         setData(newData);
-        setEditingKey('');
+        setEditingKey("");
       } else {
         newData.push(row);
         setData(newData);
-        setEditingKey('');
+        setEditingKey("");
       }
     } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
+      console.log("Validate Failed:", errInfo);
     }
   };
 
@@ -235,67 +378,79 @@ export default function CreateRequest() {
     try {
       const row = await form.validateFields();
       const newData = [...channelData];
-      console.log('-------newData---------', key, newData);
+      console.log("-------newData---------", key, newData);
       const index = newData.findIndex((item) => key === item.key);
       if (index > -1) {
         const item = newData[index];
-        console.log('--------------------before if-----------', item);
-        if (item.dataType == 'Channel' && !Array.isArray(item.orgName)) {
-          console.log('--------------------inside if-----------');
-          item.orgName = item?.orgName?.split(',');
+        console.log("--------------------before if-----------", item);
+        if (item.dataType == "Channel" && !Array.isArray(item.orgName)) {
+          console.log("--------------------inside if-----------");
+          item.orgName = item?.orgName?.split(",");
         } else {
           console.log(
-            '--------------------inside else-----------',
+            "--------------------inside else-----------",
             Array.isArray(item.orgName)
           );
         }
-        console.log('---item----newData---------', item, newData);
+        console.log("---item----newData---------", item, newData);
         newData.splice(index, 1, {
           ...item,
           ...row,
         });
 
-        console.log('-------newData---66666------', newData);
+        console.log("-------newData---66666------", newData);
         setChannelData(newData);
-        setChannelEditKey('');
+        setChannelEditKey("");
       } else {
         newData.push(row);
         setChannelData(newData);
-        setChannelEditKey('');
+        setChannelEditKey("");
       }
     } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
+      console.log("Validate Failed:", errInfo);
     }
   };
 
   const columns = [
     {
-      title: 'Org Type',
-      dataIndex: 'orgType',
-      width: '10%',
+      title: "Org Type",
+      dataIndex: "orgType",
+      width: "15%",
       editable: false,
     },
     {
-      title: 'Org Name',
-      dataIndex: 'orgName',
-      width: '15%',
+      title: "Org Name",
+      dataIndex: "orgName",
+      width: "20%",
       editable: true,
     },
     {
-      title: 'MSP',
-      dataIndex: 'MSP',
-      width: '15%',
+      title: "MSP",
+      dataIndex: "msp",
+      width: "15%",
+      editable: false,
+    },
+    {
+      title: "Certificate Authority",
+      dataIndex: "ca",
+      width: "15%",
+      editable: false,
+    },
+    {
+      title: "Current State DB",
+      dataIndex: "db",
+      width: "15%",
+      editable: false,
+    },
+    {
+      title: "Peer count",
+      dataIndex: "peerCount",
+      width: "10%",
       editable: true,
     },
     {
-      title: 'Peer count',
-      dataIndex: 'peerCount',
-      width: '10%',
-      editable: true,
-    },
-    {
-      title: 'Action',
-      dataIndex: 'operation',
+      title: "Action",
+      dataIndex: "operation",
       render: (_, record) => {
         const editable = isEditing(record);
         return editable ? (
@@ -308,13 +463,13 @@ export default function CreateRequest() {
             >
               Save
             </Typography.Link>
-            <Popconfirm title='Sure to cancel?' onConfirm={cancel}>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
               <a>Cancel</a>
             </Popconfirm>
           </span>
         ) : (
           <Typography.Link
-            disabled={editingKey !== ''}
+            disabled={editingKey !== ""}
             onClick={() => edit(record)}
           >
             Edit
@@ -334,108 +489,46 @@ export default function CreateRequest() {
 
     return editable ? (
       <Select
-        mode='multiple'
-        style={{ width: '100%' }}
-        placeholder='Select organizations'
+        mode="multiple"
+        style={{ width: "100%" }}
+        placeholder="Select organizations"
         value={selectedValues}
         onChange={handleChange}
       >
         {/* {options.map(e=> {
           return <Option value="org1">e</Option>
         })} */}
-        <Option value='org1'>e</Option>
-        <Option value='org2'>Organization 2</Option>
-        <Option value='org3'>Organization 3</Option>
+        <Option value="org1">e</Option>
+        <Option value="org2">Organization 2</Option>
+        <Option value="org3">Organization 3</Option>
       </Select>
     ) : (
       value
     );
   };
 
-  const handleOrgChange = (value, key) => {
-    console.log('---------handleOrgChange---------', value, key);
-    // setData(prevData =>
-    //   prevData.map(item => {
-    //     if (item.key === key) {
-    //       return { ...item, org: value };
-    //     }
-    //     return item;
-    //   })
-    // );
-  };
-
   const channelColumns = [
     {
-      title: 'Channel Name',
-      dataIndex: 'channelName',
-      width: '12%',
-      inputType: 'text',
+      title: "Channel Name",
+      dataIndex: "channelName",
+      width: "25%",
       editable: true,
     },
     {
-      title: 'Participating Orgs',
-      dataIndex: 'orgName',
-      width: '30%',
-      inputType: 'multiSelect',
-      editable: true,
-      // render: (text, record) => {
-      //   const editable = isChannelEditing(record);
-      //   console.log("0000000000000000000Rendering started----00000000000000000", record, editable)
-      //   if (editable) {
-      //     return (
-      //       <Select
-      //         mode='tags'
-      //         style={{ width: '100%' }}
-      //         defaultValue={record.orgName}
-      //       >
-      //         {orgNameList?.map((e) => {
-      //           return <Option value={e}>{e}</Option>;
-      //         })}
-      //       </Select>
-      //     );
-      //   } 
-      // },
-      render: (text, record) =>{
-        const editable = isChannelEditing(record);
-        return editable? (
-        <Select
-        options={orgNameList}
-          mode='multiple' // Set mode to 'multiple' for multi-select
-          style={{ width: '100%' }} // Set width as per your requirement
-          placeholder='Select orgs'
-          // value={record.orgName}
-
-          // onChange={(value) => handleOrgChange(value, record.key)}
-        >
-          {/* {orgNameList?.map((e) => {
-            return <Option value={e}>{e}</Option>;
-          })} */}
-          {/* <Option value="Org1">Org1</Option>
-          <Option value="Org2">Org2</Option>
-          <Option value="Org3">Org3</Option> */}
-        </Select>
-        ) :(
-          Array.isArray(record.orgName)?  record?.orgName?.join(', '): record.orgName
-        )
-      },
-    },
-    {
-      title: 'Chaincode Name',
-      dataIndex: 'ChaincodeName',
-      width: '15%',
-      inputType: 'text',
+      title: "Participating Orgs",
+      dataIndex: "orgName",
+      width: "30%",
       editable: true,
     },
     {
-      title: 'Endorsement Policy',
-      dataIndex: 'endorsement',
-      width: '10%',
-      inputType: 'text',
+      title: "Chaincode Name",
+      dataIndex: "ChaincodeName",
+      width: "25%",
       editable: true,
     },
     {
-      title: 'Action',
-      dataIndex: 'operation',
+      title: "Action",
+      dataIndex: "operation",
       render: (_, record) => {
         const editable = isChannelEditing(record);
         return editable ? (
@@ -448,13 +541,13 @@ export default function CreateRequest() {
             >
               Save
             </Typography.Link>
-            <Popconfirm title='Sure to cancel?' onConfirm={cancelChannel}>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancelChannel}>
               <a>Cancel</a>
             </Popconfirm>
           </span>
         ) : (
           <Typography.Link
-            disabled={channelEditKey !== ''}
+            disabled={channelEditKey !== ""}
             onClick={() => editChannel(record)}
           >
             Edit
@@ -472,7 +565,7 @@ export default function CreateRequest() {
       ...col,
       onCell: (record) => ({
         record,
-        inputType: col.dataIndex === 'orgName' ? 'number' : 'text',
+        inputType: col.dataIndex === "peerCount" ? "number" : "text",
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
@@ -485,29 +578,44 @@ export default function CreateRequest() {
     }
     return {
       ...col,
-      
+
       onCell: (record) => ({
         record,
-        inputType: col.dataIndex === 'orgName' ? 'multiSelect' : 'multiSelect',
+        inputType: col.dataIndex === "orgName" ? "multiSelect" : "multiSelect",
         dataIndex: col.dataIndex,
+        orgNameList: orgNameList,
         title: col.title,
         editing: isChannelEditing(record),
-        
       }),
     };
   });
+  const { addToast } = useToasts();
+
+  const [isValidating, setIsValidating] = useState(false);
+
+  const validateAndCreateRequest = () => {
+    setIsValidating(true);
+    if (!projectName) {
+      addToast(`Please add projectName `, {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
+
+    sendRequestDataToServer();
+  };
 
   return (
     <>
       <Header />
-      <Container className='mt--7' fluid>
+      <Container className="mt--7" fluid>
         <Row>
-          <div className='col'>
-            <Card className='shadow'>
-              <CardHeader className='border-0'>
+          <div className="col">
+            <Card className="shadow">
+              <CardHeader className="border-0">
                 <FormGroup row>
                   <Col sm={9}>
-                    <h3 className='mb-0'>Create Custom Configuration</h3>
+                    <h3 className="mb-0">Create Custom Configuration</h3>
                   </Col>
                 </FormGroup>
               </CardHeader>
@@ -515,101 +623,129 @@ export default function CreateRequest() {
                 <Card>
                   <CardBody>
                     <FormGroup row>
+                      <Label sm={2}>Project Name</Label>
+                      <Col sm={10}>
+                        <Input
+                          value={projectName}
+                          invalid={isValidating && projectName == ""}
+                          onChange={(e) => {
+                            projectNameChangeHandler(e.target.value);
+                          }}
+                          placeholder="Enter Project Name"
+                        />
+                        <FormFeedback>*Required</FormFeedback>
+                      </Col>
+                    </FormGroup>
+                    <Divider />
+
+                    <FormGroup row>
                       <Label sm={2}>Number Of Orgs</Label>
-                      <Col sm={1.2}>
+                      <Col sm={2}>
                         <Input
                           value={totalOrgs}
-                          type='Number'
-                          // invalid={ name == ''}
+                          type="Number"
+                          invalid={isValidating && data?.length == 0}
                           onChange={(e) => {
                             inputChangeHandler(e.target.value);
                           }}
-                          placeholder='please enter name '
+                          placeholder="please enter name "
                         />
 
                         <FormFeedback>*Required</FormFeedback>
                       </Col>
                       <Col sm={4}>
                         <Button
-                          color='primary'
+                          color="primary"
                           onClick={() => {
                             createConfig();
                           }}
                         >
-                          Create Configuration
+                          Create Org Configuration
                         </Button>
                       </Col>
                     </FormGroup>
+                    {data?.length ? (
+                      <FormGroup>
+                        <Form form={form} component={false}>
+                          <Table
+                            components={{
+                              body: {
+                                cell: EditableCell,
+                              },
+                            }}
+                            bordered
+                            dataSource={data}
+                            columns={mergedColumns}
+                            rowClassName="editable-row"
+                            pagination={false}
+                            // pagination={{
+                            //   onChange: cancel,
+                            // }}
+                          />
+                        </Form>
+                      </FormGroup>
+                    ) : null}
                   </CardBody>
                 </Card>
 
-                <FormGroup>
-                  <Form form={form} component={false}>
-                    <Table
-                      components={{
-                        body: {
-                          cell: EditableCell,
-                        },
-                      }}
-                      bordered
-                      dataSource={data}
-                      columns={mergedColumns}
-                      rowClassName='editable-row'
-                      pagination={false}
-                      // pagination={{
-                      //   onChange: cancel,
-                      // }}
-                    />
-                  </Form>
-                </FormGroup>
                 <Card>
                   <CardBody>
                     <FormGroup row>
-                      <Label sm={2}>Number Of Channels</Label>
-                      <Col sm={1.2}>
+                      <Label sm={2}>Channels Count</Label>
+                      <Col sm={2}>
                         <Input
                           value={totalChannel}
-                          type='Number'
+                          type="Number"
                           // invalid={ name == ''}
                           onChange={(e) => {
                             inputChangeHandlerChannel(e.target.value);
                           }}
-                          placeholder='please enter name '
                         />
 
                         <FormFeedback>*Required</FormFeedback>
                       </Col>
                       <Col sm={4}>
                         <Button
-                          color='primary'
+                          color="primary"
                           onClick={() => {
                             createChannelConfig();
                           }}
                         >
-                          Configure Channel
+                          Configure Channels
                         </Button>
                       </Col>
                     </FormGroup>
-
-                    <FormGroup>
-                      <Form form={form} component={false}>
-                        <Table
-                          components={{
-                            body: {
-                              cell: EditableCell,
-                            },
-                          }}
-                          bordered
-                          dataSource={channelData}
-                          columns={mergedColumnsChannel}
-                          rowClassName='editable-row'
-                          pagination={false}
-                          // pagination={{
-                          //   onChange: cancel,
-                          // }}
-                        />
-                      </Form>
-                    </FormGroup>
+                    {channelData?.length ? (
+                      <FormGroup>
+                        <Form form={form} component={false}>
+                          <Table
+                            components={{
+                              body: {
+                                cell: EditableCellChannel,
+                              },
+                            }}
+                            bordered
+                            dataSource={channelData}
+                            columns={mergedColumnsChannel}
+                            rowClassName="editable-row"
+                            pagination={false}
+                            // pagination={{
+                            //   onChange: cancel,
+                            // }}
+                          />
+                        </Form>
+                      </FormGroup>
+                    ) : null}
+                    <Divider></Divider>
+                    <Button
+                      disabled={data?.length == 0 || channelData?.length == 0}
+                      color="primary"
+                      onClick={() => {
+                        validateAndCreateRequest();
+                      }}
+                    >
+                      Submit
+                    </Button>{" "}
                   </CardBody>
                 </Card>
               </CardBody>

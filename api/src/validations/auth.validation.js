@@ -12,6 +12,14 @@ const register = {
   }),
 };
 
+const loginGoogleAuth = {
+  body: Joi.object().keys({
+    credential: Joi.string().required(),
+    clientId: Joi.string().required(),
+    select_by: Joi.string().required(),
+  }),
+};
+
 const login = {
   body: Joi.object().keys({
     email: Joi.string().required(),
@@ -55,4 +63,5 @@ module.exports = {
   refreshTokens,
   forgotPassword,
   resetPassword,
+  loginGoogleAuth
 };

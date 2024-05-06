@@ -5,7 +5,7 @@ const { toJSON, paginate } = require('./plugins');
 const organizationSchema = new mongoose.Schema(
   {
     configuration: {
-      type: [Object],
+      type: Object,
       required: true,
     },
     status: {

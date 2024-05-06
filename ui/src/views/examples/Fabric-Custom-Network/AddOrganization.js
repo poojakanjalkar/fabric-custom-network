@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Modal,
@@ -16,8 +16,13 @@ import {
   DropdownMenu,
   DropdownItem,
   CustomInput,
-} from 'reactstrap';
-import { useToasts } from 'react-toast-notifications';
+  Table,
+  Row,
+  CardHeader,
+  CardBody,
+  Container,
+} from "reactstrap";
+import { useToasts } from "react-toast-notifications";
 
 // import type { TableProps } from 'antd';
 import {
@@ -25,44 +30,8 @@ import {
   Input as antDInput,
   InputNumber,
   Popconfirm,
-  Table,
   Typography,
-} from 'antd';
-
-const EditableCell = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  ...restProps
-}) => {
-  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{
-            margin: 0,
-          }}
-          rules={[
-            {
-              required: true,
-              message: `Please Input ${title}!`,
-            },
-          ]}
-        >
-          {inputNode}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
+} from "antd";
 
 export default function AddOrganization(props) {
   const { toggle, modal, className } = props;
@@ -75,91 +44,69 @@ export default function AddOrganization(props) {
   const [isValidating, setIsValidating] = useState(false);
 
   const initialData = [];
+  useEffect(() => {
+    console.log(
+      "___swlected -----------------item changed___",
+      props.selectedItem
+    );
+  }, [props.selectedItem]);
 
-  for (let i = 0; i < 100; i++) {
-    initialData.push({
-      key: i.toString(),
-      name: `Edward ${i}`,
-      age: 32,
-      address: `London Park no. ${i}`,
-    });
-  }
+  // useEffect(() => {
+  //   console.log("$$$$$$$$$$$$$", props.selectedItem.Organizations.length);
+  // }, [props.selectedItem.Organizations.length]);
 
   const [form] = Form.useForm();
   const [data, setData] = useState(initialData);
-  const [editingKey, setEditingKey] = useState('');
+  const [editingKey, setEditingKey] = useState("");
   const isEditing = (record) => record.key === editingKey;
   const edit = (record) => {
     form.setFieldsValue({
-      name: '',
-      age: '',
-      address: '',
+      name: "",
+      age: "",
+      address: "",
       ...record,
     });
     setEditingKey(record.key);
   };
 
   const cancel = () => {
-    setEditingKey('');
-  };
-
-  const save = async (key) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...data];
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setData(newData);
-        setEditingKey('');
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
+    setEditingKey("");
   };
 
   const columns = [
     {
-      title: 'Org Type',
-      dataIndex: 'name',
-      width: '10%',
+      title: "Org Type",
+      dataIndex: "name",
+      width: "10%",
       editable: true,
     },
     {
-      title: 'Org Name',
-      dataIndex: 'name',
-      width: '15%',
+      title: "Org Name",
+      dataIndex: "name",
+      width: "15%",
       editable: true,
     },
     {
-      title: 'MSP',
-      dataIndex: 'age',
-      width: '15%',
+      title: "MSP",
+      dataIndex: "age",
+      width: "15%",
       editable: true,
     },
     {
-      title: 'Peer count',
-      dataIndex: 'address',
-      width: '10%',
+      title: "Peer count",
+      dataIndex: "address",
+      width: "10%",
       editable: true,
     },
     {
-      title: 'Chaincode',
-      dataIndex: 'address',
-      width: '10%',
+      title: "Chaincode",
+      dataIndex: "address",
+      width: "10%",
       editable: true,
     },
     {
-      title: 'State DB',
-      dataIndex: 'operation',
+      title: "State DB",
+      dataIndex: "operation",
       render: (_, record) => {
         const editable = isEditing(record);
         return editable ? (
@@ -172,13 +119,13 @@ export default function AddOrganization(props) {
             >
               Save
             </Typography.Link>
-            <Popconfirm title='Sure to cancel?' onConfirm={cancel}>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
               <a>Cancel</a>
             </Popconfirm>
           </span>
         ) : (
           <Typography.Link
-            disabled={editingKey !== ''}
+            disabled={editingKey !== ""}
             onClick={() => edit(record)}
           >
             Edit
@@ -188,163 +135,72 @@ export default function AddOrganization(props) {
     },
   ];
 
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        inputType: col.dataIndex === 'age' ? 'number' : 'text',
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record),
-      }),
-    };
-  });
-
-  const { addToast } = useToasts();
-  const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
-
-  const validateAndAddDevice = () => {
-    let isInvalid = false;
-
-    setIsValidating(true);
-
-    if (name == '') {
-      addToast(`Please enter correct name`, {
-        appearance: 'error',
-        autoDismiss: true,
-      });
-      isInvalid = true;
-    }
-
-    if (msp == '') {
-      addToast(`Please enter MSP`, {
-        appearance: 'error',
-        autoDismiss: true,
-      });
-      isInvalid = true;
-    }
-
-    if (numberOfPeers == '') {
-      addToast(`Please enter number of peers`, {
-        appearance: 'error',
-        autoDismiss: true,
-      });
-      isInvalid = true;
-    }
-
-    if (currentStateDb == '') {
-      addToast(`Please enter current state db`, {
-        appearance: 'error',
-        autoDismiss: true,
-      });
-      isInvalid = true;
-    }
-
-    if (!isInvalid) {
-      // handleDropdownSelect();
-      addOrganization();
-    }
-  };
-
-  const inputChangeHandler = (value, fieldName) => {
-    switch (fieldName) {
-      // case "selectedItem":
-      //   setSelectedItem(value);
-      //   break;
-      case 'name':
-        setName(value);
-        break;
-      case 'msp':
-        setMsp(value);
-        break;
-      case 'numberOfPeers':
-        setNumberOfPeers(value);
-        break;
-      case 'currentStateDb':
-        setCurrentStateDb(value);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const addOrganization = () => {
-    let organization = {
-      type: type,
-      name: name,
-      msp: msp,
-      numberOfPeers: numberOfPeers,
-      currentStateDb: currentStateDb,
-    };
-
-    console.log('OOOOOOOOO', organization);
-    props.addOrganizationItem(organization);
-    // props.handleDropdownSelect(selectedItem);
-    props.toggle();
-    resetInput();
-  };
-
-  const resetInput = () => {
-    setType('');
-    setName('');
-    setMsp('');
-    setNumberOfPeers('');
-    setCurrentStateDb('');
-  };
-
-  const toggleDropdownItem = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
-
-  const handleDropdownSelect = (type) => {
-    setType(type);
-    // props.handleDropdownSelect(item);
-    setDropdownOpen(false);
-  };
-
   const [organizations, setOrganizations] = useState([]);
 
   const handleAddOrgs = () => {};
   return (
     <div>
-      <Modal isOpen={modal} toggle={toggle} className={className} size={'xl'}>
+      <Modal isOpen={modal} toggle={toggle} className={className} size={"xl"}>
         <ModalHeader toggle={toggle}>Add Organization Details</ModalHeader>
 
         <>
-          <Card className='bg-secondary  px-md-2'>
+          <Card className="bg-secondary  px-md-2">
             <ModalBody>
               <FormGroup row>
                 <Label sm={2}>Number Of Orgs</Label>
-                <Col sm={8}>
+                <Col sm={2}>
                   <Input
-                    value={name}
-                    type='Number'
-                    invalid={isValidating && name == ''}
-                    onChange={(e) => {
-                      inputChangeHandler(e.target.value, 'name');
-                    }}
-                    placeholder='please enter name '
-                  />
-
+                    type="text"
+                    value={
+                      props?.selectedItem?.configuration?.Organizations?.length
+                    }
+                    disabled
+                  ></Input>
                   <FormFeedback>*Required</FormFeedback>
                 </Col>
-                <Col sm={2}>
+                {/* <Col sm={2}>
                   <Button
-                    color='primary'
+                    color="primary"
                     onClick={() => {
                       validateAndAddDevice();
                     }}
                   >
                     Add Orgs
                   </Button>
-                </Col>
+                </Col> */}
               </FormGroup>
 
-              <FormGroup>
+              <Table
+                className="align-items-center table-flush"
+                striped
+                bordered
+                hover
+              >
+                <thead className="thead-light">
+                  <tr>
+                    <th>Project Name</th>
+                    <th>Org Count</th>
+                    <th>Channel Count</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <td>{props.selectedItem?.configuration?.projectName}</td>
+                  <td>
+                    {props.selectedItem?.configuration?.Organizations?.map(
+                      (e) => e.orgName + ", "
+                    )}
+                  </td>
+                  <td>
+                    {props.selectedItem?.configuration?.channels?.map(
+                      (e) => e.channelName + ", "
+                    )}
+                  </td>
+                  <td>{props.selectedItem?.status}</td>
+                </tbody>
+              </Table>
+              {/* <FormGroup>
                 <Form form={form} component={false}>
                   <Table
                     components={{
@@ -355,34 +211,34 @@ export default function AddOrganization(props) {
                     bordered
                     dataSource={data}
                     columns={mergedColumns}
-                    rowClassName='editable-row'
+                    rowClassName="editable-row"
                     pagination={{
                       onChange: cancel,
                     }}
                   />
                 </Form>
-              </FormGroup>
+              </FormGroup> */}
 
-              <FormGroup row>
+              {/* <FormGroup row>
                 <Label sm={2}>Type</Label>
                 <Col sm={10}>
-                  <>
-                    {/* // invalid={isValidating && name == ""}
+                  <> */}
+              {/* // invalid={isValidating && name == ""}
                     // onChange={(e) => { */}
-                    {/* //   inputChangeHandler(e.target.value, "name");
+              {/* //   inputChangeHandler(e.target.value, "name");
                     // }} */}
-                    <Dropdown isOpen={dropdownOpen} toggle={toggleDropdownItem}>
+              {/* <Dropdown isOpen={dropdownOpen} toggle={toggleDropdownItem}>
                       <DropdownToggle caret>
-                        {type ? type : 'Select an item'}
+                        {type ? type : "Select an item"}
                       </DropdownToggle>
                       <DropdownMenu>
                         <DropdownItem
-                          onClick={() => handleDropdownSelect('Peer')}
+                          onClick={() => handleDropdownSelect("Peer")}
                         >
                           Peer
                         </DropdownItem>
                         <DropdownItem
-                          onClick={() => handleDropdownSelect('Orderer')}
+                          onClick={() => handleDropdownSelect("Orderer")}
                         >
                           Orderer
                         </DropdownItem>
@@ -392,79 +248,78 @@ export default function AddOrganization(props) {
 
                   <FormFeedback>*Required</FormFeedback>
                 </Col>
-              </FormGroup>
-              <form>
-                <FormGroup row>
+              </FormGroup> */}
+
+              {/* <FormGroup row>
                   <Label sm={2}>Name</Label>
                   <Col sm={10}>
                     <Input
                       value={name}
-                      invalid={isValidating && name == ''}
+                      invalid={isValidating && name == ""}
                       onChange={(e) => {
-                        inputChangeHandler(e.target.value, 'name');
+                        inputChangeHandler(e.target.value, "name");
                       }}
-                      placeholder='please enter name '
+                      placeholder="please enter name "
                     />
                     <FormFeedback>*Required</FormFeedback>
                   </Col>
-                </FormGroup>
-                <FormGroup row>
+                </FormGroup> */}
+              {/* <FormGroup row>
                   <Label sm={2}>MSP</Label>
                   <Col sm={10}>
                     <Input
                       value={msp}
-                      invalid={isValidating && msp == ''}
+                      invalid={isValidating && msp == ""}
                       onChange={(e) => {
-                        inputChangeHandler(e.target.value, 'msp');
+                        inputChangeHandler(e.target.value, "msp");
                       }}
-                      placeholder='please enter MSP '
+                      placeholder="please enter MSP "
                     />
                     <FormFeedback>*Required</FormFeedback>
                   </Col>
-                </FormGroup>
-                <FormGroup row>
+                </FormGroup> */}
+              {/* <FormGroup row>
                   <Label sm={2}>Number Of Peers</Label>
                   <Col sm={10}>
                     <Input
                       value={numberOfPeers}
-                      type='Number'
-                      invalid={isValidating && numberOfPeers == ''}
+                      type="Number"
+                      invalid={isValidating && numberOfPeers == ""}
                       onChange={(e) => {
-                        inputChangeHandler(e.target.value, 'numberOfPeers');
+                        inputChangeHandler(e.target.value, "numberOfPeers");
                       }}
-                      placeholder='Enter number of peers'
+                      placeholder="Enter number of peers"
                     />
                     <FormFeedback>*Required</FormFeedback>
                   </Col>
-                </FormGroup>
-                <FormGroup row>
+                </FormGroup> */}
+              {/* <FormGroup row>
                   <Label sm={2}>Current State DB</Label>
                   <Col sm={10}>
                     <Input
                       value={currentStateDb}
-                      invalid={isValidating && currentStateDb == ''}
+                      invalid={isValidating && currentStateDb == ""}
                       onChange={(e) => {
-                        inputChangeHandler(e.target.value, 'currentStateDb');
+                        inputChangeHandler(e.target.value, "currentStateDb");
                       }}
-                      placeholder='please enter current state DB'
+                      placeholder="please enter current state DB"
                     />
                     <FormFeedback>*Required</FormFeedback>
                   </Col>
-                </FormGroup>
-              </form>
+                </FormGroup> */}
             </ModalBody>
           </Card>
 
           <ModalFooter>
             <Button
-              color='primary'
+              color="primary"
               onClick={() => {
                 validateAndAddDevice();
               }}
             >
               Submit
-            </Button>{' '}
-            <Button color='secondary' onClick={toggle}>
+            </Button>{" "}
+            <Button color="secondary" onClick={toggle}>
               Cancel
             </Button>
           </ModalFooter>
