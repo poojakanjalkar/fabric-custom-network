@@ -20,6 +20,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import ProgressBar from "../ProgressBar";
 import {
   Form,
   Input as antDInput,
@@ -36,7 +37,8 @@ import AddOrganization from "./AddOrganization";
 
 import { useToasts } from "react-toast-notifications";
 import { headers } from "helper/config";
-
+import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 const { Option } = Select;
 // import type { TableProps } from 'antd';
 
@@ -184,6 +186,10 @@ export default function CreateRequest(props) {
 
   const [totalChannel, setTotalChannel] = useState(0);
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  let history = useHistory();
+
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [channelData, setChannelData] = useState([]);
@@ -269,12 +275,19 @@ export default function CreateRequest(props) {
       Organizations: data,
       channels: channelData,
     };
-
-    let result = await axios.post(
-      "http://localhost:3000/v1/org/",
-      payload,
-      headers()
-    );
+    setIsLoading(true);
+    try {
+      let result = await axios.post(
+        "http://localhost:3000/v1/org/",
+        payload,
+        headers()
+      );
+      history.push("/admin/Organization");
+    } catch (error) {
+      console.log("error occured");
+    } finally {
+      setIsLoading(false);
+    }
 
     console.log("------------data added successfully--------", result);
   };
@@ -619,136 +632,140 @@ export default function CreateRequest(props) {
                   </Col>
                 </FormGroup>
               </CardHeader>
-              <CardBody>
-                <Card>
-                  <CardBody>
-                    <FormGroup row>
-                      <Label sm={2}>Project Name</Label>
-                      <Col sm={10}>
-                        <Input
-                          value={projectName}
-                          invalid={isValidating && projectName == ""}
-                          onChange={(e) => {
-                            projectNameChangeHandler(e.target.value);
-                          }}
-                          placeholder="Enter Project Name"
-                        />
-                        <FormFeedback>*Required</FormFeedback>
-                      </Col>
-                    </FormGroup>
-                    <Divider />
-
-                    <FormGroup row>
-                      <Label sm={2}>Number Of Orgs</Label>
-                      <Col sm={2}>
-                        <Input
-                          value={totalOrgs}
-                          type="Number"
-                          invalid={isValidating && data?.length == 0}
-                          onChange={(e) => {
-                            inputChangeHandler(e.target.value);
-                          }}
-                          placeholder="please enter name "
-                        />
-
-                        <FormFeedback>*Required</FormFeedback>
-                      </Col>
-                      <Col sm={4}>
-                        <Button
-                          color="primary"
-                          onClick={() => {
-                            createConfig();
-                          }}
-                        >
-                          Create Org Configuration
-                        </Button>
-                      </Col>
-                    </FormGroup>
-                    {data?.length ? (
-                      <FormGroup>
-                        <Form form={form} component={false}>
-                          <Table
-                            components={{
-                              body: {
-                                cell: EditableCell,
-                              },
+              {isLoading ? (
+                <ProgressBar />
+              ) : (
+                <CardBody>
+                  <Card>
+                    <CardBody>
+                      <FormGroup row>
+                        <Label sm={2}>Project Name</Label>
+                        <Col sm={10}>
+                          <Input
+                            value={projectName}
+                            invalid={isValidating && projectName == ""}
+                            onChange={(e) => {
+                              projectNameChangeHandler(e.target.value);
                             }}
-                            bordered
-                            dataSource={data}
-                            columns={mergedColumns}
-                            rowClassName="editable-row"
-                            pagination={false}
-                            // pagination={{
-                            //   onChange: cancel,
-                            // }}
+                            placeholder="Enter Project Name"
                           />
-                        </Form>
+                          <FormFeedback>*Required</FormFeedback>
+                        </Col>
                       </FormGroup>
-                    ) : null}
-                  </CardBody>
-                </Card>
+                      <Divider />
 
-                <Card>
-                  <CardBody>
-                    <FormGroup row>
-                      <Label sm={2}>Channels Count</Label>
-                      <Col sm={2}>
-                        <Input
-                          value={totalChannel}
-                          type="Number"
-                          // invalid={ name == ''}
-                          onChange={(e) => {
-                            inputChangeHandlerChannel(e.target.value);
-                          }}
-                        />
-
-                        <FormFeedback>*Required</FormFeedback>
-                      </Col>
-                      <Col sm={4}>
-                        <Button
-                          color="primary"
-                          onClick={() => {
-                            createChannelConfig();
-                          }}
-                        >
-                          Configure Channels
-                        </Button>
-                      </Col>
-                    </FormGroup>
-                    {channelData?.length ? (
-                      <FormGroup>
-                        <Form form={form} component={false}>
-                          <Table
-                            components={{
-                              body: {
-                                cell: EditableCellChannel,
-                              },
+                      <FormGroup row>
+                        <Label sm={2}>Number Of Orgs</Label>
+                        <Col sm={2}>
+                          <Input
+                            value={totalOrgs}
+                            type="Number"
+                            invalid={isValidating && data?.length == 0}
+                            onChange={(e) => {
+                              inputChangeHandler(e.target.value);
                             }}
-                            bordered
-                            dataSource={channelData}
-                            columns={mergedColumnsChannel}
-                            rowClassName="editable-row"
-                            pagination={false}
-                            // pagination={{
-                            //   onChange: cancel,
-                            // }}
+                            placeholder="please enter name "
                           />
-                        </Form>
+
+                          <FormFeedback>*Required</FormFeedback>
+                        </Col>
+                        <Col sm={4}>
+                          <Button
+                            color="primary"
+                            onClick={() => {
+                              createConfig();
+                            }}
+                          >
+                            Create Org Configuration
+                          </Button>
+                        </Col>
                       </FormGroup>
-                    ) : null}
-                    <Divider></Divider>
-                    <Button
-                      disabled={data?.length == 0 || channelData?.length == 0}
-                      color="primary"
-                      onClick={() => {
-                        validateAndCreateRequest();
-                      }}
-                    >
-                      Submit
-                    </Button>{" "}
-                  </CardBody>
-                </Card>
-              </CardBody>
+                      {data?.length ? (
+                        <FormGroup>
+                          <Form form={form} component={false}>
+                            <Table
+                              components={{
+                                body: {
+                                  cell: EditableCell,
+                                },
+                              }}
+                              bordered
+                              dataSource={data}
+                              columns={mergedColumns}
+                              rowClassName="editable-row"
+                              pagination={false}
+                              // pagination={{
+                              //   onChange: cancel,
+                              // }}
+                            />
+                          </Form>
+                        </FormGroup>
+                      ) : null}
+                    </CardBody>
+                  </Card>
+
+                  <Card>
+                    <CardBody>
+                      <FormGroup row>
+                        <Label sm={2}>Channels Count</Label>
+                        <Col sm={2}>
+                          <Input
+                            value={totalChannel}
+                            type="Number"
+                            // invalid={ name == ''}
+                            onChange={(e) => {
+                              inputChangeHandlerChannel(e.target.value);
+                            }}
+                          />
+
+                          <FormFeedback>*Required</FormFeedback>
+                        </Col>
+                        <Col sm={4}>
+                          <Button
+                            color="primary"
+                            onClick={() => {
+                              createChannelConfig();
+                            }}
+                          >
+                            Configure Channels
+                          </Button>
+                        </Col>
+                      </FormGroup>
+                      {channelData?.length ? (
+                        <FormGroup>
+                          <Form form={form} component={false}>
+                            <Table
+                              components={{
+                                body: {
+                                  cell: EditableCellChannel,
+                                },
+                              }}
+                              bordered
+                              dataSource={channelData}
+                              columns={mergedColumnsChannel}
+                              rowClassName="editable-row"
+                              pagination={false}
+                              // pagination={{
+                              //   onChange: cancel,
+                              // }}
+                            />
+                          </Form>
+                        </FormGroup>
+                      ) : null}
+                      <Divider></Divider>
+                      <Button
+                        disabled={data?.length == 0 || channelData?.length == 0}
+                        color="primary"
+                        onClick={() => {
+                          validateAndCreateRequest();
+                        }}
+                      >
+                        Submit
+                      </Button>{" "}
+                    </CardBody>
+                  </Card>
+                </CardBody>
+              )}
             </Card>
           </div>
         </Row>
