@@ -29,6 +29,7 @@ import { map } from "jquery";
 import "@fortawesome/fontawesome-free/css/all.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faDownload } from "@fortawesome/free-solid-svg-icons";
+import ViewOrgTable from "./ViewOrgTable";
 export default function Organization() {
   const [orgList, setOrgList] = useState([
     {
@@ -44,9 +45,12 @@ export default function Organization() {
 
   const [pageCount, setPageCount] = useState(0);
   const [paginationData, setPaginationData] = useState({ selectedPage: 0 });
-
+  const [selectedItem, setSelectedItem] = useState();
   const [modal, setModal] = useState(false);
-  const toggleModal = () => {
+  const toggleModal = (row) => {
+    if (row) {
+      setSelectedItem(row);
+    }
     setModal(!modal);
   };
 
@@ -90,28 +94,25 @@ export default function Organization() {
   //   console.log("---dropdown value--", result);
   // };
 
-  const [selectedItem, setSelectedItem] = useState();
+  // useEffect(() => {
+  //   console.log("0000000000-----", selectedItem);
+  // }, [selectedItem]);
 
-  useEffect(() => {
-    console.log("0000000000-----", selectedItem);
-  }, [selectedItem]);
+  // const ItemView = (item) => {
+  //   console.log("^%^^%&&^^&%^&%^$^&$^&$-----------", item);
+  //   setSelectedItem(item);
 
-  const ItemView = (item) => {
-    console.log("^%^^%&&^^&%^&%^$^&$^&$-----------", item);
-    setSelectedItem(item);
-
-    toggleModal();
-  };
+  //   toggleModal();
+  // };
 
   return (
     <>
       <Header />
-      <AddOrganization
+
+      <ViewOrgTable
         toggle={toggleModal}
         modal={modal}
         selectedItem={selectedItem}
-        addOrganizationItem={addOrganizationItem}
-        // handleDropdownSelect={handleDropdownSelect}
       />
       <Container className="mt--7" fluid>
         <Row>
@@ -165,7 +166,7 @@ export default function Organization() {
                           <td>{request?.status}</td>
                           {/* <td>{request?.configuration?.currentStateDb}</td> */}
                           <td>
-                            <Button onClick={() => ItemView(request)}>
+                            <Button onClick={() => toggleModal(request)}>
                               <FontAwesomeIcon icon={faEye} />
                             </Button>
                             <span style={{ marginRight: "15px" }}></span>
