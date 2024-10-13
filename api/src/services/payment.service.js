@@ -11,10 +11,10 @@ const createPayment = async (data) => {
       txId: data?.payload?.payment?.entity?.id,
       email: data?.payload?.payment?.entity?.notes?.email,
       name: data?.payload?.payment?.entity?.notes?.name,
-      amount:data?.payload?.payment?.entity?.amount,
+      amount: data?.payload?.payment?.entity?.amount,
       currency: data?.payload?.payment?.entity?.currency,
       status: data?.payload?.payment?.entity?.status,
-      fee:data?.payload?.payment?.entity?.fee,
+      fee: data?.payload?.payment?.entity?.fee,
       event: data?.event,
     };
     let txData = new Transaction(t);
@@ -22,15 +22,15 @@ const createPayment = async (data) => {
 
     await txData.save();
 
-    let sub = await  Subscription.findOne({email: t.email}).exec()
-    console.log("-----------cp1-----------------", sub)
-    if(sub){
-      console.log("-----------cp2 if-----------------")
-      let newAmount = sub.amount + t.amount
-      console.log("-----------cp2.1-----------------", newAmount)
-      await Subscription.updateOne({}, {$set: {amount:newAmount}})
-    }else{
-      console.log("-----------cp3 else-----------------")
+    let sub = await Subscription.findOne({ email: t.email }).exec();
+    console.log('-----------cp1-----------------', sub);
+    if (sub) {
+      console.log('-----------cp2 if-----------------');
+      let newAmount = sub.amount + t.amount;
+      console.log('-----------cp2.1-----------------', newAmount);
+      await Subscription.updateOne({ email: t.email }, { $set: { amount: newAmount } });
+    } else {
+      console.log('-----------cp3 else-----------------');
       let s = {
         email: t.email,
         name: t.name,
@@ -39,17 +39,15 @@ const createPayment = async (data) => {
       };
       if (t.amount >= 1) {
         s.credit = 10;
-      }else {
+      } else {
         s.credit = 1;
       }
       console.log('-------------subscription--------------', s);
       let subscription = new Subscription(s);
       await subscription.save();
     }
-
-    
   } catch (error) {
-    console.log("Error occurred---------", error)
+    console.log('Error occurred---------', error);
   }
 };
 
