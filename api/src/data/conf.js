@@ -11,10 +11,10 @@ const staticMasterData = {
       stateDB: 'NA',
       db: 'Not Require',
     },
-    { key: '1', orgType: 'Peer', orgName: 'Org1', ca: 'org1-ca', msp: 'Org1MSP', peerCount: '1',peerPorts:[7051], db: 'Couchdb' },
-    { key: '2', orgType: 'Peer', orgName: 'Org2', ca: 'org2-ca', msp: 'Org2MSP', peerCount: '1',peerPorts:[8051], db: 'Couchdb' },
-    { key: '3', orgType: 'Peer', orgName: 'Org3', ca: 'org3-ca', msp: 'Org3MSP', peerCount: '1',peerPorts:[9051], db: 'Couchdb' },
-    { key: '4', orgType: 'Peer', orgName: 'Org4', ca: 'org4-ca', msp: 'Org4MSP', peerCount: '2',peerPorts:[10051, 11051], db: 'Couchdb' },
+    { key: '1', orgType: 'Peer', orgName: 'Org1', ca: 'org1-ca', msp: 'Org1MSP', peerCount: '1', peerPorts: [7051], db: 'Couchdb' },
+    { key: '2', orgType: 'Peer', orgName: 'Org2', ca: 'org2-ca', msp: 'Org2MSP', peerCount: '1', peerPorts: [8051], db: 'Couchdb' },
+    { key: '3', orgType: 'Peer', orgName: 'Org3', ca: 'org3-ca', msp: 'Org3MSP', peerCount: '1', peerPorts: [9051], db: 'Couchdb' },
+    { key: '4', orgType: 'Peer', orgName: 'Org4', ca: 'org4-ca', msp: 'Org4MSP', peerCount: '2', peerPorts: [10051, 11051], db: 'Couchdb' },
   ],
   channels: [
     {
@@ -589,6 +589,48 @@ const configFileJSONData = () => {
   };
 };
 
+let d = {
+  projectName: 'test22',
+  Organizations: [
+    {
+      key: '0',
+      orgType: 'Orderer',
+      orgName: 'Orderer',
+      ca: 'orderer-ca',
+      msp: 'OrdererMSP',
+      peerCount: 3,
+      stateDB: 'NA',
+      db: 'Not Require',
+    },
+    { key: '1', orgType: 'Peer', orgName: 'Org1', ca: 'org1-ca', msp: 'Org1MSP', peerCount: '1', db: 'Couchdb' },
+    { key: '2', orgType: 'Peer', orgName: 'Org2', ca: 'org2-ca', msp: 'Org2MSP', peerCount: '1', db: 'Couchdb' },
+    { key: '3', orgType: 'Peer', orgName: 'Org3', ca: 'org3-ca', msp: 'Org3MSP', peerCount: '1', db: 'Couchdb' },
+    { key: '4', orgType: 'Peer', orgName: 'Org4', ca: 'org4-ca', msp: 'Org4MSP', peerCount: '1', db: 'Couchdb' },
+    { key: '5', orgType: 'Peer', orgName: 'Org5', ca: 'org5-ca', msp: 'Org5MSP', peerCount: '1', db: 'Couchdb' },
+  ],
+  channels: [
+    {
+      key: '0',
+      channelName: 'mychannel1',
+      orgName: ['Org1', 'Org3', 'Org5'],
+      ChaincodeName: 'chaincode1',
+      endorsement: 'Org1',
+      dataType: 'Channel',
+    },
+    {
+      key: '1',
+      channelName: 'mychannel2',
+      orgName: ['Org1', 'Org2', 'Org3', 'Org4', 'Org5'],
+      ChaincodeName: 'chaincode2',
+      endorsement: 'Org1',
+      dataType: 'Channel',
+    }]
+  }
+
+
+
+
+
 module.exports = {
   staticMasterData,
-};
+}

@@ -6,32 +6,17 @@ const { registerUser } = require('./blockchainUtils');
 const staticUser = [
   {
     name: 'max',
-    email: 'pavan11124@gmail.com',
+    email: 'adhavpavan1@gmail.com',
     orgId: 1,
     password: config.commonPassword,
-    department: ORG_DEPARTMENT.LEGAL,
-  },
-  {
-    name: 'jon',
-    email: 'pavan1231@gmail.com',
-    orgId: 2,
-    password: config.commonPassword,
-    department: ORG_DEPARTMENT.LEGAL,
-  },
-  {
-    name: 'jon',
-    email: 'pavan13111@gmail.com',
-    orgId: 3,
-    password: config.commonPassword,
+    type: USER_TYPE.ADMIN,
     department: ORG_DEPARTMENT.LEGAL,
   },
 ];
 
 const ingestBootstrapData = async () => {
   const staticOrgData = [
-    { name: 'Org1', id: 1, parentId: 1 },
-    { name: 'Org2', id: 2, parentId: 1 },
-    { name: 'Org3', id: 3, parentId: 1 },
+    { name: 'Pavan', id: 1, parentId: 1 },
   ];
   
   //org data
@@ -62,17 +47,8 @@ const ingestBootstrapData = async () => {
         password: user.password,
         status: USER_STATUS.ACTIVE,
         type: USER_TYPE.ADMIN,
-        department: user.department,
+        isVerified: true
       });
-      try {
-        //Blockchain Registration and Enrollment call
-        let secret = await registerUser(`org${user.orgId}`, user.email);
-        newUser.secret = secret;
-        newUser.isVerified = true;
-      } catch (error) {
-        console.log("-----Error occured while registring user-----", error)
-      }
-     
       await newUser.save();
 
       console.log('----ingest static user data--', user.email);

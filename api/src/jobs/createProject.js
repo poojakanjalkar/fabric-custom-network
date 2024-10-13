@@ -4,20 +4,21 @@ const yaml = require('js-yaml');
 const path = require('path');
 
 
-const projectName = './Project123';
+const projectName = 'NetworksData';
 
 let firstCAPort = 7054;
 let firstPeerPort = 7050;
 
 
-const createProject = (data1) => {
+const createUserProject = (user, folderName) => {
   //
 
   const data = staticMasterData;
-  console.log(data);
-  // const projectName = './Project123';
-  if (fs.existsSync(projectName)) {
-    fs.mkdirSync(projectName, { recursive: true });
+  // console.log(data);
+  const userFolder = `${folderName}/${user}/${folderName}`;
+  console.log("-------", userFolder)
+  if (!fs.existsSync(userFolder)) {
+    fs.mkdirSync(userFolder, { recursive: true });
   }
 };
 
@@ -27,9 +28,18 @@ const createFileIfNotExist = (filePath) => {
   }
 };
 
+const getFinalFolder= (projectName, email, networkName)=> {
+  return  `${__dirname}/${projectName}/${email}/${networkName}`;
+}
+
 // docker-compose file for CA
 
-const createCADockerComposeFile = (staticMasterData) => {
+const createCADockerComposeFile = (staticMasterData, userFolder) => {
+
+  // const userFolder =  getFinalFolder()
+
+
+
   let finalData = {
     version: '2.1',
     networks: {
@@ -38,7 +48,7 @@ const createCADockerComposeFile = (staticMasterData) => {
     services: {},
   };
 
-  let filePath = `${projectName}/blockchain/artifacts/channel/create-certificate-with-ca/`;
+  let filePath = `${userFolder}/blockchain/artifacts/channel/create-certificate-with-ca/`;
   createFileIfNotExist(filePath);
   let caPort = firstCAPort;
 
@@ -74,8 +84,8 @@ const createCADockerComposeFile = (staticMasterData) => {
 // createCADockerComposeFile(staticMasterData);
 
 // 2
-const createCryptoConfigScript = (staticMasterData) => {
-  let filePath = `${projectName}/blockchain/artifacts/channel/create-certificate-with-ca/`;
+const createCryptoConfigScript = (staticMasterData, userFolder) => {
+  let filePath = `${userFolder}/blockchain/artifacts/channel/create-certificate-with-ca/`;
 
   let finalContent = `#!/bin/bash
 echo "Hello, this is a shell script created with Node.js!"
@@ -322,7 +332,7 @@ let callingFunctions = ''
 // createCryptoConfigScript(staticMasterData);
 
 // 3
-const createConfigTxFile = (staticMasterData) => {
+const createConfigTxFile = (staticMasterData, userFolder) => {
   let finalObject = {};
 
   let orgs = [];
@@ -556,17 +566,6 @@ const createConfigTxFile = (staticMasterData) => {
 
   finalObject.Profiles = {};
 
-  // {
-  //   key: '0',
-  //   channelName: 'mychannel1',
-  //   orgName: ['Org1', 'Org2', 'Org3', 'Org4'],
-  //   ChaincodeName: 'chaincode1',
-  //   endorsement: 'Org1',
-  //   dataType: 'Channel',
-  // },
-
-  let profile;
-
   // let channelOrgs;
   for (let channel of staticMasterData.channels) {
     let channelsOrgs = finalObject.Organizations.filter((item1) => channel?.orgName?.some((item2) => item1.Name === item2));
@@ -644,7 +643,7 @@ const createConfigTxFile = (staticMasterData) => {
     };
   }
 
-  let filePath = `${projectName}/blockchain/artifacts/channel/`;
+  let filePath = `${userFolder}/blockchain/artifacts/channel/`;
 
   const yamlData = yaml.dump(finalObject);
   fs.writeFileSync(`${filePath}configtx.yaml`, yamlData, 'utf8');
@@ -653,8 +652,8 @@ const createConfigTxFile = (staticMasterData) => {
 
 // createProject()
 
-const createArtifacts = (staticMasterData) => {
-  let filePath = `${projectName}/blockchain/artifacts/channel/`;
+const createArtifacts = (staticMasterData, userFolder) => {
+  let filePath = `${userFolder}/blockchain/artifacts/channel/`;
   createFileIfNotExist(filePath);
   let finalContent = `#!/bin/bash
   echo "Hello, this is a shell script created with Node.js!"
@@ -670,12 +669,12 @@ const createArtifacts = (staticMasterData) => {
     finalContent = finalContent + '\n' + channelContent;
   }
 
-  fs.writeFileSync(`${filePath}create-artifacts.sh`, finalContent, 'utf8');
+  fs.writeFileSync(`${filePath}/create-artifacts.sh`, finalContent, 'utf8');
 };
 
 // createArtifacts(staticMasterData)
 
-const createServicesDockerComposeFile = (staticMasterData) => {
+const createServicesDockerComposeFile = (staticMasterData, userFolder) => {
   let finalData = {
     // version: '2.1',
     networks: {
@@ -684,7 +683,7 @@ const createServicesDockerComposeFile = (staticMasterData) => {
     services: {},
   };
 
-  let filePath = `${projectName}/blockchain/artifacts/`;
+  let filePath = `${userFolder}/blockchain/artifacts/`;
   createFileIfNotExist(filePath);
 
   let couchDBStart = 1;
@@ -799,7 +798,7 @@ const createServicesDockerComposeFile = (staticMasterData) => {
   fs.writeFileSync(`${filePath}.env`, 'COMPOSE_PROJECT_NAME=artifacts', 'utf8');
 };
 
-createServicesDockerComposeFile(staticMasterData)
+// createServicesDockerComposeFile(staticMasterData)
 
 
 async function copyDirectory(src, dest) {
@@ -830,17 +829,18 @@ async function copyDirectory(src, dest) {
   }
 }
 
-const copyAllStaticFiles = ()=> {
+const copyAllStaticFiles = (userFolder)=> {
   // Copy Config folder
   // const sourceFolderRelative = '../../../blockchain/artifacts/channel/config';
-  const sourceFolder = path.resolve(process.cwd(), '../../../blockchain/artifacts/channel/config');
-  let destinationFolder = `${projectName}/blockchain/artifacts/channel/config`;
+  // const sourceFolder = path.resolve(process.cwd(), '../../../blockchain/artifacts/channel/config');
+  const sourceFolder = __dirname+'/'+'../../../blockchain/artifacts/channel/config';
+  let destinationFolder = `${userFolder}/blockchain/artifacts/channel/config`;
 
   copyDirectory(sourceFolder, destinationFolder);
 
   // copy chaincode
-  const chaincodeSourceFolder = path.resolve(process.cwd(), '../../../blockchain/artifacts/chaincode/javascript');
-  let chaincodeDestinationFolder = `${projectName}/blockchain/artifacts/chaincode/javascript`;
+  const chaincodeSourceFolder =__dirname+'/'+'../../../blockchain/artifacts/chaincode/javascript';
+  let chaincodeDestinationFolder = `${userFolder}/blockchain/artifacts/chaincode/javascript`;
   copyDirectory(chaincodeSourceFolder, chaincodeDestinationFolder);
 }
 
@@ -849,11 +849,11 @@ const copyAllStaticFiles = ()=> {
 
 
 //Verified-----------
-const createEnvVarScript = (staticMasterData) => {
+const createEnvVarScript = (staticMasterData, userFolder) => {
   let ordererOrg = staticMasterData.Organizations.find((elm) => elm.orgType === 'Orderer');
   let ordererCount = ordererOrg.peerCount;
 
-  let filePath = `${projectName}/blockchain/scripts/`;
+  let filePath = `${userFolder}/blockchain/scripts/`;
   createFileIfNotExist(filePath);
 
   let helperFunctions = `
@@ -1001,8 +1001,8 @@ setGlobals() {
 // createEnvVarScript(staticMasterData)
 
 // Verified-----------
-const createChannelScript = (staticMasterData) => {
-  let filePath = `${projectName}/blockchain/scripts/`;
+const createChannelScript = (staticMasterData, userFolder) => {
+  let filePath = `${userFolder}/blockchain/scripts/`;
   createFileIfNotExist(filePath);
 
   for (let channel of staticMasterData?.channels) {
@@ -1071,8 +1071,8 @@ const createChannelScript = (staticMasterData) => {
 
 // createChannelScript(staticMasterData)
 
-const createDeployChaincodeScript = (staticMasterData) => {
-  let filePath = `${projectName}/blockchain/scripts/`;
+const createDeployChaincodeScript = (staticMasterData, userFolder) => {
+  let filePath = `${userFolder}/blockchain/scripts/`;
   createFileIfNotExist(filePath);
   let i = 0;
 
@@ -1305,8 +1305,84 @@ const createDeployChaincodeScript = (staticMasterData) => {
   }
 };
 
-createDeployChaincodeScript(staticMasterData);
+// createDeployChaincodeScript(staticMasterData);
+
+// const fs = require('fs');
+const archiver = require('archiver');
+// const path = require('path');
+
+const createZipFile = (userFolder, outputPath)=> {
+
+  // const folderToZip = path.join(__dirname, 'your-folder-name');  // Replace with your folder
+const zipFilePath = userFolder+ new Date()+'.zip'//path.join(__dirname, 'output.zip');        // Output ZIP file path
+
+// createZip(userFolder, zipFilePath);
+  const output = fs.createWriteStream(outputPath);
+  const archive = archiver('zip', {
+    zlib: { level: 9 } // Sets the compression level.
+  });
+
+  // Listen for all archive data to be written.
+  output.on('close', () => {
+    console.log(`${archive.pointer()} total bytes`);
+    console.log('ZIP file has been finalized and the output file descriptor has closed.');
+  });
+
+  // Catch any warnings (e.g., stat failures) or errors.
+  archive.on('warning', (err) => {
+    if (err.code === 'ENOENT') {
+      console.warn('Warning:', err);
+    } else {
+      throw err;
+    }
+  });
+
+  archive.on('error', (err) => {
+    throw err;
+  });
+
+  // Pipe archive data to the file.
+  archive.pipe(output);
+
+  // Append files from the specified folder.
+  archive.directory(userFolder, false);
+
+  // Finalize the archive (i.e., no more files will be added).
+  archive.finalize();
+}
+
+
+const initiateProjectCreation = (staticMasterData, email, networkName) => {
+
+  try {
+    const userFolder =  getFinalFolder(projectName, email, networkName )
+    console.log("------userFolder----", userFolder)
+    createUserProject(email, networkName )
+  
+    createCADockerComposeFile(staticMasterData, userFolder)
+    createCryptoConfigScript(staticMasterData, userFolder);
+    createConfigTxFile(staticMasterData, userFolder)
+    createArtifacts(staticMasterData, userFolder)
+    createServicesDockerComposeFile(staticMasterData, userFolder)
+    copyAllStaticFiles( userFolder)
+    createEnvVarScript(staticMasterData, userFolder)
+    createChannelScript(staticMasterData, userFolder)
+    createDeployChaincodeScript(staticMasterData, userFolder);
+
+    createZipFile(userFolder,`${__dirname}/${projectName}/${email}/${networkName}.zip`)
+  } catch (error) {
+    
+    console.log("--------error--------", error)
+  }
 
 
 
+}
 
+// initiateProjectCreation(staticMasterData, 'adhavpavan@gmail.com', 'testNetwork2')
+
+
+
+module.exports = {
+  initiateProjectCreation
+}

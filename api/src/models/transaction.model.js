@@ -8,8 +8,7 @@ const TxSchema = mongoose.Schema({
   amount: { type: Number, required: true },
   currency: { type: String, required: true },
   status: { type: String, required: true },
-  fee: { type: Number, required: true },
-  event: { type: String, required: true },
+  fee: { type: Number, required: false },
 });
 
 const Transaction = mongoose.model('Transaction', TxSchema);

@@ -72,18 +72,22 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-// userSchema.methods.isPasswordMatch = async function (password) {
-//   const user = this;
-//   return bcrypt.compare(password, user.password);
-// };
+userSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  return bcrypt.compare(password, user.password);
+};
 
-// userSchema.pre('save', async function (next) {
-//   const user = this;
-//   if (user.isModified('password')) {
-//     user.password = await bcrypt.hash(user.password, 8);
-//   }
-//   next();
-// });
+userSchema.pre('save', async function (next) {
+  const user = this;
+  if(user.password){
+    
+    if (user.isModified('password')) {
+      user.password = await bcrypt.hash(user.password, 8);
+    }
+  }
+
+  next();
+});
 userSchema.plugin(mongoosePaginate);
 /**
  * @typedef User
