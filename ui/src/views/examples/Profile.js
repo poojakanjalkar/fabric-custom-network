@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 // import Razorpay from 'razorpay';
 
 // reactstrap components
@@ -13,11 +13,13 @@ import {
   Container,
   Row,
   Col,
-} from 'reactstrap';
+} from "reactstrap";
 // core components
-import UserHeader from '../../components/Headers/UserHeader.js';
+import UserHeader from "../../components/Headers/UserHeader.js";
 // import { useSelector } from 'react-redux';
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
+import { headers } from "helper/config.js";
+import axios from "axios";
 // import Razorpay from 'razorpay';
 
 class Profile extends React.Component {
@@ -39,8 +41,8 @@ class Profile extends React.Component {
   };
 
   // razorpay = new Razorpay();
-  startPayment = async()=> {
 
+  startPayment = async () => {
     const res = await this.loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
@@ -56,24 +58,36 @@ class Profile extends React.Component {
       amount: 1 * 100,
       name: "Pavan Tech Academy",
       description: "Thanks for purchasing",
-      customer:{
-        name:JSON.parse(localStorage.getItem('user-data'))
-        .name,
-        email: JSON.parse(localStorage.getItem('user-data'))
-        .email
+      customer: {
+        name: JSON.parse(localStorage.getItem("user-data")).name,
+        email: JSON.parse(localStorage.getItem("user-data")).email,
       },
       // image:
       //   "https://mern-blog-akky.herokuapp.com/static/media/logo.8c649bfa.png",
 
-      handler: function (response) {
+      handler: async function (response) {
         // alert(response.razorpay_payment_id);
         // alert("Payment Successfully");
+        console.log("++++++++++*******+++++*****+++++");
+        let subscription = await axios.get(
+          "http://localhost:3000/v1/org/credit",
+          headers()
+        );
+        console.log(
+          "_______get subscription creditttt_____________",
+          subscription.data
+        );
+
+        useEffect(() => {
+          console.log(
+            "++++++++subscription user creditt++++++ ",
+            subscription.data
+          );
+        }, [subscription.data]);
       },
-      notes:{
-        name:JSON.parse(localStorage.getItem('user-data'))
-        .name,
-        email: JSON.parse(localStorage.getItem('user-data'))
-        .email
+      notes: {
+        name: JSON.parse(localStorage.getItem("user-data")).name,
+        email: JSON.parse(localStorage.getItem("user-data")).email,
       },
       prefill: {
         name: "Pavan Tech Academy",
@@ -82,21 +96,20 @@ class Profile extends React.Component {
 
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
+  };
 
-
-  }
   render() {
     return (
       <>
         <UserHeader />
         {/* Page content */}
-        <Container className='mt--7' fluid>
+        <Container className="mt--7" fluid>
           <Row>
-            <Col className='order-xl-2 mb-5 mb-xl-0' xl='4'>
-              <Card className='card-profile shadow'>
-                <Row className='justify-content-center'>
-                  <Col className='order-lg-2' lg='3'>
-                    <div className='card-profile-image'>
+            <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
+              <Card className="card-profile shadow">
+                <Row className="justify-content-center">
+                  <Col className="order-lg-2" lg="3">
+                    <div className="card-profile-image">
                       {/* <a href="#pablo" onClick={e => e.preventDefault()}>
                         <img
                           alt="..."
@@ -107,19 +120,23 @@ class Profile extends React.Component {
                     </div>
                   </Col>
                 </Row>
-                <CardBody className='pt-0 pt-md-4 mt-5'>
+                <CardBody className="pt-0 pt-md-4 mt-5">
                   <Form>
-                    <h6 className='heading-small text-muted mb-4'>
+                    <h6 className="heading-small text-muted mb-4">
                       Subscription
                     </h6>
-                    <h6 className='heading-small text-muted mb-4'>
-                      <div className='h5 font-weight-300'>
-                        <i className='ni location_pin mr-2' />
-                        {` Total Credit - ${(JSON.parse(localStorage.getItem('user-data'))).subscription?.credit}`}
+                    <h6 className="heading-small text-muted mb-4">
+                      <div className="h5 font-weight-300">
+                        <i className="ni location_pin mr-2" />
+                        {` Total Credit - ${
+                          JSON.parse(localStorage.getItem("user-data"))?.credit
+                        }`}
+
+                        {/* {` Total Credit - ${credit}`} */}
                       </div>
-                      <div className='h5 font-weight-300'>
-                        <i className='ni location_pin mr-2' />
-                        {` Used Credit - 0`}
+                      <div className="h5 font-weight-300">
+                        <i className="ni location_pin mr-2" />
+                        {/* {` Used Credit - ${creditUsed}`} */}
                       </div>
                       {/* <div className='h5 font-weight-300'>
                         <i className='ni location_pin mr-2' />
@@ -128,8 +145,8 @@ class Profile extends React.Component {
                     </h6>
 
                     <Button
-                      color='info'
-                      href='#pablo'
+                      color="info"
+                      href="#pablo"
                       onClick={(e) => this.startPayment()}
                     >
                       Buy Credit
@@ -138,14 +155,14 @@ class Profile extends React.Component {
                 </CardBody>
               </Card>
             </Col>
-            <Col className='order-xl-1' xl='8'>
-              <Card className='bg-secondary shadow'>
-                <CardHeader className='bg-white border-0'>
-                  <Row className='align-items-center'>
-                    <Col xs='8'>
-                      <h3 className='mb-0'>My account</h3>
+            <Col className="order-xl-1" xl="8">
+              <Card className="bg-secondary shadow">
+                <CardHeader className="bg-white border-0">
+                  <Row className="align-items-center">
+                    <Col xs="8">
+                      <h3 className="mb-0">My account</h3>
                     </Col>
-                    <Col className='text-right' xs='4'>
+                    <Col className="text-right" xs="4">
                       {/* <Button
                         color="primary"
                         href="#pablo"
@@ -159,48 +176,48 @@ class Profile extends React.Component {
                 </CardHeader>
                 <CardBody>
                   <Form>
-                    <h6 className='heading-small text-muted mb-4'>
+                    <h6 className="heading-small text-muted mb-4">
                       User information
                     </h6>
-                    <div className='pl-lg-4'>
+                    <div className="pl-lg-4">
                       <Row>
-                        <Col lg='6'>
+                        <Col lg="6">
                           <FormGroup>
                             <label
-                              className='form-control-label'
-                              htmlFor='input-username'
+                              className="form-control-label"
+                              htmlFor="input-username"
                             >
                               Name
                             </label>
                             <Input
-                              className='form-control-alternative'
-                              defaultValue='lucky.jesse'
-                              id='input-username'
-                              placeholder='Username'
-                              type='text'
+                              className="form-control-alternative"
+                              defaultValue="lucky.jesse"
+                              id="input-username"
+                              placeholder="Username"
+                              type="text"
                               value={
-                                JSON.parse(localStorage.getItem('user-data'))
+                                JSON.parse(localStorage.getItem("user-data"))
                                   .name
                               }
                               disabled={true}
                             />
                           </FormGroup>
                         </Col>
-                        <Col lg='6'>
+                        <Col lg="6">
                           <FormGroup>
                             <label
-                              className='form-control-label'
-                              htmlFor='input-email'
+                              className="form-control-label"
+                              htmlFor="input-email"
                             >
                               Email address
                             </label>
                             <Input
-                              className='form-control-alternative'
-                              id='input-email'
-                              placeholder='jesse@example.com'
-                              type='email'
+                              className="form-control-alternative"
+                              id="input-email"
+                              placeholder="jesse@example.com"
+                              type="email"
                               value={
-                                JSON.parse(localStorage.getItem('user-data'))
+                                JSON.parse(localStorage.getItem("user-data"))
                                   .email
                               }
                               disabled={true}
@@ -245,7 +262,7 @@ class Profile extends React.Component {
                         </Col>
                       </Row> */}
                     </div>
-                    <hr className='my-4' />
+                    <hr className="my-4" />
                     {/* Address */}
                   </Form>
                 </CardBody>

@@ -2,6 +2,8 @@ const httpStatus = require('http-status');
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { registerUser } = require('../utils/blockchainUtils');
+const catchAsync = require('../utils/catchAsync');
+const Subscription = require('../models/subscription.model');
 
 /**
  * Create a user
@@ -73,26 +75,30 @@ const updateUserById = async (userId, updateBody) => {
  */
 const updateUserStatus = async (userId, status) => {
   const user = await getUserById(userId);
- 
+
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
 
   try {
-    if(!user.secret){
+    if (!user.secret) {
       //Blockchain Registration and Enrollment call
       let secret = await registerUser(`org${user.orgId}`, user.email, user.department);
-      user.secret = secret
-      user.isVerified = true
+      user.secret = secret;
+      user.isVerified = true;
     }
   } catch (error) {
-    console.log("Error occured--", error)
+    console.log('Error occured--', error);
   }
-  
 
-  user.status = status
+  user.status = status;
   await user.save();
   return user;
+};
+
+const getSubscriptionData = async (user) => {
+  let subscription = await Subscription.findOne({ email: user.email });
+  return subscription;
 };
 
 /**
@@ -116,5 +122,6 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
-  updateUserStatus
+  updateUserStatus,
+  getSubscriptionData,
 };

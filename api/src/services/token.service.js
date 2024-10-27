@@ -69,7 +69,7 @@ const verifyToken = async (token, type) => {
  */
 const generateAuthTokens = async (user) => {
   let org = await Organization.findOne({ id: user.orgId });
-  let subscription = await Subscription.findOne({email:user.email}).exec()
+  let subscription = await Subscription.findOne({ email: user.email }).exec();
 
   let userData = {
     email: user.email,
@@ -78,25 +78,20 @@ const generateAuthTokens = async (user) => {
     name: user.name,
     id: user.id,
     subscription,
-    isSubscribed: subscription? true: false,
+    credit: subscription.credit,
+    isSubscribed: subscription ? true : false,
   };
 
   const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
   const accessToken = generateToken(userData, accessTokenExpires, tokenTypes.ACCESS);
-
 
   return {
     access: {
       token: accessToken,
       expires: accessTokenExpires.toDate(),
     },
-    
   };
 };
-
-
-
-
 
 module.exports = {
   generateToken,
