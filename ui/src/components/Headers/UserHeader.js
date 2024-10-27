@@ -11,7 +11,7 @@ class UserHeader extends React.Component {
         <div
           className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
           style={{
-            minHeight: "600px",
+            minHeight: "400px",
             // backgroundImage:
             //   "url(" + require("../../assets/img/theme/profile-cover.jpg") + ")",
             backgroundSize: "cover",
@@ -24,7 +24,7 @@ class UserHeader extends React.Component {
           <Container className="d-flex align-items-center" fluid>
             <Row>
               <Col lg="7" md="10">
-                <h2 className="display-3 text-white">{`Hello ${(JSON.parse(localStorage.getItem('user-data')).name)}` }</h2>
+                <h2 className="display-4 text-white">{`Hello ${(JSON.parse(localStorage.getItem('user-data')).name)}`}</h2>
                 {/* <p className="text-white mt-0 mb-5">
                  Profile details
                 </p> */}

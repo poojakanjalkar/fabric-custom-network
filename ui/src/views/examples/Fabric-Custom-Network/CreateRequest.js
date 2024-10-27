@@ -42,6 +42,7 @@ import { useHistory } from "react-router-dom";
 const { Option } = Select;
 // import type { TableProps } from 'antd';
 
+
 const EditableCell = ({
   editing,
   dataIndex,
@@ -71,8 +72,8 @@ const EditableCell = ({
           {inputNode}
         </Form.Item>
       ) : (
-        children
-      )}
+          children
+        )}
     </td>
   );
 };
@@ -124,8 +125,8 @@ const EditableCellChannel = ({
         style={{ width: "100%" }} // Set width as per your requirement
         placeholder="Select orgs"
         tagRender={tagRender}
-        // value={record.orgName}
-        // onChange={(value) => handleOrgChange(value, record.key)}
+      // value={record.orgName}
+      // onChange={(value) => handleOrgChange(value, record.key)}
       >
         {orgNameList?.map((e) => {
           return (
@@ -136,8 +137,8 @@ const EditableCellChannel = ({
         })}
       </Select>
     ) : (
-      <Input />
-    );
+        <Input />
+      );
 
   // console.log('-----------ssssssssssssssssssss-----', orgNameList);
   return (
@@ -175,8 +176,8 @@ const EditableCellChannel = ({
           })}
         </Select>
       ) : (
-        children
-      )}
+            children
+          )}
     </td>
   );
 };
@@ -227,6 +228,21 @@ export default function CreateRequest(props) {
   }, [channelData]);
 
   // console.log('-----------data111111', data);
+
+  const [checkboxes, setCheckboxes] = useState({
+    caliper: true,
+    api: true,
+    blockchainExplorer: true,
+  });
+
+  // Handle checkbox change
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setCheckboxes({
+      ...checkboxes,
+      [name]: checked,
+    });
+  };
 
   const inputChangeHandler = (value) => {
     if (value > 0) {
@@ -299,7 +315,7 @@ export default function CreateRequest(props) {
           appearance: "success",
           autoDismiss: true,
         });
-      history.push("/admin/Organization");
+        history.push("/admin/Organization");
       }
     } catch (error) {
       console.log("error occured", error);
@@ -497,13 +513,13 @@ export default function CreateRequest(props) {
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            Edit
-          </Typography.Link>
-        );
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+            >
+              Edit
+            </Typography.Link>
+          );
       },
     },
   ];
@@ -532,8 +548,8 @@ export default function CreateRequest(props) {
         <Option value="org3">Organization 3</Option>
       </Select>
     ) : (
-      value
-    );
+        value
+      );
   };
 
   const channelColumns = [
@@ -575,13 +591,13 @@ export default function CreateRequest(props) {
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link
-            disabled={channelEditKey !== ""}
-            onClick={() => editChannel(record)}
-          >
-            Edit
-          </Typography.Link>
-        );
+            <Typography.Link
+              disabled={channelEditKey !== ""}
+              onClick={() => editChannel(record)}
+            >
+              Edit
+            </Typography.Link>
+          );
       },
     },
   ];
@@ -651,137 +667,176 @@ export default function CreateRequest(props) {
               {isLoading ? (
                 <ProgressBar />
               ) : (
-                <CardBody>
-                  <Card>
-                    <CardBody>
-                      <FormGroup row>
-                        <Label sm={2}>Project Name</Label>
-                        <Col sm={10}>
-                          <Input
-                            value={projectName}
-                            invalid={isValidating && projectName == ""}
-                            onChange={(e) => {
-                              projectNameChangeHandler(e.target.value);
-                            }}
-                            placeholder="Enter Project Name"
-                          />
-                          <FormFeedback>*Required</FormFeedback>
-                        </Col>
-                      </FormGroup>
-                      <Divider />
-
-                      <FormGroup row>
-                        <Label sm={2}>Number Of Orgs</Label>
-                        <Col sm={2}>
-                          <Input
-                            value={totalOrgs}
-                            type="Number"
-                            invalid={isValidating && data?.length == 0}
-                            onChange={(e) => {
-                              inputChangeHandler(e.target.value);
-                            }}
-                            placeholder="please enter name "
-                          />
-
-                          <FormFeedback>*Required</FormFeedback>
-                        </Col>
-                        <Col sm={4}>
-                          <Button
-                            color="primary"
-                            onClick={() => {
-                              createConfig();
-                            }}
-                          >
-                            Create Org Configuration
-                          </Button>
-                        </Col>
-                      </FormGroup>
-                      {data?.length ? (
-                        <FormGroup>
-                          <Form form={form} component={false}>
-                            <Table
-                              components={{
-                                body: {
-                                  cell: EditableCell,
-                                },
+                  <CardBody>
+                    <Card>
+                      <CardBody>
+                        <FormGroup row>
+                          <Label sm={2}>Project Name</Label>
+                          <Col sm={10}>
+                            <Input
+                              value={projectName}
+                              invalid={isValidating && projectName == ""}
+                              onChange={(e) => {
+                                projectNameChangeHandler(e.target.value);
                               }}
-                              bordered
-                              dataSource={data}
-                              columns={mergedColumns}
-                              rowClassName="editable-row"
-                              pagination={false}
+                              placeholder="Enter Project Name"
+                            />
+                            <FormFeedback>*Required</FormFeedback>
+                          </Col>
+                        </FormGroup>
+                        <Divider />
+
+                        <FormGroup row>
+                          <Label sm={2}>Number Of Orgs</Label>
+                          <Col sm={2}>
+                            <Input
+                              value={totalOrgs}
+                              type="Number"
+                              invalid={isValidating && data?.length == 0}
+                              onChange={(e) => {
+                                inputChangeHandler(e.target.value);
+                              }}
+                              placeholder="please enter name "
+                            />
+
+                            <FormFeedback>*Required</FormFeedback>
+                          </Col>
+                          <Col sm={4}>
+                            <Button
+                              color="primary"
+                              onClick={() => {
+                                createConfig();
+                              }}
+                            >
+                              Create Org Configuration
+                          </Button>
+                          </Col>
+                        </FormGroup>
+                        {data?.length ? (
+                          <FormGroup>
+                            <Form form={form} component={false}>
+                              <Table
+                                components={{
+                                  body: {
+                                    cell: EditableCell,
+                                  },
+                                }}
+                                bordered
+                                dataSource={data}
+                                columns={mergedColumns}
+                                rowClassName="editable-row"
+                                pagination={false}
                               // pagination={{
                               //   onChange: cancel,
                               // }}
-                            />
-                          </Form>
-                        </FormGroup>
-                      ) : null}
-                    </CardBody>
-                  </Card>
+                              />
+                            </Form>
+                          </FormGroup>
+                        ) : null}
+                      </CardBody>
+                    </Card>
 
-                  <Card>
-                    <CardBody>
-                      <FormGroup row>
-                        <Label sm={2}>Channels Count</Label>
-                        <Col sm={2}>
-                          <Input
-                            value={totalChannel}
-                            type="Number"
-                            // invalid={ name == ''}
-                            onChange={(e) => {
-                              inputChangeHandlerChannel(e.target.value);
-                            }}
-                          />
-
-                          <FormFeedback>*Required</FormFeedback>
-                        </Col>
-                        <Col sm={4}>
-                          <Button
-                            color="primary"
-                            onClick={() => {
-                              createChannelConfig();
-                            }}
-                          >
-                            Configure Channels
-                          </Button>
-                        </Col>
-                      </FormGroup>
-                      {channelData?.length ? (
-                        <FormGroup>
-                          <Form form={form} component={false}>
-                            <Table
-                              components={{
-                                body: {
-                                  cell: EditableCellChannel,
-                                },
+                    <Card>
+                      <CardBody>
+                        <FormGroup row>
+                          <Label sm={2}>Channels Count</Label>
+                          <Col sm={2}>
+                            <Input
+                              value={totalChannel}
+                              type="Number"
+                              // invalid={ name == ''}
+                              onChange={(e) => {
+                                inputChangeHandlerChannel(e.target.value);
                               }}
-                              bordered
-                              dataSource={channelData}
-                              columns={mergedColumnsChannel}
-                              rowClassName="editable-row"
-                              pagination={false}
+                            />
+
+                            <FormFeedback>*Required</FormFeedback>
+                          </Col>
+                          <Col sm={4}>
+                            <Button
+                              color="primary"
+                              onClick={() => {
+                                createChannelConfig();
+                              }}
+                            >
+                              Configure Channels
+                          </Button>
+                          </Col>
+                        </FormGroup>
+                        {channelData?.length ? (
+                          <FormGroup>
+                            <Form form={form} component={false}>
+                              <Table
+                                components={{
+                                  body: {
+                                    cell: EditableCellChannel,
+                                  },
+                                }}
+                                bordered
+                                dataSource={channelData}
+                                columns={mergedColumnsChannel}
+                                rowClassName="editable-row"
+                                pagination={false}
                               // pagination={{
                               //   onChange: cancel,
                               // }}
+                              />
+                            </Form>
+                          </FormGroup>
+
+
+
+                        ) : null}
+                        <Divider></Divider>
+                        <FormGroup row>
+                          <Label sm={2}>
+                            <Input
+                              type="checkbox"
+                              name="caliper"
+                              checked={checkboxes.caliper}
+                              onChange={handleCheckboxChange}
+                              disabled={true}
                             />
-                          </Form>
+                          Caliper
+                        </Label>
+
+
+
+                          <Label sm={2}>
+                            <Input
+                              type="checkbox"
+                              name="api"
+                              checked={checkboxes.api}
+                              onChange={handleCheckboxChange}
+                              disabled={true}
+                            />
+                            API
+                         </Label>
+                          <Label sm={4}>
+                            <Input
+                              type="checkbox"
+                              name="blockchainExplorer"
+                              checked={checkboxes.blockchainExplorer}
+                              onChange={handleCheckboxChange}
+                              disabled={true}
+                            />
+                            Blockchain Explorer
+                          </Label>
                         </FormGroup>
-                      ) : null}
-                      <Divider></Divider>
-                      <Button
-                        disabled={data?.length == 0 || channelData?.length == 0}
-                        color="primary"
-                        onClick={() => {
-                          validateAndCreateRequest();
-                        }}
-                      >
-                        Submit
+
+                        <Button
+                          disabled={data?.length == 0 || channelData?.length == 0}
+                          color="primary"
+                          onClick={() => {
+                            validateAndCreateRequest();
+                          }}
+                        >
+                          Submit
                       </Button>{" "}
-                    </CardBody>
-                  </Card>
-                </CardBody>
-              )}
+                      </CardBody>
+                    </Card>
+                  </CardBody>
+                )}
             </Card>
           </div>
         </Row>

@@ -67,23 +67,25 @@ export default function Organization() {
     });
   };
 
-  const handleDownloadClick = async(id) => {
-    let h = headers()
-    h.headers.Accept = 'application/zip'
-    h.headers['Access-Control-Allow-Origin']= '*'
-    h.responseType = 'arraybuffer'
+  const handleDownloadClick = async (id) => {
+    let h = headers();
+    h.headers.Accept = "application/zip";
+    h.headers["Access-Control-Allow-Origin"] = "*";
+    h.responseType = "arraybuffer";
     let result = await axios.get(
       `http://localhost:3000/v1/org/download/${id}`,
       h
     );
 
-    const url = window.URL.createObjectURL(new Blob([result.data], { type: 'application/zip' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'file.zip';
-      link.click();
+    const url = window.URL.createObjectURL(
+      new Blob([result.data], { type: "application/zip" })
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "file.zip";
+    link.click();
 
-      window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(url);
     console.log(
       "----------------dsfgdsrfgdfhdfhdhdthdthjjjjjjjjjjjjjj-----------",
       result.data
@@ -147,12 +149,12 @@ export default function Organization() {
                     <h3 className="mb-0">Organization Data</h3>
                   </Col>
                   <Col sm={3}>
-                    <Button
+                    {/* <Button
                       className="my-1"
                       color="primary"
                       onClick={toggleModal}
                       type="button"
-                    ></Button>
+                    ></Button> */}
                   </Col>
                 </FormGroup>
                 <Table
@@ -177,15 +179,9 @@ export default function Organization() {
                         <tr>
                           <td>{request?.configuration?.projectName}</td>
                           <td>
-                            {request?.configuration?.Organizations?.map(
-                              (e) => e.orgName + ", "
-                            )}
+                            {request?.configuration?.Organizations?.length}
                           </td>
-                          <td>
-                            {request?.configuration?.channels?.map(
-                              (e) => e.channelName + ", "
-                            )}
-                          </td>
+                          <td>{request?.configuration?.channels?.length}</td>
                           <td>{request?.status}</td>
                           {/* <td>{request?.configuration?.currentStateDb}</td> */}
                           <td>
@@ -194,7 +190,10 @@ export default function Organization() {
                             </Button>
                             <span style={{ marginRight: "15px" }}></span>
 
-                            <FontAwesomeIcon onClick={()=> handleDownloadClick(request?.id)} icon={faDownload} />
+                            <FontAwesomeIcon
+                              onClick={() => handleDownloadClick(request?.id)}
+                              icon={faDownload}
+                            />
                           </td>
                           {/* <Button color="success" onClick={""}>
                            
