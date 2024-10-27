@@ -289,7 +289,6 @@ export default function CreateRequest(props) {
       setIsLoading(false);
     }
 
-    console.log("------------data added successfully--------", result);
   };
 
   const createConfig = () => {

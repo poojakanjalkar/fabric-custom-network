@@ -1,7 +1,11 @@
 const OrgService = require('../services/org.service');
+const path = require("path");
+const fs = require("fs");
 const httpStatus = require('http-status');
-const { getSuccessResponse } = require('../utils/Response');
+const { getSuccessResponse, getErrorResponse } = require('../utils/Response');
 const { getPagination } = require('../utils/pagination');
+const FileService = require('../services/file.service');
+const Org = require('../models/org.model');
 
 const getAllOrganizations = async (req, res) => {
   const { page, size } = req.query;
@@ -42,10 +46,44 @@ const deleteOrganization = async (req, res) => {
   res.status(httpStatus.OK).send(getSuccessResponse(httpStatus.OK, 'organization deleted successfully', organization));
 };
 
+const downloadFile = async(req, res) => {
+  let { filename, projectId } = req.params;
+  const { user } = req.loggerInfo;
+  let org = await Org.findById(projectId)
+  filename = org._id+'.zip'
+  try {
+    // Get file path from the service
+    const filePath = FileService.getUserFile(user.email, filename);
+    console.log("================", user, filename, filePath)
+
+
+    fs.exists(filePath, (exists) => {
+      if (!exists) {
+        res
+          .status(httpStatus.NOT_FOUND)
+          .send(getErrorResponse(httpStatus.NOT_FOUND, "No project found", 'No project found'))
+        return;
+      }
+
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Disposition');
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', `attachment; filename="file.zip"`);
+
+      const readStream = fs.createReadStream(filePath);
+      readStream.pipe(res);
+    });
+
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllOrganizations,
   getOrganizationById,
   createOrganization,
   updateOrganization,
   deleteOrganization,
+  downloadFile
 };

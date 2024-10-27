@@ -67,6 +67,29 @@ export default function Organization() {
     });
   };
 
+  const handleDownloadClick = async(id) => {
+    let h = headers()
+    h.headers.Accept = 'application/zip'
+    h.headers['Access-Control-Allow-Origin']= '*'
+    h.responseType = 'arraybuffer'
+    let result = await axios.get(
+      `http://localhost:3000/v1/org/download/${id}`,
+      h
+    );
+
+    const url = window.URL.createObjectURL(new Blob([result.data], { type: 'application/zip' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'file.zip';
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+    console.log(
+      "----------------dsfgdsrfgdfhdfhdhdthdthjjjjjjjjjjjjjj-----------",
+      result.data
+    );
+  };
+
   const addOrganizationItem = (organization) => {
     setOrgList([...orgList, organization]);
     // console.log("++++++++++++", result);
@@ -171,7 +194,7 @@ export default function Organization() {
                             </Button>
                             <span style={{ marginRight: "15px" }}></span>
 
-                            <FontAwesomeIcon icon={faDownload} />
+                            <FontAwesomeIcon onClick={()=> handleDownloadClick(request?.id)} icon={faDownload} />
                           </td>
                           {/* <Button color="success" onClick={""}>
                            
