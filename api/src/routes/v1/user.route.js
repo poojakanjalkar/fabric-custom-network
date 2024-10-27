@@ -1,5 +1,5 @@
 const express = require('express');
-const {auth, adminAuth} = require('../../middlewares/auth');
+const { auth, adminAuth } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const userValidation = require('../../validations/user.validation');
 const userController = require('../../controllers/user.controller');
@@ -11,10 +11,8 @@ const router = express.Router();
 // // .put(adminAuth, validate(userValidation.updateUserStatus), userController.updateUserStatus)
 // .get(adminAuth, validate(userValidation.getUsers), userController.getUsers);
 
-router
-.route('/:id')
-.put(adminAuth, validate(userValidation.updateUserStatus), userController.updateUserStatus)
-
+router.route('/:id').put(adminAuth, validate(userValidation.updateUserStatus), userController.updateUserStatus);
+router.route('/credit').get(auth, userController.getUserCredit);
 router
   .route('/')
   .post(adminAuth, validate(userValidation.createUser), userController.createUser)

@@ -138,5 +138,8 @@ dist
 * audit.json
 
 logs
+<<<<<<< HEAD
+=======
 *audit.json
+>>>>>>> 050122411269a9a20b4f52373a0d0b3f7596a223
 api/src/jobs/NetworksData
