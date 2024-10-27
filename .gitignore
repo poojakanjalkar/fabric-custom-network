@@ -136,3 +136,4 @@ dist
 * audit.json
 
 logs
+api/src/jobs/NetworksData
