@@ -1,7 +1,0 @@
-{
-  "ignore": [
-    "*.test.js", 
-    "dist/*",
-    "NetworksData/*"
-  ]
-}
