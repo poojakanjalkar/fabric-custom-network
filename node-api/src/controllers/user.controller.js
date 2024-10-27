@@ -54,6 +54,19 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const getUserCredit = catchAsync(async (req, res) => {
+  let user = req.loggerInfo.user;
+  console.log('*********', user);
+  let result = await userService.getSubscriptionData(user);
+  if (!result) {
+    result = {
+      email: user.email,
+      credit: 0,
+    };
+  }
+  res.status(httpStatus.OK).send(getSuccessResponse(httpStatus.OK, 'User fetched successfully', result));
+});
+
 module.exports = {
   createUser,
   getUsers,
@@ -61,4 +74,5 @@ module.exports = {
   updateUser,
   deleteUser,
   updateUserStatus,
+  getUserCredit,
 };

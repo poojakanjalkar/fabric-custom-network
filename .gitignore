@@ -139,6 +139,7 @@ dist
 
 logs
 *audit.json
-api/src/jobs/NetworksData
+node-api/src/jobs/NetworksData
 api/src/src
+node-api/src/jobs/NetworksData
 node-api/src/jobs/NetworksData

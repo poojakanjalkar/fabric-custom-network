@@ -282,13 +282,30 @@ export default function CreateRequest(props) {
         payload,
         headers()
       );
+      console.log("________________", result.data);
+
+      // {
+      //   "success": true,
+      //   "message": "organization created successfully",
+      //   "status": 200,
+      //   "timestamp": "2024-05-24T05:36:02.522Z",
+      // }
+
+      let message = result?.data?.message;
+      if (message == "Insufficient balance, please buy credit") {
+        addToast(message, { appearance: "error", autoDismiss: false });
+      } else {
+        addToast("Request created successfully", {
+          appearance: "success",
+          autoDismiss: true,
+        });
       history.push("/admin/Organization");
+      }
     } catch (error) {
-      console.log("error occured");
+      console.log("error occured", error);
     } finally {
       setIsLoading(false);
     }
-
   };
 
   const createConfig = () => {
