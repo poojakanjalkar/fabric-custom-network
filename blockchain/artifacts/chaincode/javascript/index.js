@@ -1,6 +1,6 @@
 'use strict';
 
-const trustScore = require('./lib/trust-score');
+const Asset = require('./lib/Asset');
 
-module.exports.TrustScore = trustScore;
-module.exports.contracts = [trustScore];
+module.exports.Asset = Asset;
+module.exports.contracts = [Asset];

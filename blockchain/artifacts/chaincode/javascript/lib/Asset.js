@@ -1,9 +1,7 @@
 "use strict";
 
 const { Contract, Transaction } = require("fabric-contract-api");
-const geolib = require('geolib');
-const MAX_DISTANCE_COVERED_IN_10_MIN = 1
-class TrustScore extends Contract {
+class Asset extends Contract {
 
   async CreateAsset(ctx, assetData) {
     try {
@@ -12,79 +10,7 @@ class TrustScore extends Contract {
       return ctx.stub.getTxID();
     } catch (err) {
       throw new Error(err.stack);
-    }    
-  }
-
-  async AddSensorReading(ctx, assetData, lastReadingId) {
-    try {
-      console.log("-----------------AddSensorReading-----------0---------", assetData, lastReadingId)
-      let asset = JSON.parse(assetData)
-      await ctx.stub.putState(asset.id, assetData);
-      await this.updateTrustScore(ctx, asset, lastReadingId)
-      return ctx.stub.getTxID();
-    } catch (err) {
-      throw new Error(err.stack);
-    }    
-  }
-
-
-
-  async updateTrustScore(ctx, data, lastReadingId){
-    console.log("-----------------Updating trust score 1--------------------", data, lastReadingId)
-
-    if(data.docType == 'SensorData'){
-      console.log("-----------------Updating trust score 2 Sensor data--------------------")
-
-      let deviceData = await ctx.stub.getState(data.deviceId)
-      let lastReading =lastReadingId? await ctx.stub.getState(lastReadingId): null
-      if(lastReading && lastReading.length > 0){
-        lastReading = JSON.parse(lastReading)
-      }
-
-      console.log("-----------------Updating trust score 3----------device data, lastReading Data----------", deviceData, lastReading)
-      
-      if(data.type == 'Location' ){
-
-        let temporalCorelation ;
-        if(lastReading){
-          const start = { latitude : data?.location?.lat, longitude: data?.location?.long}
-          const end =  { latitude : lastReading?.location?.lat, longitude: lastReading?.location?.long}
-          const distance = geolib.getDistance(start, end);
-          console.log("-----------------Updating trust score 4 ------------distance-------", distance)
-          temporalCorelation = distance > MAX_DISTANCE_COVERED_IN_10_MIN ? 0:1
-        }else{
-          temporalCorelation = 1
-        }
-        let calibrationScore = 0
-        if(deviceData){
-          let d2 = new Date( deviceData.calibrationExpiryDate)
-          let d1 = new Date( data.createdAt)
-          calibrationScore = d2.getTime() > d1.getTime() ? 1: 0
-          console.log("-----------------Updating trust score 5 ------------distance-------", calibrationScore)
-  
-        }
-        const batteryLevel = data.batteryLevel> 5? data.batteryLevel/100 : 0
-        console.log("-----------------All Score-------", calibrationScore , batteryLevel , temporalCorelation)
-        let score = (calibrationScore + batteryLevel + temporalCorelation )/3 || 0
-
-        let scoreData = {
-          id:`score_${data.id}`,
-          score,
-          deviceId:data.deviceId,
-          cattleId: data.cattleId,
-          scoreDate: data.captureDate,
-          captureDate: data.captureDate,
-          deviceType:data.deviceType,
-          meta: {calibrationScore, batteryLevel, temporalCorelation},
-          docType: 'Score'
-        }
-        console.log("-----------------Updating trust score 6 ------------score-------", JSON.stringify(scoreData))
-        await ctx.stub.putState(scoreData.id, JSON.stringify(scoreData)); 
-      }
-    }else {
-
     }
-
   }
 
   async UpdateAsset(ctx, assetData) {
@@ -98,7 +24,7 @@ class TrustScore extends Contract {
       return ctx.stub.getTxID();
     } catch (err) {
       throw new Error(err.stack);
-    }    
+    }
   }
 
 
@@ -114,8 +40,17 @@ class TrustScore extends Contract {
       throw new Error(err.stack);
     }
   }
+  // assetExists returns true when asset with given ID exists in world state.
+  async assetExists(ctx, id) {
+    try {
+      const assetJSON = await ctx.stub.getState(id);
+      return assetJSON && assetJSON.length > 0;
+    } catch (err) {
+      return new Error(err.stack);
+    }
+  }
 
- 
+
   // deleteAsset deletes an given asset from the world state.
   async deleteAsset(ctx, id) {
     try {
@@ -129,15 +64,6 @@ class TrustScore extends Contract {
     }
   }
 
-  // assetExists returns true when asset with given ID exists in world state.
-  async assetExists(ctx, id) {
-    try {
-      const assetJSON = await ctx.stub.getState(id);
-      return assetJSON && assetJSON.length > 0;
-    } catch (err) {
-      return new Error(err.stack);
-    }
-  }
 
   // getAllAssets returns all assets found in the world state.
   async getAllAssets(ctx) {
@@ -280,4 +206,4 @@ class TrustScore extends Contract {
   }
 }
 
-module.exports = TrustScore;
+module.exports = Asset;

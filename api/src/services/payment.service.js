@@ -14,7 +14,7 @@ const createPayment = async (data) => {
       amount: data?.payload?.payment?.entity?.amount,
       currency: data?.payload?.payment?.entity?.currency,
       status: data?.payload?.payment?.entity?.status,
-      fee: data?.payload?.payment?.entity?.fee,
+      fee: data?.payload?.payment?.entity?.fee || 0,
       event: data?.event,
     };
     let txData = new Transaction(t);

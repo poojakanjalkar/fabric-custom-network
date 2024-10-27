@@ -30,7 +30,6 @@ import {
   Typography,
   Divider,
   Select,
-  message,
 } from "antd";
 
 import Header from "components/Headers/Header";
@@ -300,7 +299,7 @@ export default function CreateRequest(props) {
           appearance: "success",
           autoDismiss: true,
         });
-        history.push("/admin/Organization");
+      history.push("/admin/Organization");
       }
     } catch (error) {
       console.log("error occured", error);

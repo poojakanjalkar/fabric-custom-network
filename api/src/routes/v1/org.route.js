@@ -4,6 +4,7 @@ const orgController = require('../../controllers/org.controller');
 const { auth } = require('../../middlewares/auth');
 const { validateSubscription } = require('../../middlewares/validateSubscription');
 
+router.get('/download/:projectId', auth, orgController.downloadFile);
 router.get('/', auth, orgController.getAllOrganizations);
 router.get('/:id', auth, orgController.getOrganizationById);
 router.post('/', auth, validateSubscription, orgController.createOrganization);
