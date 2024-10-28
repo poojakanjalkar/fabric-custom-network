@@ -12,7 +12,7 @@ const getAllOrganizations = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   let options = { offset, limit, sort: { createdAt: -1 } };
   const organizations = await OrgService.getAllOrganizations(options);
-  console.log('----docs-----', organizations);
+  // console.log('----docs-----', organizations);
   res.status(httpStatus.OK).send(getSuccessResponse(httpStatus.OK, 'organization fetched successfully', organizations));
 };
 

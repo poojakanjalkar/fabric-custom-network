@@ -1,7 +1,7 @@
 "use strict";
 
 const { Contract, Transaction } = require("fabric-contract-api");
-class Asset extends Contract {
+class Performance extends Contract {
 
   async CreateAsset(ctx, assetData) {
     try {
@@ -10,23 +10,22 @@ class Asset extends Contract {
       return ctx.stub.getTxID();
     } catch (err) {
       throw new Error(err.stack);
-    }
+    }    
   }
 
-  async UpdateAsset(ctx, assetData) {
-    try {
-      let asset = JSON.parse(assetData)
-      const exists = await this.assetExists(asset.id);
-      if (!exists) {
-        throw new Error(`The asset ${id} does not exist`);
-      }
-      await ctx.stub.putState(asset.id, assetData);
-      return ctx.stub.getTxID();
-    } catch (err) {
-      throw new Error(err.stack);
-    }
-  }
-
+  async CreateAsset1(ctx, id, color, size, owner, appraisedValue) {
+    console.log("----Create Asset with id-", id)
+    const asset = {
+        ID: id,
+        Color: color,
+        Size: size,
+        Owner: owner,
+        AppraisedValue: appraisedValue,
+    };
+    // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
+    await ctx.stub.putState(id, Buffer.from(JSON.stringify(asset)));
+    return JSON.stringify(asset);
+}
 
   // ReadAsset returns the asset stored in the world state with given id.
   async getAssetByID(ctx, id) {
@@ -40,6 +39,7 @@ class Asset extends Contract {
       throw new Error(err.stack);
     }
   }
+
   // assetExists returns true when asset with given ID exists in world state.
   async assetExists(ctx, id) {
     try {
@@ -47,48 +47,6 @@ class Asset extends Contract {
       return assetJSON && assetJSON.length > 0;
     } catch (err) {
       return new Error(err.stack);
-    }
-  }
-
-
-  // deleteAsset deletes an given asset from the world state.
-  async deleteAsset(ctx, id) {
-    try {
-      const exists = await this.assetExists(ctx, id);
-      if (!exists) {
-        throw new Error(`The asset ${id} does not exist`);
-      }
-      return ctx.stub.deleteState(id);
-    } catch (err) {
-      return new Error(err.stack);
-    }
-  }
-
-
-  // getAllAssets returns all assets found in the world state.
-  async getAllAssets(ctx) {
-    try {
-      const allResults = [];
-      // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
-      const iterator = await ctx.stub.getStateByRange("", "");
-      let result = await iterator.next();
-      while (!result.done) {
-        const strValue = Buffer.from(result.value.value.toString()).toString(
-          "utf8"
-        );
-        let record;
-        try {
-          record = JSON.parse(strValue);
-        } catch (err) {
-          console.log(err);
-          record = strValue;
-        }
-        allResults.push({ Key: result.value.key, Record: record });
-        result = await iterator.next();
-      }
-      return JSON.stringify(allResults);
-    } catch (err) {
-      return new Error(err.message);
     }
   }
 
@@ -206,4 +164,4 @@ class Asset extends Contract {
   }
 }
 
-module.exports = Asset;
+module.exports = Performance;

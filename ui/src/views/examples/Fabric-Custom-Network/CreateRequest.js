@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faFileAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   Button,
   Card,
@@ -10,6 +13,7 @@ import {
   NavItem,
   NavLink,
   Label,
+  Collapse,
   Nav,
   Input,
   Progress,
@@ -17,9 +21,13 @@ import {
   FormFeedback,
   Container,
   CardTitle,
+  ListGroup,
+  ListGroupItem,
   Row,
   Col,
 } from "reactstrap";
+
+
 import ProgressBar from "../ProgressBar";
 import {
   Form,
@@ -634,6 +642,21 @@ export default function CreateRequest(props) {
     sendRequestDataToServer();
   };
 
+  const instructions = [
+    "1. The organization name should be a small letter and no space",
+    "2. the channel name should be the small case and no space",
+    "3. chain code name should be the small case and no space",
+    "4. Max 20 Orgs configuration can be created",
+    "5. Explorer will be configured for the first organization",
+    "6. Caliper will be configured for the first organization",
+    "7. A basic API structure will be given for basic asset operation"
+  ];
+
+  const [isOpen, setIsOpen] = useState(true);
+
+  const toggle = () => setIsOpen(!isOpen);
+
+
   return (
     <>
       <Header />
@@ -647,6 +670,32 @@ export default function CreateRequest(props) {
                     <h3 className="mb-0">Create Custom Configuration</h3>
                   </Col>
                 </FormGroup>
+                {/* <div className="bg-light p-4" style={{ backgroundColor: '#F3E5F5', minHeight: '400px', position: 'relative', fontFamily: 'Arial, sans-serif' }}> */}
+                {/* <div className="bg-light p-4" style={{ backgroundColor: '#F3E5F5', minHeight: '400px', position: 'relative', fontFamily: 'Arial, sans-serif' }}> */}
+      <Card className="shadow-sm">
+        <CardHeader 
+          className="bg-primary text-white d-flex justify-content-between align-items-center" 
+          onClick={toggle}
+          style={{ cursor: 'pointer' }}
+        >
+          <h2 className="mb-0" style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white' }}>Instructions</h2>
+          <span>{isOpen ? '▲' : '▼'}</span>
+        </CardHeader>
+        <Collapse isOpen={isOpen}>
+          <CardBody>
+            <ListGroup flush numbered>
+              {instructions.map((instruction, index) => (
+                <ListGroupItem key={index} className="border-0 py-2 px-3" style={{ fontSize: '0.9rem', color: 'purple' }}>
+                  {instruction}
+                </ListGroupItem>
+              ))}
+            </ListGroup>
+          </CardBody>
+        </Collapse>
+      </Card>
+     
+    {/* </div> */}
+    {/* </div> */}
               </CardHeader>
               {isLoading ? (
                 <ProgressBar />

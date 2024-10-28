@@ -1,6 +1,0 @@
-{
-  "index": { "fields": ["createAt"] },
-  "ddoc": "indexDate",
-  "name": "createAt",
-  "type": "json"
-}

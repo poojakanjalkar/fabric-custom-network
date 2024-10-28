@@ -10,7 +10,7 @@ let firstCAPort = 7054;
 let firstPeerPort = 7050;
 
 
-const createUserProject = (user, folderName) => {
+const createUserProject = async(user, folderName) => {
   //
 
   const data = staticMasterData;
@@ -34,7 +34,7 @@ const getFinalFolder= (projectName, email, networkName)=> {
 
 // docker-compose file for CA
 
-const createCADockerComposeFile = (staticMasterData, userFolder) => {
+const createCADockerComposeFile = async(staticMasterData, userFolder) => {
 
   // const userFolder =  getFinalFolder()
 
@@ -84,7 +84,7 @@ const createCADockerComposeFile = (staticMasterData, userFolder) => {
 // createCADockerComposeFile(staticMasterData);
 
 // 2
-const createCryptoConfigScript = (staticMasterData, userFolder) => {
+const createCryptoConfigScript = async(staticMasterData, userFolder) => {
   let filePath = `${userFolder}/blockchain/artifacts/channel/create-certificate-with-ca/`;
 
   let finalContent = `#!/bin/bash
@@ -94,6 +94,8 @@ echo "Hello, this is a shell script created with Node.js!"
 let callingFunctions = ''
 
   let caPort = firstCAPort;
+
+  let firstPeerOrg = staticMasterData?.Organizations?.find(e=> e.orgType== 'Peer')
 
   for (let org of staticMasterData?.Organizations) {
     if (org.orgType === 'Peer') {
@@ -322,6 +324,20 @@ let callingFunctions = ''
     }
   }
 
+  connectionScript = ` \n
+
+
+  createConnectionProfile() {
+    cd ../../../../api/connection-profiles && ./generate-ccp.sh
+
+    cp connection-${firstPeerOrg.orgName}.json ../../blockchain/artifacts/channel/crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/
+  } 
+  
+  `
+  finalContent += `\n` + connectionScript
+
+  callingFunctions += `\n`+ 'createConnectionProfile'
+
   finalContent += `\n`+ callingFunctions
 
   // const yamlData = yaml.dump(finalData);
@@ -332,7 +348,7 @@ let callingFunctions = ''
 // createCryptoConfigScript(staticMasterData);
 
 // 3
-const createConfigTxFile = (staticMasterData, userFolder) => {
+const createConfigTxFile = async(staticMasterData, userFolder) => {
   let finalObject = {};
 
   let orgs = [];
@@ -365,8 +381,8 @@ const createConfigTxFile = (staticMasterData, userFolder) => {
         },
         AnchorPeers: [
           {
-            Host: `peer0.${org.orgName}.com`,
-            Port: `${peerPort}`,
+            Host: `peer1.${org.orgName}.com`,
+            Port: `${org.peerPorts[0]}`,
           },
         ],
       };
@@ -570,7 +586,7 @@ const createConfigTxFile = (staticMasterData, userFolder) => {
   for (let channel of staticMasterData.channels) {
     let channelsOrgs = finalObject.Organizations.filter((item1) => channel?.orgName?.some((item2) => item1.Name === item2));
 
-    console.log('----------channelsOrgs--------', channelsOrgs, finalObject.Organizations);
+    // console.log('----------channelsOrgs--------', channelsOrgs, finalObject.Organizations);
 
     finalObject.Profiles[`${channel.channelName}`] = {
       Policies: {
@@ -652,7 +668,7 @@ const createConfigTxFile = (staticMasterData, userFolder) => {
 
 // createProject()
 
-const createArtifacts = (staticMasterData, userFolder) => {
+const createArtifacts = async(staticMasterData, userFolder) => {
   let filePath = `${userFolder}/blockchain/artifacts/channel/`;
   createFileIfNotExist(filePath);
   let finalContent = `#!/bin/bash
@@ -674,7 +690,7 @@ const createArtifacts = (staticMasterData, userFolder) => {
 
 // createArtifacts(staticMasterData)
 
-const createServicesDockerComposeFile = (staticMasterData, userFolder) => {
+const createServicesDockerComposeFile = async(staticMasterData, userFolder) => {
   let finalData = {
     // version: '2.1',
     networks: {
@@ -840,7 +856,7 @@ async function copyDirectory2(src, dest) {
   }
 }
 
-const copyAllStaticFiles = (userFolder)=> {
+const copyAllStaticFiles = async(userFolder)=> {
   // Copy Config folder
   // const sourceFolderRelative = '../../../blockchain/artifacts/channel/config';
   // const sourceFolder = path.resolve(process.cwd(), '../../../blockchain/artifacts/channel/config');
@@ -852,17 +868,159 @@ const copyAllStaticFiles = (userFolder)=> {
   // copy chaincode
   const chaincodeSourceFolder =__dirname+'/'+'../../../blockchain/artifacts/chaincode/javascript';
   let chaincodeDestinationFolder = `${userFolder}/blockchain/artifacts/chaincode/javascript`;
-  copyDirectory2(chaincodeSourceFolder, chaincodeDestinationFolder);
+  await copyDirectory2(chaincodeSourceFolder, chaincodeDestinationFolder);
 
-  // copy chaincode
+  // copy explorer
   const explorerSourceFolder =__dirname+'/'+'../../../blockchain/Explorer';
   let explorerDestinationFolder = `${userFolder}/blockchain/Explorer`;
-  copyDirectory2(explorerSourceFolder, explorerDestinationFolder);
+  await copyDirectory2(explorerSourceFolder, explorerDestinationFolder);
 
-  // copy chaincode
+  // copy performance tools
   const performanceToolsSourceFolder =__dirname+'/'+'../../../blockchain/performance-tool';
   let performanceToolsDestinationFolder = `${userFolder}/blockchain/performance-tool`;
-  copyDirectory2(performanceToolsSourceFolder, performanceToolsDestinationFolder);
+  await copyDirectory2(performanceToolsSourceFolder, performanceToolsDestinationFolder);
+
+    // copy API
+    const apiSourceFolder =__dirname+'/'+'../../../api';
+    let apiDestinationFolder = `${userFolder}/api`;
+    await copyDirectory2(apiSourceFolder, apiDestinationFolder);
+
+}
+
+const addAPIChanges = async(staticMasterData, userFolder)=> {
+
+
+  let generateCCPFile = `
+  #!/bin/bash
+
+    function one_line_pem {
+       echo \"\`awk 'NF {sub(/\\\\n/, ""); printf "%s\\\\\\\\\\\\\\n",$0;}' $1\`"
+    }
+
+    function json_ccp {
+        local PP=$(one_line_pem $4)
+        local CP=$(one_line_pem $5)
+        sed -e "s/\\\${ORG}/$1/" \\
+            -e "s/\\\${P0PORT}/$2/" \\
+            -e "s/\\\${CAPORT}/$3/" \\
+            -e "s#\\\${PEERPEM}#$PP#" \\
+            -e "s#\\\${CAPEM}#$CP#" \\
+            ./ccp-template.json
+    }
+  `
+
+  let peerOrgs = staticMasterData.Organizations.filter((elm) => elm.orgType == 'Peer');
+  // console.log("----peerOrgs-----", peerOrgs)
+  let varData =''
+  let caPort = 7054
+  for(let org of peerOrgs){
+    varData += `
+    
+    ORG=${org.orgName}
+    P0PORT=${org.peerPorts[0]}
+    CAPORT=${caPort}
+    PEERPEM=../../blockchain/artifacts/channel/crypto-config/peerOrganizations/${org.orgName}.com/peers/peer1.${org.orgName}.com/tls/tlscacerts/tls-localhost-${caPort}-ca-${org.orgName}-com.pem
+    CAPEM=../../blockchain/artifacts/channel/crypto-config/peerOrganizations/${org.orgName}.com/msp/tlscacerts/ca.crt
+
+    echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM )" > connection-${org.orgName}.json
+    
+    `
+
+    caPort +=1000
+
+  }
+  generateCCPFile +="\n"+ varData
+
+
+  let filePath = `${userFolder}/api/connection-profiles`;
+  try {
+  createFileIfNotExist(filePath);
+  } catch (error) {
+    console.log("--------error---addAPIChanges----", error)
+  }
+  fs.writeFileSync(`${filePath}/generate-ccp.sh`, generateCCPFile, 'utf8');
+
+}
+
+const addExplorerChanges = async (staticMasterData, userFolder)=> {
+
+let channel = staticMasterData?.channels[0]?.channelName
+
+let firstPeerOrg= staticMasterData?.Organizations?.find(elm => elm.orgType === 'Peer')
+let data = {
+  "name": "first network (ignored)",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "client": {
+    "tlsEnable": true,
+    "caCredential": {
+      "id": "admin",
+      "password": "adminpw"
+    },
+    "adminCredential": {
+      "id": "exploreradmin",
+      "password": "exploreradminpw",
+      "affiliation": `${firstPeerOrg.orgName}.department1`
+    },
+    "enableAuthentication": true,
+    "organization": `${firstPeerOrg.orgName}MSP`,
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        },
+        "orderer": "300"
+      }
+    }
+  },
+  "channels": {
+    [`${channel}`]: {
+      "peers": {
+        [`peer1.${firstPeerOrg.orgName}.com`]: {}
+      },
+      "connection": {
+        "timeout": {
+          "peer": {
+            "endorser": "6000",
+            "eventHub": "6000",
+            "eventReg": "6000"
+          }
+        }
+      }
+    }
+  },
+  "organizations": {
+    [`${firstPeerOrg.orgName}MSP`]: {
+      "mspid": `${firstPeerOrg.orgName}MSP`,
+      "adminPrivateKey": {
+        "path": `/etc/data/peerOrganizations/${firstPeerOrg.orgName}.com/users/Admin@${firstPeerOrg.orgName}.com/msp/keystore/priv_sk`
+      },
+      "peers": [
+        `peer1.${firstPeerOrg.orgName}.com`
+      ],
+      "signedCert": {
+        "path": `/etc/data/peerOrganizations/${firstPeerOrg.orgName}.com/users/Admin@${firstPeerOrg.orgName}.com/msp/signcerts/cert.pem`
+      }
+    }
+  },
+  "peers": {
+    [`peer1.${firstPeerOrg.orgName}.com`]: {
+      "tlsCACerts": {
+        "path": `/etc/data/peerOrganizations/${firstPeerOrg.orgName}.com/peers/peer1.${firstPeerOrg.orgName}.com/tls/ca.crt`
+      },
+      "url": `grpcs://peer1.${firstPeerOrg.orgName}.com:${firstPeerOrg.peerPorts[0]}`,
+      "grpcOptions": {
+        "ssl-target-name-override": `peer1.${firstPeerOrg.orgName}.com`
+      }
+    }
+  }
+  };
+
+  let explorerConnectionDestinationFolder = `${userFolder}/blockchain/Explorer/connection-profile/first-network.json`;
+
+// Write the JSON content to the file
+fs.writeFileSync(explorerConnectionDestinationFolder, JSON.stringify(data, null, 2), 'utf8');
+console.log('Data written to Explorer connection file successfully!');
 
 }
 
@@ -871,7 +1029,7 @@ const copyAllStaticFiles = (userFolder)=> {
 
 
 //Verified-----------
-const createEnvVarScript = (staticMasterData, userFolder) => {
+const createEnvVarScript = async(staticMasterData, userFolder) => {
   let ordererOrg = staticMasterData.Organizations.find((elm) => elm.orgType === 'Orderer');
   let ordererCount = ordererOrg.peerCount;
 
@@ -1010,7 +1168,7 @@ setGlobals() {
   finalContent += `
           esac`
 
-  console.log('-----------');
+  // console.log('-----------');
 
 
 
@@ -1023,7 +1181,7 @@ setGlobals() {
 // createEnvVarScript(staticMasterData)
 
 // Verified-----------
-const createChannelScript = (staticMasterData, userFolder) => {
+const createChannelScript = async(staticMasterData, userFolder) => {
   let filePath = `${userFolder}/blockchain/scripts/`;
   createFileIfNotExist(filePath);
 
@@ -1047,7 +1205,7 @@ const createChannelScript = (staticMasterData, userFolder) => {
 
     let peerOrg = staticMasterData.Organizations.find((elm) => elm.orgName === channel.orgName[0]);
 
-    console.log("--------peerOrg-------", peerOrg)
+    // console.log("--------peerOrg-------", peerOrg)
     for (let i = 1; i <= ordererCount; i++) {
       let content = `
       setGlobals ${peerOrg.orgName}
@@ -1072,7 +1230,7 @@ const createChannelScript = (staticMasterData, userFolder) => {
       // console.log("---------------", peerOrg)
 
       for (let j = 1; j <= parseInt(peerOrg.peerCount); j++) {
-        console.log('-------inside peer----------');
+        // console.log('-------inside peer----------');
         content = `
         setGlobals ${org} ${j}
         peer channel join -b ../channel-artifacts/${CHANNEL_NAME}.block`;
@@ -1085,7 +1243,7 @@ const createChannelScript = (staticMasterData, userFolder) => {
 
    
 
-    console.log("------", finalContent)
+    // console.log("------", finalContent)
 
     fs.writeFileSync(`${filePath}create-${channel.channelName}.sh`, finalContent, 'utf8');
   }
@@ -1093,7 +1251,7 @@ const createChannelScript = (staticMasterData, userFolder) => {
 
 // createChannelScript(staticMasterData)
 
-const createDeployChaincodeScript = (staticMasterData, userFolder) => {
+const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
   let filePath = `${userFolder}/blockchain/scripts/`;
   createFileIfNotExist(filePath);
   let i = 0;
@@ -1159,7 +1317,7 @@ const createDeployChaincodeScript = (staticMasterData, userFolder) => {
       let peerOrg = staticMasterData.Organizations.find((elm) => elm.orgName === org);
 
       for (let j = 1; j <= parseInt(peerOrg.peerCount); j++) {
-        console.log('-------inside peer----------');
+        // console.log('-------inside peer----------');
         content = `
         setGlobals ${org} ${j}
         peer lifecycle chaincode install \${CC_NAME}.tar.gz`;
@@ -1240,7 +1398,7 @@ const createDeployChaincodeScript = (staticMasterData, userFolder) => {
       let peerOrg = staticMasterData.Organizations.find((elm) => elm.orgName === org);
 
       for (let j = 1; j <= parseInt(peerOrg.peerCount); j++) {
-        console.log('-------inside peer----------');
+        // console.log('-------inside peer----------');
         content = `--peerAddresses localhost:${peerOrg.peerPorts[j - 1]} --tlsRootCertFiles \$${peerOrg.orgName}_CA \\
         `;
 
@@ -1248,7 +1406,7 @@ const createDeployChaincodeScript = (staticMasterData, userFolder) => {
       }
     }
 
-    console.log("------------peersAddress-----------", peersAddress)
+    // console.log("------------peersAddress-----------", peersAddress)
 
     finalContent =
       finalContent +
@@ -1302,6 +1460,7 @@ const createDeployChaincodeScript = (staticMasterData, userFolder) => {
     `;
 
     allFunctions += `chaincodeInvoke` + '\n'
+    allFunctions += `sleep 3` + '\n'
     // --------------------------------------
 
     finalContent =
@@ -1321,7 +1480,7 @@ const createDeployChaincodeScript = (staticMasterData, userFolder) => {
       '\n' + allFunctions
     // -----------------------------------------
 
-    console.log('-----------');
+    // console.log('-----------');
 
     fs.writeFileSync(`${filePath}deploy-${channel.ChaincodeName}.sh`, finalContent, 'utf8');
   }
@@ -1333,7 +1492,7 @@ const createDeployChaincodeScript = (staticMasterData, userFolder) => {
 const archiver = require('archiver');
 // const path = require('path');
 
-const createZipFile = (userFolder, outputPath)=> {
+const createZipFile =async (userFolder, outputPath)=> {
 
   // const folderToZip = path.join(__dirname, 'your-folder-name');  // Replace with your folder
 const zipFilePath = userFolder+ new Date()+'.zip'//path.join(__dirname, 'output.zip');        // Output ZIP file path
@@ -1379,19 +1538,20 @@ const initiateProjectCreation = async(staticMasterData, email, networkName) => {
   try {
     const userFolder =  getFinalFolder(projectName, email, networkName )
     console.log("------userFolder----", userFolder)
-    createUserProject(email, networkName )
-  
-    createCADockerComposeFile(staticMasterData, userFolder)
-    createCryptoConfigScript(staticMasterData, userFolder);
-    createConfigTxFile(staticMasterData, userFolder)
-    createArtifacts(staticMasterData, userFolder)
-    createServicesDockerComposeFile(staticMasterData, userFolder)
-    copyAllStaticFiles( userFolder)
-    createEnvVarScript(staticMasterData, userFolder)
-    createChannelScript(staticMasterData, userFolder)
-    createDeployChaincodeScript(staticMasterData, userFolder);
+    await createUserProject(email, networkName )
+    await createCADockerComposeFile(staticMasterData, userFolder)
+    await createCryptoConfigScript(staticMasterData, userFolder);
+    await createConfigTxFile(staticMasterData, userFolder)
+    await createArtifacts(staticMasterData, userFolder)
+    await createServicesDockerComposeFile(staticMasterData, userFolder)
+    await copyAllStaticFiles( userFolder)
+    await addAPIChanges(staticMasterData, userFolder)
+    await addExplorerChanges(staticMasterData, userFolder)
+    await createEnvVarScript(staticMasterData, userFolder)
+    await createChannelScript(staticMasterData, userFolder)
+    await createDeployChaincodeScript(staticMasterData, userFolder);
 
-    createZipFile(userFolder,`${__dirname}/${projectName}/${email}/${networkName}.zip`)
+    await createZipFile(userFolder,`${__dirname}/${projectName}/${email}/${networkName}.zip`)
   } catch (error) {
     
     console.log("--------error--------", error)

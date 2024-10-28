@@ -7,7 +7,7 @@ const { REQUEST_STATUS } = require('../utils/Constants');
 const getAllOrganizations = async (options, filter) => {
   console.log('++++++options+++++', options);
   const result = await Org.find({});
-  console.log('________', result);
+  // console.log('________', result);
   return Org.paginate(filter, options);
 };
 
@@ -18,6 +18,7 @@ const getOrganizationById = async (id) => {
 const getModifiedObject = (data)=> {
 
   let peerPorts = 7051
+  let caPort= 7054
 
   let orgs = data.filter(elm => elm.orgType == "Peer")
   let ordererOrg = data.filter(elm => elm.orgType != "Peer")
@@ -33,12 +34,16 @@ const getModifiedObject = (data)=> {
       peerPorts += 1000
     }
     org.peerPorts = ports
+    org.caPort= caPort
     o.push(org)
+    caPort +=1000
   }
+
+  ordererOrg.caPort = caPort
 
   console.log("----------ordererOrg-----------", ordererOrg)
 
-  console.log("-------------o--------", o )
+  console.log("-------------new static data--------", [...o, ...ordererOrg] )
 
   return [...o, ...ordererOrg]
 
