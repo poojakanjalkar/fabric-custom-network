@@ -944,9 +944,11 @@ const addAPIChanges = async(staticMasterData, userFolder)=> {
 
 const addExplorerChanges = async (staticMasterData, userFolder)=> {
 
-let channel = staticMasterData?.channels[0]?.channelName
-
-let firstPeerOrg= staticMasterData?.Organizations?.find(elm => elm.orgType === 'Peer')
+  let channel = staticMasterData?.channels[0]?.channelName
+  let channelFirstOrg = staticMasterData?.channels[0]?.orgName[0]
+  
+  let firstPeerOrg= staticMasterData?.Organizations?.find(elm => elm.orgName === channelFirstOrg)
+ 
 let data = {
   "name": "first network (ignored)",
   "version": "1.0.0",
@@ -1023,6 +1025,168 @@ fs.writeFileSync(explorerConnectionDestinationFolder, JSON.stringify(data, null,
 console.log('Data written to Explorer connection file successfully!');
 
 }
+
+const addCaliperChanges = async (staticMasterData, userFolder)=> {
+
+  let channelName = staticMasterData?.channels[0]?.channelName
+  let channelFirstOrg = staticMasterData?.channels[0]?.orgName[0]
+  let chaincodeName =  staticMasterData?.channels[0]?.ChaincodeName
+  
+  let firstPeerOrg= staticMasterData?.Organizations?.find(elm => elm.orgName === channelFirstOrg)
+
+    let networkConfigtFile = {
+      "name": "Caliper Benchmarks",
+      "version": "2.0.0",
+      "caliper": {
+        "blockchain": "fabric"
+      },
+      "info": {
+        "Version": "2.1.0",
+        "Size": `${staticMasterData?.Organizations?.length} Orgs with 1 Peer`,
+        "Orderer": "Raft",
+        "Distribution": "Single Host",
+        "StateDB": "CouchDB"
+      },
+      "channels": [
+        {
+          "channelName": channelName,
+          "contracts": [
+            {
+              "id": chaincodeName
+            }
+          ]
+        }
+      ],
+      "organizations": [
+        {
+          "mspid": `${firstPeerOrg.orgName}MSP`,
+          "identities": {
+            "certificates": [
+              {
+                "name": "User1",
+                "clientPrivateKey": {
+                  "path": `crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/users/User1@${firstPeerOrg.orgName}.com/msp/keystore/priv_sk`
+                },
+                "clientSignedCert": {
+                  "path": `crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/users/User1@${firstPeerOrg.orgName}.com/msp/signcerts/cert.pem`
+                }
+              }
+            ]
+          },
+          "connectionProfile": {
+            "path": `crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/connection-${firstPeerOrg.orgName}.json`,
+            "discover": true
+          }
+        }
+      ]
+    }
+
+    let caliperNetworkCOnfigFileDestinationFolder = `${userFolder}/blockchain/performance-tool/caliper/caliper-benchmarks-local/networks/network-config.yaml`;
+
+    const yamlData = yaml.dump(networkConfigtFile, { lineWidth: -1 });
+    fs.writeFileSync(caliperNetworkCOnfigFileDestinationFolder, yamlData, 'utf8');
+    console.log('Data written to Caliper network config file successfully!');
+
+
+
+    let createAssetFile = `
+    'use strict';
+
+      const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
+      const { v1: uuidv4 } = require('uuid')
+
+      let assetIdArray = [];
+
+      class CreateDeviceWorkload extends WorkloadModuleBase {
+          constructor() {
+              super();
+          }
+
+          async submitTransaction() {
+              let id = uuidv4()
+              assetIdArray.push(id)
+
+              let assetData = {
+                  id: id,
+                  Color: "White",
+                  Size: "Large",
+                  Owner: "Pavan",
+                  AppraisedValue: "2000000",
+              };
+
+
+              let args = {
+                  contractId: "${chaincodeName}",
+                  contractVersion: 'v1',
+                  contractFunction: 'CreateAsset',
+                  contractArguments: [JSON.stringify(assetData)],
+                  timeout: 30
+              };
+
+              await this.sutAdapter.sendRequests(args);
+          }
+      }
+
+      function createWorkloadModule() {
+          return new CreateDeviceWorkload();
+      }
+
+      module.exports.createWorkloadModule = createWorkloadModule;
+      module.exports.assetIdArray = assetIdArray;
+
+    `
+  
+    let caliperCreateAssetFileDestinationFolder = `${userFolder}/blockchain/performance-tool/caliper/caliper-benchmarks-local/benchmarks/createAsset.js`;
+  // Write the JSON content to the file
+  fs.writeFileSync(caliperCreateAssetFileDestinationFolder, createAssetFile, 'utf8');
+  console.log('Data written to Caliper Create asset file successfully!');
+
+
+  let queryAssetFile = `
+  'use strict';
+
+  const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
+  const { assetIdArray } = require('./createAsset');
+
+  class QueryDeviceWorkload extends WorkloadModuleBase {
+      constructor() {
+          super();
+          this.txIndex = 0;
+          this.limitIndex = 0;
+      }
+
+      async submitTransaction() {
+          const randomIndex = Math.floor(Math.random() * assetIdArray.length);
+
+          let assetId= assetIdArray[randomIndex]
+          console.log("-----------------------------------", assetId)
+          let args = {
+              contractId: "${chaincodeName}",
+              contractVersion: 'v1',
+              contractFunction: 'getAssetByID',
+              contractArguments: [assetId],
+              timeout: 30,
+              readOnly: true
+          };
+
+          await this.sutAdapter.sendRequests(args);
+      }
+  }
+
+  function createWorkloadModule() {
+      return new QueryDeviceWorkload();
+  }
+
+  module.exports.createWorkloadModule = createWorkloadModule;
+  
+  `
+
+  let caliperQueryAssetFileDestinationFolder = `${userFolder}/blockchain/performance-tool/caliper/caliper-benchmarks-local/benchmarks/queryAsset.js`;
+  // Write the JSON content to the file
+  fs.writeFileSync(caliperQueryAssetFileDestinationFolder, queryAssetFile, 'utf8');
+  console.log('Data written to Caliper Create asset file successfully!');
+  
+  }
 
 // copyAllStaticFiles
 
@@ -1547,6 +1711,7 @@ const initiateProjectCreation = async(staticMasterData, email, networkName) => {
     await copyAllStaticFiles( userFolder)
     await addAPIChanges(staticMasterData, userFolder)
     await addExplorerChanges(staticMasterData, userFolder)
+    await addCaliperChanges(staticMasterData, userFolder)
     await createEnvVarScript(staticMasterData, userFolder)
     await createChannelScript(staticMasterData, userFolder)
     await createDeployChaincodeScript(staticMasterData, userFolder);
