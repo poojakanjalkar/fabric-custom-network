@@ -60,10 +60,51 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+
+  console.log("--------record------------", record)
+
+  // const isEditableRow = record && record.isEditable
+  const handleInputChange = (e) => {
+    // Remove non-alphanumeric characters for orgName field
+    e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
+  };
+  const handlNumberChange = (e) => {
+    const value = e.target.value.toLowerCase(); // Convert to lowercase
+    e.target.value = value.replace(/[^0-9]/g, ""); // Remove non-alphanumeric characters
+  };
+
+  const preventInvalidKeys = (e) => {
+    // Block spacebar and uppercase letters
+    if (e.key === " ") {
+      e.preventDefault();
+    }
+  };
+
+
+  const inputNode =
+    dataIndex === "peerCount" ? (
+      <InputNumber
+      min={1}
+      // max={10}
+placeholder="Enter a number between 1 and 10"
+onKeyPress={(e) => {
+  // Prevent non-numeric input
+  if (!/[0-9]/.test(e.key)) {
+    e.preventDefault();
+  }
+}}
+parser={(value) => (isNaN(parseInt(value)) ? "" : parseInt(value))}
+      />
+    ) : (
+      <Input
+        onChange={dataIndex === "orgName" ? handleInputChange : undefined}
+        onKeyPress={dataIndex === "orgName" ? (e) => e.key === " " && e.preventDefault() : undefined}
+        placeholder="Enter alphanumeric, no spaces"
+      />
+    );
   return (
     <td {...restProps}>
-      {editing ? (
+      {editing  ? (
         <Form.Item
           name={dataIndex}
           style={{
@@ -72,8 +113,32 @@ const EditableCell = ({
           rules={[
             {
               required: true,
-              message: `Please Input ${title}!`,
+              message: `Please input ${title}!`,
             },
+            ...(dataIndex === "orgName"
+              ? [
+                  {
+                    pattern: /^[a-zA-Z0-9]+$/, // Alphanumeric pattern, allows uppercase letters
+                    message: `${title} should only contain letters and numbers with no spaces!`,
+                  },
+                ]
+              : []),
+              ...(dataIndex === "peerCount"
+                ? [
+                    {
+                      type: "number",
+                      min: 1,
+                      message: `${title} should be a positive number!`,
+                      transform: (value) => (value ? Number(value) : 0),
+                    },
+                    {
+                      type: "number",
+                      max: 10,
+                      message: `${title} should not be more than 10!`,
+                      transform: (value) => (value ? Number(value) : 0),
+                    },
+                  ]
+                : []),
           ]}
         >
           {inputNode}
@@ -124,6 +189,19 @@ const EditableCellChannel = ({
       </div>
     );
   };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value.toLowerCase(); // Convert to lowercase
+    e.target.value = value.replace(/[^a-zA-Z0-9]/g, ""); // Remove non-alphanumeric characters
+  };
+
+  const preventInvalidKeys = (e) => {
+    // Block spacebar and uppercase letters
+    if (e.key === " ") {
+      e.preventDefault();
+    }
+  };
+
   const inputNode =
     dataIndex === "orgName" ? (
       <Select
@@ -132,8 +210,8 @@ const EditableCellChannel = ({
         style={{ width: "100%" }} // Set width as per your requirement
         placeholder="Select orgs"
         tagRender={tagRender}
-        // value={record.orgName}
-        // onChange={(value) => handleOrgChange(value, record.key)}
+      // value={record.orgName}
+      // onChange={(value) => handleOrgChange(value, record.key)}
       >
         {orgNameList?.map((e) => {
           return (
@@ -144,7 +222,9 @@ const EditableCellChannel = ({
         })}
       </Select>
     ) : (
-      <Input />
+      <Input onChange={(dataIndex === "channelName" || dataIndex === "ChaincodeName") ? handleInputChange : undefined}
+        onKeyPress={(dataIndex === "channelName" || dataIndex === "ChaincodeName") ? preventInvalidKeys : undefined}
+        placeholder="Enter lowercase, no spaces" />
     );
 
   // console.log('-----------ssssssssssssssssssss-----', orgNameList);
@@ -161,6 +241,14 @@ const EditableCellChannel = ({
               required: true,
               message: `Please Input ${title}!`,
             },
+            ...(dataIndex === "channelName" || dataIndex === "ChaincodeName"
+              ? [
+                {
+                  pattern: /^[a-zA-Z0-9]+$/, // Alphanumeric pattern, allows uppercase letters
+                  message: `${title} should only contain letters and numbers with no spaces!`,
+                },
+              ]
+              : []),
           ]}
         >
           {inputNode}
@@ -191,6 +279,8 @@ const EditableCellChannel = ({
 
 export default function CreateRequest(props) {
   const [totalOrgs, setTotalOrgs] = useState(0);
+  const [validationMessage, setValidationMessage] = useState('')
+  const [validationMessageChannel, setValidationMessageChannel] = useState('')
 
   const [totalChannel, setTotalChannel] = useState(0);
 
@@ -252,19 +342,51 @@ export default function CreateRequest(props) {
   };
 
   const inputChangeHandler = (value) => {
-    if (value > 0) {
-      console.log("-------input changed--------", value);
 
+
+    const numericValue = Number(value);
+    
+    // Validate based on min and max
+    if (value === '') {
       setTotalOrgs(value);
+      setValidationMessage(''); // Clear validation message if input is empty
+    } else if (numericValue < 1) {
+      setValidationMessage('Minimum count is 1'); // Set validation message for min
+    } else if (numericValue > 50) {
+      setValidationMessage('Maximum count is 50'); // Set validation message for max
+    } else {
+      setTotalOrgs(value);
+      setValidationMessage(''); // Clear validation message if valid
     }
+    // if (value > 0) {
+    //   console.log("-------input changed--------", value);
+
+    //   setTotalOrgs(value);
+    // }
   };
 
   const inputChangeHandlerChannel = (value) => {
-    if (value > 0) {
-      console.log("-------input changed--------", value);
-
+    const numericValue = Number(value);
+    
+    // Validate based on min and max
+    if (value === '') {
       setTotalChannel(value);
+      setValidationMessageChannel(''); // Clear validation message if input is empty
+    } else if (numericValue < 1) {
+      setValidationMessage('Minimum count is 1'); // Set validation message for min
+    } else if (numericValue > 50) {
+      setValidationMessage('Maximum count is 50'); // Set validation message for max
+    } else {
+      setTotalChannel(value);
+      setValidationMessage(''); // Clear validation message if valid
     }
+    
+
+    // if (value > 0) {
+    //   console.log("-------input changed--------", value);
+
+    //   setTotalChannel(value);
+    // }
   };
   const [projectName, setProjectName] = useState("");
 
@@ -322,7 +444,7 @@ export default function CreateRequest(props) {
           appearance: "success",
           autoDismiss: true,
         });
-      history.push("/admin/Organization");
+        history.push("/admin/Organization");
       }
     } catch (error) {
       console.log("error occured", error);
@@ -342,10 +464,11 @@ export default function CreateRequest(props) {
           key: i.toString(),
 
           orgType: "Orderer",
-          orgName: "Orderer",
+          orgName: "orderer",
           ca: `orderer-ca`,
-          msp: `OrdererMSP`,
+          msp: `ordererMSP`,
           peerCount: 3,
+          isEditable:false,
           stateDB: "NA",
           db: "Not Require",
         });
@@ -355,9 +478,10 @@ export default function CreateRequest(props) {
           key: i.toString(),
 
           orgType: "Peer",
-          orgName: `Org${i}`,
+          orgName: `org${i}`,
           ca: `org${i}-ca`,
-          msp: `Org${i}MSP`,
+          msp: `org${i}MSP`,
+          isEditable: true,
           peerCount: "1",
           db: "Couchdb",
         });
@@ -522,6 +646,7 @@ export default function CreateRequest(props) {
         ) : (
           <Typography.Link
             disabled={editingKey !== ""}
+            // disabled={!record.isEditable}
             onClick={() => edit(record)}
           >
             Edit
@@ -687,30 +812,30 @@ export default function CreateRequest(props) {
                 </FormGroup>
                 {/* <div className="bg-light p-4" style={{ backgroundColor: '#F3E5F5', minHeight: '400px', position: 'relative', fontFamily: 'Arial, sans-serif' }}> */}
                 {/* <div className="bg-light p-4" style={{ backgroundColor: '#F3E5F5', minHeight: '400px', position: 'relative', fontFamily: 'Arial, sans-serif' }}> */}
-      <Card className="shadow-sm">
-        <CardHeader 
-          className="bg-primary text-white d-flex justify-content-between align-items-center" 
-          onClick={toggle}
-          style={{ cursor: 'pointer' }}
-        >
-          <h2 className="mb-0" style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white' }}>Instructions</h2>
-          <span>{isOpen ? '▲' : '▼'}</span>
-        </CardHeader>
-        <Collapse isOpen={isOpen}>
-          <CardBody>
-            <ListGroup flush numbered>
-              {instructions.map((instruction, index) => (
-                <ListGroupItem key={index} className="border-0 py-2 px-3" style={{ fontSize: '0.9rem', color: 'purple' }}>
-                  {instruction}
-                </ListGroupItem>
-              ))}
-            </ListGroup>
-          </CardBody>
-        </Collapse>
-      </Card>
-     
-    {/* </div> */}
-    {/* </div> */}
+                <Card className="shadow-sm">
+                  <CardHeader
+                    className="bg-primary text-white d-flex justify-content-between align-items-center"
+                    onClick={toggle}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <h2 className="mb-0" style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white' }}>Instructions</h2>
+                    <span>{isOpen ? '▲' : '▼'}</span>
+                  </CardHeader>
+                  <Collapse isOpen={isOpen}>
+                    <CardBody>
+                      <ListGroup flush numbered>
+                        {instructions.map((instruction, index) => (
+                          <ListGroupItem key={index} className="border-0 py-2 px-3" style={{ fontSize: '0.9rem', color: 'purple' }}>
+                            {instruction}
+                          </ListGroupItem>
+                        ))}
+                      </ListGroup>
+                    </CardBody>
+                  </Collapse>
+                </Card>
+
+                {/* </div> */}
+                {/* </div> */}
               </CardHeader>
               {isLoading ? (
                 <ProgressBar />
@@ -737,17 +862,22 @@ export default function CreateRequest(props) {
                       <FormGroup row>
                         <Label sm={2}>Number Of Orgs</Label>
                         <Col sm={2}>
-                          <Input
-                            value={totalOrgs}
-                            type="Number"
-                            invalid={isValidating && data?.length == 0}
-                            onChange={(e) => {
-                              inputChangeHandler(e.target.value);
-                            }}
-                            placeholder="please enter name "
-                          />
-
-                          <FormFeedback>*Required</FormFeedback>
+                        <div>
+      <Input
+        value={totalOrgs}
+        type="number"
+        onChange={(e) => {
+          inputChangeHandler(e.target.value);
+        }}
+        placeholder="Please enter count"
+        status={validationMessage ? 'error' : ''} // Set status based on validation message
+      />
+      {validationMessage && (
+        <FormFeedback style={{ color: 'red' }}>
+          {validationMessage}
+        </FormFeedback>
+      )}
+    </div>
                         </Col>
                         <Col sm={4}>
                           <Button
@@ -774,9 +904,9 @@ export default function CreateRequest(props) {
                               columns={mergedColumns}
                               rowClassName="editable-row"
                               pagination={false}
-                              // pagination={{
-                              //   onChange: cancel,
-                              // }}
+                            // pagination={{
+                            //   onChange: cancel,
+                            // }}
                             />
                           </Form>
                         </FormGroup>
@@ -796,9 +926,14 @@ export default function CreateRequest(props) {
                             onChange={(e) => {
                               inputChangeHandlerChannel(e.target.value);
                             }}
+                            status={validationMessage ? 'error' : ''} // Set status based on validation message
                           />
 
-                          <FormFeedback>*Required</FormFeedback>
+{validationMessageChannel && (
+        <FormFeedback style={{ color: 'red' }}>
+          {validationMessage}
+        </FormFeedback>
+      )}
                         </Col>
                         <Col sm={4}>
                           <Button
@@ -825,50 +960,50 @@ export default function CreateRequest(props) {
                               columns={mergedColumnsChannel}
                               rowClassName="editable-row"
                               pagination={false}
-                              // pagination={{
-                              //   onChange: cancel,
-                              // }}
+                            // pagination={{
+                            //   onChange: cancel,
+                            // }}
                             />
                           </Form>
                         </FormGroup>
                       ) : null}
                       <Divider></Divider>
 
-                        <FormGroup row  >
-                          <Label sm={3}>
-                            <Input
-                              type="checkbox"
-                              name="caliper"
-                              checked={checkboxes.caliper}
-                              onChange={handleCheckboxChange}
-                              disabled={true}
-                            />
+                      <FormGroup row  >
+                        <Label sm={3}>
+                          <Input
+                            type="checkbox"
+                            name="caliper"
+                            checked={checkboxes.caliper}
+                            onChange={handleCheckboxChange}
+                            disabled={true}
+                          />
                           Caliper
                         </Label>
 
 
 
-                          <Label sm={2}>
-                            <Input
-                              type="checkbox"
-                              name="api"
-                              checked={checkboxes.api}
-                              onChange={handleCheckboxChange}
-                              disabled={true}
-                            />
-                            API
-                         </Label>
-                          <Label sm={4}>
-                            <Input
-                              type="checkbox"
-                              name="blockchainExplorer"
-                              checked={checkboxes.blockchainExplorer}
-                              onChange={handleCheckboxChange}
-                              disabled={true}
-                            />
-                            Blockchain Explorer
-                          </Label>
-                        </FormGroup>
+                        <Label sm={2}>
+                          <Input
+                            type="checkbox"
+                            name="api"
+                            checked={checkboxes.api}
+                            onChange={handleCheckboxChange}
+                            disabled={true}
+                          />
+                          API
+                        </Label>
+                        <Label sm={4}>
+                          <Input
+                            type="checkbox"
+                            name="blockchainExplorer"
+                            checked={checkboxes.blockchainExplorer}
+                            onChange={handleCheckboxChange}
+                            disabled={true}
+                          />
+                          Blockchain Explorer
+                        </Label>
+                      </FormGroup>
                       <Button
                         disabled={data?.length == 0 || channelData?.length == 0}
                         color="primary"
