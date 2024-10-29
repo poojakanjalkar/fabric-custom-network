@@ -101,7 +101,7 @@ export default function Organization() {
 
   const getData = async (page) => {
     let result = await axios.get(
-      `http://localhost:3000/v1/org/?page=${page}&size=10`,
+      `http://localhost:3000/v1/org/?page=${page}&size=5`,
       headers()
     );
     console.log(
@@ -146,14 +146,7 @@ export default function Organization() {
                   <Col sm={9}>
                     <h3 className="mb-0">Organization Data</h3>
                   </Col>
-                  <Col sm={3}>
-                    <Button
-                      className="my-1"
-                      color="primary"
-                      onClick={toggleModal}
-                      type="button"
-                    ></Button>
-                  </Col>
+
                 </FormGroup>
                 <Table
                   className="align-items-center table-flush"
