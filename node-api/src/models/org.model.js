@@ -31,7 +31,7 @@ const organizationSchema = new mongoose.Schema(
       trim: true,
     },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
 organizationSchema.plugin(toJSON);

@@ -128,7 +128,7 @@ class Profile extends React.Component {
                     <h6 className="heading-small text-muted mb-4">
                       <div className="h5 font-weight-300">
                         <i className="ni location_pin mr-2" />
-                        {` Total Credit - ${
+                        {` Remaining Credit - ${
                           JSON.parse(localStorage.getItem("user-data"))?.credit
                         }`}
 

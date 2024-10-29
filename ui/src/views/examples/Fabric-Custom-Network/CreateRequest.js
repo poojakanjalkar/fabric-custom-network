@@ -236,6 +236,21 @@ export default function CreateRequest(props) {
 
   // console.log('-----------data111111', data);
 
+  const [checkboxes, setCheckboxes] = useState({
+    caliper: true,
+    api: true,
+    blockchainExplorer: true,
+  });
+
+  // Handle checkbox change
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setCheckboxes({
+      ...checkboxes,
+      [name]: checked,
+    });
+  };
+
   const inputChangeHandler = (value) => {
     if (value > 0) {
       console.log("-------input changed--------", value);
@@ -818,6 +833,42 @@ export default function CreateRequest(props) {
                         </FormGroup>
                       ) : null}
                       <Divider></Divider>
+
+                        <FormGroup row  >
+                          <Label sm={3}>
+                            <Input
+                              type="checkbox"
+                              name="caliper"
+                              checked={checkboxes.caliper}
+                              onChange={handleCheckboxChange}
+                              disabled={true}
+                            />
+                          Caliper
+                        </Label>
+
+
+
+                          <Label sm={2}>
+                            <Input
+                              type="checkbox"
+                              name="api"
+                              checked={checkboxes.api}
+                              onChange={handleCheckboxChange}
+                              disabled={true}
+                            />
+                            API
+                         </Label>
+                          <Label sm={4}>
+                            <Input
+                              type="checkbox"
+                              name="blockchainExplorer"
+                              checked={checkboxes.blockchainExplorer}
+                              onChange={handleCheckboxChange}
+                              disabled={true}
+                            />
+                            Blockchain Explorer
+                          </Label>
+                        </FormGroup>
                       <Button
                         disabled={data?.length == 0 || channelData?.length == 0}
                         color="primary"

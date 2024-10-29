@@ -177,15 +177,9 @@ export default function Organization() {
                         <tr>
                           <td>{request?.configuration?.projectName}</td>
                           <td>
-                            {request?.configuration?.Organizations?.map(
-                              (e) => e.orgName + ", "
-                            )}
+                          {request?.configuration?.Organizations?.length}
                           </td>
-                          <td>
-                            {request?.configuration?.channels?.map(
-                              (e) => e.channelName + ", "
-                            )}
-                          </td>
+                          <td>{request?.configuration?.channels?.length}</td>
                           <td>{request?.status}</td>
                           {/* <td>{request?.configuration?.currentStateDb}</td> */}
                           <td>
