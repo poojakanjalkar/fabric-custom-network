@@ -47,18 +47,6 @@ const getModifiedObject = (data)=> {
 
   return [...o, ...ordererOrg]
 
-  // for (let a =0; a< orgs.length; a++){
-  //   let org  = orgs[a].peerPorts
-  // }
-
-  // orgs = orgs.map(elm => {
-  //   peerPorts += 1000
-  //   return {
-  //     ...elm,
-  //     peerPorts
-  //   }
-  // })
-
 }
 
 
@@ -89,7 +77,7 @@ let requestModel = new Org({
   let modifiedPorts = getModifiedObject(data.Organizations)
   data.Organizations = modifiedPorts
 
-  console.log("------------data---------", data)
+  console.log("Request received from user", data)
 
   await initiateProjectCreation(data,  user.email, requestModel._id)
 

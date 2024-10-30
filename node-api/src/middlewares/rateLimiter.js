@@ -6,6 +6,14 @@ const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+
+const requestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  skipSuccessfulRequests: true,
+});
+
 module.exports = {
   authLimiter,
+  requestLimiter
 };

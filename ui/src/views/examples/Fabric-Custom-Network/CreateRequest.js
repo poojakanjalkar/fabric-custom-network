@@ -61,7 +61,7 @@ const EditableCell = ({
   ...restProps
 }) => {
 
-  console.log("--------record------------", record)
+  // console.log("--------record------------", record)
 
   // const isEditableRow = record && record.isEditable
   const handleInputChange = (e) => {
@@ -427,7 +427,7 @@ export default function CreateRequest(props) {
         payload,
         headers()
       );
-      console.log("________________", result.data);
+      console.log("______pavan__________", result.data);
 
       // {
       //   "success": true,
@@ -447,6 +447,8 @@ export default function CreateRequest(props) {
         history.push("/admin/Organization");
       }
     } catch (error) {
+      console.log("----------pavan------------", error)
+      addToast(error?.response?.data?.message, { appearance: "error", autoDismiss: false });
       console.log("error occured", error);
     } finally {
       setIsLoading(false);
@@ -554,13 +556,10 @@ export default function CreateRequest(props) {
     try {
       const row = await form.validateFields();
       const newData = [...channelData];
-      console.log("-------newData---------", key, newData);
       const index = newData.findIndex((item) => key === item.key);
       if (index > -1) {
         const item = newData[index];
-        console.log("--------------------before if-----------", item);
         if (item.dataType == "Channel" && !Array.isArray(item.orgName)) {
-          console.log("--------------------inside if-----------");
           item.orgName = item?.orgName?.split(",");
         } else {
           console.log(
@@ -568,13 +567,11 @@ export default function CreateRequest(props) {
             Array.isArray(item.orgName)
           );
         }
-        console.log("---item----newData---------", item, newData);
         newData.splice(index, 1, {
           ...item,
           ...row,
         });
 
-        console.log("-------newData---66666------", newData);
         setChannelData(newData);
         setChannelEditKey("");
       } else {
@@ -600,18 +597,18 @@ export default function CreateRequest(props) {
       width: "20%",
       editable: true,
     },
-    {
-      title: "MSP",
-      dataIndex: "msp",
-      width: "15%",
-      editable: false,
-    },
-    {
-      title: "Certificate Authority",
-      dataIndex: "ca",
-      width: "15%",
-      editable: false,
-    },
+    // {
+    //   title: "MSP",
+    //   dataIndex: "msp",
+    //   width: "15%",
+    //   editable: false,
+    // },
+    // {
+    //   title: "Certificate Authority",
+    //   dataIndex: "ca",
+    //   width: "15%",
+    //   editable: false,
+    // },
     {
       title: "Current State DB",
       dataIndex: "db",
@@ -980,9 +977,6 @@ export default function CreateRequest(props) {
                           />
                           Caliper
                         </Label>
-
-
-
                         <Label sm={2}>
                           <Input
                             type="checkbox"
@@ -1005,7 +999,7 @@ export default function CreateRequest(props) {
                         </Label>
                       </FormGroup>
                       <Button
-                        disabled={data?.length == 0 || channelData?.length == 0}
+                        disabled={data?.length == 0 || channelData?.length == 0 || !projectName}
                         color="primary"
                         onClick={() => {
                           validateAndCreateRequest();
