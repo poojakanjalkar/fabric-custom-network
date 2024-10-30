@@ -889,24 +889,29 @@ const copyAllStaticFiles = async(userFolder)=> {
 
 const addAPIChanges = async(staticMasterData, userFolder)=> {
 
+  let generateCCPFile = "#!/bin/bash \n"
+  generateCCPFile += "function one_line_pem {\n" +
+"    echo \"`awk 'NF {sub(/\\\\n/, \"\"); printf \"%s\\\\\\\\\\\\\\n\",$0;}' $1`\"\n" +
+"}\n";
 
-  let generateCCPFile = `
-  #!/bin/bash
+// #!/bin/bash
 
-    function one_line_pem {
-       echo \"\`awk 'NF {sub(/\\\\n/, ""); printf "%s\\\\\\\\\\\\\\n",$0;}' $1\`"
-    }
+// function one_line_pem {
+//     echo "\`awk 'NF {sub(/\\\\n/, ""); printf "%s\\\\\\\\\\\\\\n",$0;}' $1\`"
+// }
 
-    function json_ccp {
-        local PP=$(one_line_pem $4)
-        local CP=$(one_line_pem $5)
-        sed -e "s/\\\${ORG}/$1/" \\
-            -e "s/\\\${P0PORT}/$2/" \\
-            -e "s/\\\${CAPORT}/$3/" \\
-            -e "s#\\\${PEERPEM}#$PP#" \\
-            -e "s#\\\${CAPEM}#$CP#" \\
-            ./ccp-template.json
-    }
+
+   generateCCPFile += `
+  function json_ccp {
+      local PP=$(one_line_pem $4)
+      local CP=$(one_line_pem $5)
+      sed -e "s/\\\${ORG}/$1/" \\
+          -e "s/\\\${P0PORT}/$2/" \\
+          -e "s/\\\${CAPORT}/$3/" \\
+          -e "s#\\\${PEERPEM}#$PP#" \\
+          -e "s#\\\${CAPEM}#$CP#" \\
+          ./ccp-template.json
+  }
   `
 
   let peerOrgs = staticMasterData.Organizations.filter((elm) => elm.orgType == 'Peer');
@@ -1372,7 +1377,7 @@ const createChannelScript = async(staticMasterData, userFolder) => {
     // console.log("--------peerOrg-------", peerOrg)
     for (let i = 1; i <= ordererCount; i++) {
       let content = `
-      setGlobals ${peerOrg.orgName}
+      setGlobals ${peerOrg.orgName} 1
       osnadmin channel join --channelID \${CHANNEL_NAME} \\
       --config-block ../channel-artifacts/${CHANNEL_NAME}.block -o localhost:${ordererAdminPort} \\
       --ca-file $ORDERER_CA \\
@@ -1466,7 +1471,7 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
 
     packageChaincode() {
       rm -rf \${CC_NAME}.tar.gz
-      setGlobals ${peerOrg.orgName}
+      setGlobals ${peerOrg.orgName} 1
       peer lifecycle chaincode package \${CC_NAME}.tar.gz \\
           --path \${CC_SRC_PATH} --lang \${CC_RUNTIME_LANGUAGE} \\
           --label \${CC_NAME}_\${VERSION}
@@ -1497,7 +1502,7 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
       finalContent +
       `
         queryInstalled() {
-          setGlobals ${peerOrg.orgName}
+          setGlobals ${peerOrg.orgName} 1
           peer lifecycle chaincode queryinstalled >&log.txt
           cat log.txt
           PACKAGE_ID=$(sed -n "/\${CC_NAME}_\${VERSION}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
@@ -1518,7 +1523,7 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
         '\n' +
         `
       approveFor${org}() {
-        setGlobals ${peerOrg.orgName}
+        setGlobals ${peerOrg.orgName} 1
         set -x
         peer lifecycle chaincode approveformyorg -o localhost:7050 \\
             --ordererTLSHostnameOverride orderer1.com --tls \\
@@ -1544,9 +1549,9 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
       '\n' +
       `
         checkCommitReadyness() {
-          setGlobals  ${peerOrg.orgName}
+          setGlobals  ${peerOrg.orgName} 1
           peer lifecycle chaincode checkcommitreadiness \\
-              --channelID ${channel.channelName} --name \${CC_NAME} --version \${VERSION} \\
+              --channelID \${channel.channelName} --name \${CC_NAME} --version \${VERSION} \\
               --sequence \${SEQUENCE} --output json
           echo "===================== checking commit readyness from org 1 ===================== "
       }
@@ -1577,10 +1582,10 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
       '\n' +
       `
     commitChaincodeDefination() {
-      setGlobals ${peerOrg.orgName}
+      setGlobals ${peerOrg.orgName} 1
       peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer1.com \\
           --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \\
-          --channelID ${channel.channelName} --name \${CC_NAME} \\
+          --channelID \${channel.channelName} --name \${CC_NAME} \\
           --version \${VERSION} --sequence \${SEQUENCE} \\
           ${peersAddress}
   }
@@ -1609,14 +1614,14 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
       '\n' +
       `
     chaincodeInvoke() {
-      setGlobals ${peerOrg.orgName}
+      setGlobals ${peerOrg.orgName} 1
   
       # Create Car
       peer chaincode invoke -o localhost:7050 \\
           --ordererTLSHostnameOverride orderer1.com \\
           --tls $CORE_PEER_TLS_ENABLED \\
           --cafile $ORDERER_CA \\
-          -C ${channel.channelName} -n \${CC_NAME}  \\
+          -C \${channel.channelName} -n \${CC_NAME}  \\
           -c '{"function": "CreateAsset","Args":["{\\"id\\":\\"6\\", \\"test\\":\\"updated data\\"}"]}' \\
           ${peersAddress}
           
@@ -1632,8 +1637,8 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
       '\n' +
       `
   chaincodeQuery() {
-    setGlobals ${peerOrg.orgName}
-    peer chaincode query -C ${channel.channelName} -n \${CC_NAME} -c '{"function": "getAssetByID","Args":["6"]}'
+    setGlobals ${peerOrg.orgName} 1
+    peer chaincode query -C \${channel.channelName} -n \${CC_NAME} -c '{"function": "getAssetByID","Args":["6"]}'
 }
     `;
 
