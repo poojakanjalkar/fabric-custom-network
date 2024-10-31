@@ -15,3 +15,4 @@ services:
     env_file: ./.env
     volumes:
       - ./wallets:/usr/src/app/wallets
+      - ./projectData:/usr/src/app/src/jobs/NetworkData

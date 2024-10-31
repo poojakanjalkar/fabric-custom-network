@@ -8,7 +8,6 @@ const envVarsSchema = Joi.object()
   .keys({
     ENV: Joi.string().valid('prod', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
-    MONGODB_URL: Joi.string().required().description('Mongo DB url'),
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
@@ -24,9 +23,6 @@ const envVarsSchema = Joi.object()
     MONGODB_NAME: Joi.string().required().description('Mongodb name'),
     CA_ADMIN_ID: Joi.string().required().description('CA admin user name'),
     CA_ADMIN_SECRET: Joi.string().required().description('ca admin password'),
-    AWS_SECRET_ACCESS: Joi.string().required().description('AW Secret Required'),
-    AWS_ACCESS_KEY: Joi.string().required().description('AWS Access key required'),
-    AWS_PRIVATE_BUCKET_NAME: Joi.string().required().description('AWS Access key required'),
     COMMON_PASSWORD:Joi.string().required().description("Add common password"),
     RAZORPAY_WEBHOOK_SECRET: Joi.string().required().description("Please provide razorpaywebhook secret"),
     
@@ -50,9 +46,6 @@ module.exports = {
   port: envVars.PORT,
   caAdminId: envVars.CA_ADMIN_ID,
   caAdminSecret: envVars.CA_ADMIN_SECRET,
-  awsAccessKey:envVars.AWS_ACCESS_KEY,
-  awsSecretAccess: envVars.AWS_SECRET_ACCESS,
-  awsPrivateBucketName: envVars.AWS_PRIVATE_BUCKET_NAME,
   commonPassword:envVars.COMMON_PASSWORD,
   razorPayWebhookSecret: envVars.RAZORPAY_WEBHOOK_SECRET,
   mongoose: {
@@ -69,16 +62,6 @@ module.exports = {
     refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
     resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
     verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
-  },
-  email: {
-    smtp: {
-      host: envVars.SMTP_HOST,
-      port: envVars.SMTP_PORT,
-      auth: {
-        user: envVars.SMTP_USERNAME,
-        pass: envVars.SMTP_PASSWORD,
-      },
-    },
-    from: envVars.EMAIL_FROM,
-  },
+  }
+
 };
