@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { staticMasterData } = require('../data/conf');
+// const { staticMasterData } = require('../data/conf');
 const yaml = require('js-yaml');
 const path = require('path');
 

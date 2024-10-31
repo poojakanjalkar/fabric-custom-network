@@ -70,6 +70,7 @@ const verifyToken = async (token, type) => {
 const generateAuthTokens = async (user) => {
   let org = await Organization.findOne({ id: user.orgId });
   let subscription = await Subscription.findOne({ email: user.email }).exec();
+  console.log("=========subscription========",subscription )
 
   let userData = {
     email: user.email,
@@ -78,7 +79,7 @@ const generateAuthTokens = async (user) => {
     name: user.name,
     id: user.id,
     subscription,
-    credit: subscription.credit,
+    credit: subscription?.credit,
     isSubscribed: subscription ? true : false,
   };
 

@@ -7,7 +7,7 @@ services:
   e-contract-ui:
     container_name: e-contract-ui
     image: e-contract:1.4
-    env_file: ./.env
+    env_file: ./.env.production
     build:
       context: .
     networks:
