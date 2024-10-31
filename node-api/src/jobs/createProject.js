@@ -881,7 +881,7 @@ const copyAllStaticFiles = async (userFolder) => {
   await copyDirectory2(performanceToolsSourceFolder, performanceToolsDestinationFolder);
 
   // copy API
-  const apiSourceFolder = __dirname + '/' + '../../../api';
+  const apiSourceFolder = __dirname + '/' + '../../api';
   let apiDestinationFolder = `${userFolder}/api`;
   await copyDirectory2(apiSourceFolder, apiDestinationFolder);
 
