@@ -41,8 +41,10 @@ const userSchema = mongoose.Schema(
     status: { type: String, default: USER_STATUS.INACTIVE },
     type: { type: String, default: USER_TYPE.USER },
     orgId: { type: Number },
+    orgName:{
+      type: String
+    },
 
-    department: { type: String },
     secret: { type: String, required: false },
     isVerified: { type: Boolean, required: false, default: false },
   },

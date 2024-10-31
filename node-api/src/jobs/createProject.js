@@ -894,11 +894,6 @@ const addAPIChanges = async(staticMasterData, userFolder)=> {
 "    echo \"`awk 'NF {sub(/\\\\n/, \"\"); printf \"%s\\\\\\\\\\\\\\n\",$0;}' $1`\"\n" +
 "}\n";
 
-// #!/bin/bash
-
-// function one_line_pem {
-//     echo "\`awk 'NF {sub(/\\\\n/, ""); printf "%s\\\\\\\\\\\\\\n",$0;}' $1\`"
-// }
 
 
    generateCCPFile += `
@@ -944,6 +939,132 @@ const addAPIChanges = async(staticMasterData, userFolder)=> {
     console.log("--------error---addAPIChanges----", error)
   }
   fs.writeFileSync(`${filePath}/generate-ccp.sh`, generateCCPFile, 'utf8');
+
+// Add bootstrap script
+
+let staticUsers = []
+let staticOrgs=[]
+let user;
+let org;
+
+for (let i=0;i<peerOrgs.length; i++){
+
+  user = {
+    name: 'max',
+    email: `user${i+1}@gmail.com`,
+    orgId: i+1,
+    orgName:peerOrgs[i].orgName,
+    password: "Admin@12345",
+  }
+  staticUsers.push(user)
+  org = {
+   orgName: peerOrgs[i].orgName, id: i+1, parentId: 1 
+  }
+  staticOrgs.push(org)
+}
+
+
+
+let bootstrapFile = `
+const config = require('../config/config');
+const Organization = require('../models/organization.model');
+const User = require('../models/user.model');
+const { ORG_DEPARTMENT, USER_STATUS, USER_TYPE } = require('./Constants');
+const { registerUser } = require('./blockchainUtils');
+const staticUser = ${JSON.stringify(staticUsers, null, 2)}
+
+const ingestBootstrapData = async () => {
+  const staticOrgData = ${JSON.stringify(staticOrgs, null, 2)}
+  
+  //org data
+  for (let org of staticOrgData) {
+    let orgData = await Organization.findOne({ id: org.id });
+    if (!orgData) {
+      let o = new Organization({
+        id: org.id,
+        orgName: org.orgName,
+        parentId: org.parentId,
+      });
+      await o.save();
+      console.log('Ingesting static org data', org.name);
+    } else {
+      console.log('organization already exist', org.name);
+    }
+  }
+
+  //user data
+  for (let user of staticUser) {
+    let userData = await User.findOne({ email: user.email });
+    // console.log('user data is---', userData);
+    if (!userData) {
+      let newUser = new User({
+        name: user.name,
+        email: user.email,
+        orgId: user.orgId,
+        password: user.password,
+        status: USER_STATUS.ACTIVE,
+        type: USER_TYPE.ADMIN,
+      });
+      try {
+        //Blockchain Registration and Enrollment call
+        let secret = await registerUser(\`\${user.orgName}\`, user.email);
+        newUser.secret = secret;
+        newUser.isVerified = true;
+      } catch (error) {
+        console.log("-----Error occured while registring user-----", error)
+      }
+     
+      await newUser.save();
+
+      console.log('----ingest static user data--', user.email);
+    } else {
+      console.log('user email already exist', user.email);
+    }
+  }
+};
+module.exports = { ingestBootstrapData, staticUser };
+`
+let bootstrapFilePath = `${userFolder}/api/src/utils/bootstrap.js`;
+
+fs.writeFileSync(bootstrapFilePath, bootstrapFile, 'utf8');
+
+let firstChannelName = staticMasterData.channels[0].channelName
+let firstChaincodeName = staticMasterData.channels[0].ChaincodeName
+let constantsFile = `
+const USER_STATUS = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  OTHER: 'other'
+}
+const USER_TYPE = {
+  ADMIN: 'admin',
+  USER: 'user'
+}
+const BLOCKCHAIN_DOC_TYPE = {
+  AGREEMENT: 'asset',
+  DOCUMENT: 'document'
+}
+const NETWORK_ARTIFACTS_DEFAULT ={
+  CHANNEL_NAME: '${firstChannelName}\',
+  CHAINCODE_NAME: '${firstChaincodeName}\',
+  QSCC:'qscc'
+}
+module.exports = {
+  USER_STATUS,
+  USER_TYPE,
+  NETWORK_ARTIFACTS_DEFAULT,
+  BLOCKCHAIN_DOC_TYPE,
+}
+`
+
+// /Users/pavanadhav/Documents/Pavan/UdemyCourse/fabric-custom-network/api/src/utils/bootstrap.js
+let constantsFilePath = `${userFolder}/api/src/utils/Constants.js`;
+// try {
+// createFileIfNotExist(constantsFilePath);
+// } catch (error) {
+//   console.log("--------error---addAPIChanges----", error)
+// }
+fs.writeFileSync(constantsFilePath, constantsFile, 'utf8');
 
 }
 
@@ -1551,7 +1672,7 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
         checkCommitReadyness() {
           setGlobals  ${peerOrg.orgName} 1
           peer lifecycle chaincode checkcommitreadiness \\
-              --channelID \${channel.channelName} --name \${CC_NAME} --version \${VERSION} \\
+              --channelID \${CHANNEL_NAME} --name \${CC_NAME} --version \${VERSION} \\
               --sequence \${SEQUENCE} --output json
           echo "===================== checking commit readyness from org 1 ===================== "
       }
@@ -1585,7 +1706,7 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
       setGlobals ${peerOrg.orgName} 1
       peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer1.com \\
           --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \\
-          --channelID \${channel.channelName} --name \${CC_NAME} \\
+          --channelID \${CHANNEL_NAME} --name \${CC_NAME} \\
           --version \${VERSION} --sequence \${SEQUENCE} \\
           ${peersAddress}
   }
@@ -1621,7 +1742,7 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
           --ordererTLSHostnameOverride orderer1.com \\
           --tls $CORE_PEER_TLS_ENABLED \\
           --cafile $ORDERER_CA \\
-          -C \${channel.channelName} -n \${CC_NAME}  \\
+          -C \${CHANNEL_NAME} -n \${CC_NAME}  \\
           -c '{"function": "CreateAsset","Args":["{\\"id\\":\\"6\\", \\"test\\":\\"updated data\\"}"]}' \\
           ${peersAddress}
           
@@ -1638,7 +1759,7 @@ const createDeployChaincodeScript = async(staticMasterData, userFolder) => {
       `
   chaincodeQuery() {
     setGlobals ${peerOrg.orgName} 1
-    peer chaincode query -C \${channel.channelName} -n \${CC_NAME} -c '{"function": "getAssetByID","Args":["6"]}'
+    peer chaincode query -C \${CHANNEL_NAME} -n \${CC_NAME} -c '{"function": "getAssetByID","Args":["6"]}'
 }
     `;
 

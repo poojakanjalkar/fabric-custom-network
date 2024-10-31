@@ -1,19 +1,11 @@
-const httpStatus = require('http-status');
 const { User } = require('../models');
-const mongoose = require('mongoose');
-
-const ApiError = require('../utils/ApiError');
-const { Gateway, Wallets } = require('fabric-network');
 const { getContractObject } = require('../utils/blockchainUtils');
 const {
   NETWORK_ARTIFACTS_DEFAULT,
 } = require('../utils/Constants');
 const { getUUID } = require('../utils/uuid');
-const { getSignedUrl } = require('../utils/fileUpload');
-const Emissions = require('../models/emission.model');
 
 // If we are sure that max records are limited, we can use any max number
-const DEFAULT_MAX_RECORDS = 100
 const utf8Decoder = new TextDecoder();
 
 
@@ -29,7 +21,7 @@ const addAsset = async (assetData, user) => {
   let client
   try {
     let dateTime = new Date();
-    let orgName = `org${user.orgId}`;
+    let orgName = user.orgName;
     const data = {
       id:getUUID(),
      ...assetData,
@@ -66,7 +58,7 @@ const queryHistoryById = async (id, user) => {
   let gateway;
   let client
   try {
-    let orgName = `org${user.orgId}`;
+    let orgName = user.orgName;
     const contract = await getContractObject(
       orgName,
       user.email,
@@ -76,7 +68,6 @@ const queryHistoryById = async (id, user) => {
       client
     );
     let result = await contract.submitTransaction('getAssetHistory', id);
-    // result = JSON.parse(result.toString());
     result = JSON.parse(utf8Decoder.decode(result));
     if (result) {
       result = result?.map(elm => {
@@ -105,7 +96,7 @@ const queryAssetById = async (id, user) => {
   let gateway;
   let client;
   try {
-    let orgName = `org${user.orgId}`;
+    let orgName = user.orgName;
 
     const contract = await getContractObject(
       orgName,

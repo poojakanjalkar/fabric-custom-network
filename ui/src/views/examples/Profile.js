@@ -18,11 +18,38 @@ import {
 import UserHeader from "../../components/Headers/UserHeader.js";
 // import { useSelector } from 'react-redux';
 import { connect } from "react-redux";
-import { headers } from "helper/config.js";
 import axios from "axios";
+import { routes, headers } from "../../helper/config.js";
 // import Razorpay from 'razorpay';
 
 class Profile extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      credit: 'Loading...'
+    };
+  }
+
+  componentDidMount() {
+
+    axios.get(`${routes.credits}`, headers())
+      .then(response => {
+        // Set the response data to the component state
+        this.setState({ data: response.data, loading: false });
+        let userdata = JSON.parse(localStorage.getItem("user-data"))
+        userdata.subscription = response?.data?.payload
+        // localStorage.setItem()
+        localStorage.setItem('user-data',JSON.stringify(userdata))
+        this.setState({credit: response?.data?.payload?.credit || 0 })
+        console.log("-----------------", response.data)
+      })
+      .catch(error => {
+        // Handle any errors and update the state
+        this.setState({ error: error.message, loading: false });
+      });
+  }
+
   loadScript = (src) => {
     return new Promise((resovle) => {
       const script = document.createElement("script");
@@ -54,29 +81,35 @@ class Profile extends React.Component {
 
     const options = {
       key: "rzp_test_0og2WBRWa80vrw",
-      currency: "INR",
-      amount: 1 * 100,
+      // currency:'INR',
+      currency: "USD",
+      amount: 30 * 100,
       name: "Pavan Tech Academy",
       description: "Thanks for purchasing",
       customer: {
         name: JSON.parse(localStorage.getItem("user-data")).name,
         email: JSON.parse(localStorage.getItem("user-data")).email,
       },
-      // image:
-      //   "https://mern-blog-akky.herokuapp.com/static/media/logo.8c649bfa.png",
-
       handler: async function (response) {
         // alert(response.razorpay_payment_id);
         // alert("Payment Successfully");
+        // routes
         console.log("++++++++++*******+++++*****+++++");
         let subscription = await axios.get(
-          "http://localhost:3000/v1/org/credit",
+          `${routes.credits}`,
           headers()
         );
         console.log(
           "_______get subscription creditttt_____________",
           subscription.data
         );
+
+        let userdata = JSON.parse(localStorage.getItem("user-data"))
+        userdata.subscription = subscription?.data?.payload
+        // localStorage.setItem()
+        localStorage.setItem('user-data',JSON.stringify(userdata))
+
+        this.setState({credit: subscription?.data?.payload?.credit || 0 })
 
         useEffect(() => {
           console.log(
@@ -129,7 +162,8 @@ class Profile extends React.Component {
                       <div className="h5 font-weight-300">
                         <i className="ni location_pin mr-2" />
                         {` Remaining Credit - ${
-                          JSON.parse(localStorage.getItem("user-data"))?.credit
+                          this.state.credit
+                          // JSON.parse(localStorage.getItem("user-data"))?.subscription?.credit
                         }`}
 
                         {/* {` Total Credit - ${credit}`} */}

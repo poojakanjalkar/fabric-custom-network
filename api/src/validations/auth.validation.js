@@ -7,7 +7,6 @@ const register = {
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
     name: Joi.string().required(),
-    department: Joi.string().required().valid(ORG_DEPARTMENT.FINANCIAL, ORG_DEPARTMENT.LEGAL),
     orgId: Joi.number().required()
   }),
 };

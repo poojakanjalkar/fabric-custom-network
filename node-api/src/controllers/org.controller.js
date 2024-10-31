@@ -9,10 +9,11 @@ const Org = require('../models/org.model');
 
 const getAllOrganizations = async (req, res) => {
   const { page, size } = req.query;
+  const { user } = req.loggerInfo;
+  console.log('----user---------1111---', user);
   const { limit, offset } = getPagination(page, size);
   let options = { offset, limit, sort: { createdAt: -1 } };
-  const organizations = await OrgService.getAllOrganizations(options);
-  // console.log('----docs-----', organizations);
+  const organizations = await OrgService.getAllOrganizations(options, user);
   res.status(httpStatus.OK).send(getSuccessResponse(httpStatus.OK, 'organization fetched successfully', organizations));
 };
 

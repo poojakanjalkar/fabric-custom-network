@@ -41,12 +41,15 @@ import {
 } from "antd";
 
 import Header from "components/Headers/Header";
-import AddOrganization from "./AddOrganization";
-
+// import AddOrganization from "./AddOrganization";
+headers
 import { useToasts } from "react-toast-notifications";
-import { headers } from "helper/config";
+// import { headers, routes } from "helper/config";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
+import { routes, headers } from "../../../helper/config";
+
+// import { routes } from "helper/config";
 const { Option } = Select;
 // import type { TableProps } from 'antd';
 
@@ -420,10 +423,10 @@ export default function CreateRequest(props) {
       Organizations: data,
       channels: channelData,
     };
+
     setIsLoading(true);
     try {
-      let result = await axios.post(
-        "http://localhost:3000/v1/org/",
+      let result = await axios.post(`${routes.request}`,
         payload,
         headers()
       );

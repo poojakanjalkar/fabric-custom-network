@@ -126,7 +126,7 @@ const registerUser = async (orgName, userName, department) => {
       certificate: enrollment.certificate,
       privateKey: enrollment.key.toBytes(),
     },
-    mspId: orgName.charAt(0).toUpperCase() + orgName.slice(1) + 'MSP',
+    mspId: orgName+ 'MSP',
     type: 'X.509',
   };
   await wallet.put(userName, x509Identity);
@@ -149,10 +149,10 @@ const getIdentity = async (identity) => {
 
 const getClient = async (ccp, orgName) => {
 
-  const tlsCredentials = grpc.credentials.createSsl(Buffer.from(ccp.peers[`peer0.${orgName}.com`].tlsCACerts.pem));
+  const tlsCredentials = grpc.credentials.createSsl(Buffer.from(ccp.peers[`peer1.${orgName}.com`].tlsCACerts.pem));
 
-  return new grpc.Client(ccp.peers[`peer0.${orgName}.com`].url, tlsCredentials, {
-    'grpc.ssl_target_name_override': ccp.peers[`peer0.${orgName}.com`].grpcOptions.ssl_target_name_override,
+  return new grpc.Client(ccp.peers[`peer1.${orgName}.com`].url, tlsCredentials, {
+    'grpc.ssl_target_name_override': ccp.peers[`peer1.${orgName}.com`].grpcOptions.ssl_target_name_override,
   });
 };
 

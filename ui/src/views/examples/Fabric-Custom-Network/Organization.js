@@ -22,7 +22,7 @@ import ReactPaginate from "react-paginate";
 import axios from "axios";
 import Header from "components/Headers/Header";
 import AddOrganization from "./AddOrganization";
-import { headers } from "helper/config";
+// import { headers } from "helper/config";
 import { map } from "jquery";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { faEye, faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -30,6 +30,7 @@ import "@fortawesome/fontawesome-free/css/all.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faDownload } from "@fortawesome/free-solid-svg-icons";
 import ViewOrgTable from "./ViewOrgTable";
+import { routes, headers } from "../../../helper/config";
 export default function Organization() {
   const [orgList, setOrgList] = useState([
     {
@@ -73,7 +74,7 @@ export default function Organization() {
     h.headers['Access-Control-Allow-Origin']= '*'
     h.responseType = 'arraybuffer'
     let result = await axios.get(
-      `http://localhost:3000/v1/org/download/${id}`,
+      `${routes.download}/${id}`,
       h
     );
 
@@ -98,10 +99,9 @@ export default function Organization() {
   useEffect(() => {
     getData(0);
   }, []);
-
   const getData = async (page) => {
     let result = await axios.get(
-      `http://localhost:3000/v1/org/?page=${page}&size=5`,
+      `${routes.request}?page=${page}&size=5`,
       headers()
     );
     console.log(

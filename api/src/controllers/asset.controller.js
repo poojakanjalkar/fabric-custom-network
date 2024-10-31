@@ -1,10 +1,7 @@
 const httpStatus = require('http-status');
-const pick = require('../utils/pick');
-const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService, agreementService } = require('../services');
 const { getSuccessResponse } = require('../utils/Response');
-const {  addAsset, queryAssetById } = require('../services/asset.service');
+const {  addAsset, queryAssetById, queryHistoryById } = require('../services/asset.service');
 
 const createAsset = catchAsync(async (req, res) => {
   let { user } = req.loggerInfo;
@@ -17,7 +14,7 @@ const getHistoryById = catchAsync(async (req, res) => {
   const { id } = req.params;
 
   let { user } = req.loggerInfo;
-  let data = await agreementService.queryHistoryById(id, user);
+  let data = await queryHistoryById(id, user);
 
   res.status(httpStatus.OK).send(getSuccessResponse(httpStatus.OK, 'Asset fetched successfully', data));
 });

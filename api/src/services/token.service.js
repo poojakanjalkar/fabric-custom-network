@@ -73,10 +73,9 @@ const generateAuthTokens = async (user) => {
     email: user.email,
     type: user.type,
     orgId: user.orgId,
+    orgName: org?.orgName,
     name: user.name,
     id: user.id,
-    department: user.department,
-    orgName: org.name,
   };
 
   const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');

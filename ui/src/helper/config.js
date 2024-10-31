@@ -5,7 +5,13 @@
 let BASE_URL= process.env.REACT_APP_BASE_URL || "http://localhost:3000/v1"
 
 export const routes = {
-    register: `${BASE_URL}/users`,
+    googleLogin: `${BASE_URL}/auth/login/google-auth`,
+    credits: `${BASE_URL}/users/credit`,
+    request: `${BASE_URL}/org`,
+    download: `${BASE_URL}/org/download`,
+    getRequests: `${BASE_URL}/org`,
+
+
     login: `${BASE_URL}/auth/login`,
     registerUser: `${BASE_URL}/auth/register`,
     getUserList: `${BASE_URL}/users`,
@@ -19,10 +25,6 @@ export const routes = {
 
     activateUser: `${BASE_URL}/users/activate`,
     deActivateUser:`${BASE_URL}/users/deactivate`,
-    // getAllContracts: `${BASE_URL}/fabric/channels/mychannel/chaincodes/contract_cc?args=['1']&fcn=GetContractsForQuery`,
-    // getExpiringContracts: `${BASE_URL}/fabric/channels/mychannel/chaincodes/contract_cc?args=['1']&fcn=GetInProgressContract`,
-    // addContract:`${BASE_URL}/fabric/channels/mychannel/chaincodes/contract_cc`,
-    // getContractHistory: `${BASE_URL}/fabric/channels/mychannel/chaincodes/contract_cc?fcn=GetHistoryForAsset&`
 }
 
 export const headers = () => {

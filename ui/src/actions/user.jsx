@@ -80,7 +80,7 @@ export function login(data) {
   return dispatch => {
     dispatch(createAction(START_USER_LOGIN));
     console.log("============routes.login==============", routes.login)
-    return axios.post(routes.login, data)
+    return axios.post(routesPaths.login, data)
       .then(resp => {
         dispatch(createAction(END_LOADING))
         if (resp && resp.data) {

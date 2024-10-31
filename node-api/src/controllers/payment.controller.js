@@ -3,6 +3,7 @@ const httpStatus = require('http-status');
 const { getSuccessResponse } = require('../utils/Response');
 
 const crypto = require('crypto');
+const config = require('../config/config');
 
 function verifyWebhookSignature(secret, body, signature) {
   const expectedSignature = crypto.createHmac('sha256', secret).update(body, 'utf8').digest('hex');
@@ -12,7 +13,7 @@ function verifyWebhookSignature(secret, body, signature) {
 
 const payment = async (req, res) => {
   console.log('-----------------received data from razorpay-------------------', req.body);
-  const secret = '8WrI4Kbxg9zGHl7vyRzUEkvl'; // Replace with your actual webhook secret
+  const secret =  config.razorPayWebhookSecret //'8WrI4Kbxg9zGHl7vyRzUEkvl'; // Replace with your actual webhook secret
   const body = JSON.stringify(req.body);
   console.log('----------data------', JSON.stringify(body));
   const signature = req.get('X-Razorpay-Signature');

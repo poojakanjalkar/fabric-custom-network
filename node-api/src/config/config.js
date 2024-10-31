@@ -27,7 +27,8 @@ const envVarsSchema = Joi.object()
     AWS_SECRET_ACCESS: Joi.string().required().description('AW Secret Required'),
     AWS_ACCESS_KEY: Joi.string().required().description('AWS Access key required'),
     AWS_PRIVATE_BUCKET_NAME: Joi.string().required().description('AWS Access key required'),
-    COMMON_PASSWORD:Joi.string().required().description("Add common password")
+    COMMON_PASSWORD:Joi.string().required().description("Add common password"),
+    RAZORPAY_WEBHOOK_SECRET: Joi.string().required().description("Please provide razorpaywebhook secret"),
     
   })
   .unknown();
@@ -53,6 +54,7 @@ module.exports = {
   awsSecretAccess: envVars.AWS_SECRET_ACCESS,
   awsPrivateBucketName: envVars.AWS_PRIVATE_BUCKET_NAME,
   commonPassword:envVars.COMMON_PASSWORD,
+  razorPayWebhookSecret: envVars.RAZORPAY_WEBHOOK_SECRET,
   mongoose: {
     url: `mongodb${srv}://${envVars.MONGODB_USERNAME}:${envVars.MONGODB_PASSWORD}@${envVars.MONGODB_HOST}/${envVars.MONGODB_NAME}?retryWrites=true&w=majority&authSource=admin`,
     options: {

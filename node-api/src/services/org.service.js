@@ -4,10 +4,9 @@ const Org = require('../models/org.model');
 const Subscription = require('../models/subscription.model');
 const { REQUEST_STATUS } = require('../utils/Constants');
 
-const getAllOrganizations = async (options, filter) => {
-  console.log('++++++options+++++', options);
-  const result = await Org.find({});
-  // console.log('________', result);
+const getAllOrganizations = async (options, user) => {
+  console.log('++++++options+++++', options, user);
+  let filter = {userId:user.email}
   return Org.paginate(filter, options);
 };
 

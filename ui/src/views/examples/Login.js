@@ -76,7 +76,7 @@ function Login() {
 
     console.log("before making call", credential)
     let result = await axios.post(
-      "http://localhost:3000/v1/auth/login/google-auth",
+      `${routes.googleLogin}`,
       credential,
       // headers()
     );

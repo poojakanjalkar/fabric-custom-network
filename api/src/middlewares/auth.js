@@ -21,7 +21,7 @@ const auth = catchAsync(async(req, res, next) => {
       id: decodedData?.email,
       email: decodedData?.email,
       orgId: decodedData?.orgId?.toString(),
-      department: decodedData?.department
+      orgName: decodedData?.orgName
     },
   };
   return next();
@@ -47,7 +47,8 @@ const adminAuth = catchAsync(async(req, res, next) => {
       id: decodedData?.email,
       email: decodedData?.email,
       orgId: parseInt(decodedData?.orgId),
-      department: decodedData?.department
+      department: decodedData?.department,
+      orgName: decodedData?.orgName
     },
   };
   return next();

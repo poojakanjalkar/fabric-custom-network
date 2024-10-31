@@ -6,6 +6,10 @@ const { REQUEST_STATUS } = require('../utils/Constants');
 const createPayment = async (data) => {
   console.log('--razor pay data----', data);
 
+  if(data.event !== 'payment.captured'){
+    return
+  }
+
   try {
     let t = {
       txId: data?.payload?.payment?.entity?.id,
@@ -28,7 +32,7 @@ const createPayment = async (data) => {
       console.log('-----------cp2 if-----------------');
       let newAmount = sub.amount + t.amount;
       console.log('-----------cp2.1-----------------', newAmount);
-      await Subscription.updateOne({ email: t.email }, { $set: { amount: newAmount } });
+      await Subscription.updateOne({ email: t.email }, { $set: { amount: newAmount, credit: sub.credit + 2 } });
     } else {
       console.log('-----------cp3 else-----------------');
       let s = {
@@ -37,11 +41,7 @@ const createPayment = async (data) => {
         amount: t.amount,
         currency: t.currency,
       };
-      if (t.amount >= 1) {
-        s.credit = 10;
-      } else {
-        s.credit = 1;
-      }
+        s.credit = 2;
       console.log('-------------subscription--------------', s);
       let subscription = new Subscription(s);
       await subscription.save();
