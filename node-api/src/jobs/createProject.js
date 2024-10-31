@@ -858,25 +858,25 @@ async function copyDirectory2(src, dest) {
 
 const copyAllStaticFiles = async (userFolder) => {
   // Copy Config folder
-  // const sourceFolderRelative = '../../../blockchain/artifacts/channel/config';
-  // const sourceFolder = path.resolve(process.cwd(), '../../../blockchain/artifacts/channel/config');
-  const sourceFolder = __dirname + '/' + '../../../blockchain/artifacts/channel/config';
+  // const sourceFolderRelative = '../../blockchain/artifacts/channel/config';
+  // const sourceFolder = path.resolve(process.cwd(), '../../blockchain/artifacts/channel/config');
+  const sourceFolder = __dirname + '/' + '../../blockchain/artifacts/channel/config';
   let destinationFolder = `${userFolder}/blockchain/artifacts/channel/config`;
 
   copyDirectory(sourceFolder, destinationFolder);
 
   // copy chaincode
-  const chaincodeSourceFolder = __dirname + '/' + '../../../blockchain/artifacts/chaincode/javascript';
+  const chaincodeSourceFolder = __dirname + '/' + '../../blockchain/artifacts/chaincode/javascript';
   let chaincodeDestinationFolder = `${userFolder}/blockchain/artifacts/chaincode/javascript`;
   await copyDirectory2(chaincodeSourceFolder, chaincodeDestinationFolder);
 
   // copy explorer
-  const explorerSourceFolder = __dirname + '/' + '../../../blockchain/Explorer';
+  const explorerSourceFolder = __dirname + '/' + '../../blockchain/Explorer';
   let explorerDestinationFolder = `${userFolder}/blockchain/Explorer`;
   await copyDirectory2(explorerSourceFolder, explorerDestinationFolder);
 
   // copy performance tools
-  const performanceToolsSourceFolder = __dirname + '/' + '../../../blockchain/performance-tool';
+  const performanceToolsSourceFolder = __dirname + '/' + '../../blockchain/performance-tool';
   let performanceToolsDestinationFolder = `${userFolder}/blockchain/performance-tool`;
   await copyDirectory2(performanceToolsSourceFolder, performanceToolsDestinationFolder);
 
