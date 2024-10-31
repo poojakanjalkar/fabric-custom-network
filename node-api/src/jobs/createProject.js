@@ -1024,9 +1024,14 @@ const ingestBootstrapData = async () => {
 };
 module.exports = { ingestBootstrapData, staticUser };
 `
-  let bootstrapFilePath = `${userFolder}/api/src/utils/bootstrap.js`;
-
-  fs.writeFileSync(bootstrapFilePath, bootstrapFile, 'utf8');
+  let bootstrapFilePath = `${userFolder}/api/src/utils/`;
+  try {
+    createFileIfNotExist(bootstrapFilePath);
+    } catch (error) {
+      console.log("--------error---addAPIChanges-bootstrapFilePath---", error)
+    }
+  fs.writeFileSync(bootstrapFilePath+'bootstrap.js', bootstrapFile, 'utf8');
+  console.log("-------", 'Botstrap File Created')
 
   let firstChannelName = staticMasterData.channels[0].channelName
   let firstChaincodeName = staticMasterData.channels[0].ChaincodeName
@@ -1058,13 +1063,14 @@ module.exports = {
 `
 
   // /Users/pavanadhav/Documents/Pavan/UdemyCourse/fabric-custom-network/api/src/utils/bootstrap.js
-  let constantsFilePath = `${userFolder}/api/src/utils/Constants.js`;
-  // try {
-  // createFileIfNotExist(constantsFilePath);
-  // } catch (error) {
-  //   console.log("--------error---addAPIChanges----", error)
-  // }
-  fs.writeFileSync(constantsFilePath, constantsFile, 'utf8');
+  let constantsFilePath = `${userFolder}/api/src/utils/`;
+  try {
+  createFileIfNotExist(constantsFilePath);
+  } catch (error) {
+    console.log("--------error---addAPIChanges---constantsFilePath-", error)
+  }
+  fs.writeFileSync(constantsFilePath+'Constants.js', constantsFile, 'utf8');
+  console.log("-------", 'Constant File Created')
 
 }
 
