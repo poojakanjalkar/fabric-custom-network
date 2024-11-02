@@ -1,17 +1,4 @@
-<<<<<<< HEAD
-=======
-// import React from 'react'
 
-// export default function AboutUs() {
-//   return (
-//     <div>
-//       <p>{"Pavan-----------------------------------------"}</p>
-//     </div>
-//   )
-// }
-
-
->>>>>>> 74fd20820407b3c1e830dd9f15975d5e1bb50492
 import React from "react";
 // reactstrap components
 import {
@@ -55,8 +42,4 @@ class AboutUs extends React.Component {
     );
   }
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 74fd20820407b3c1e830dd9f15975d5e1bb50492
 export default AboutUs;
