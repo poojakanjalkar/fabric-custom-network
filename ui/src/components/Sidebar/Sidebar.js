@@ -8,6 +8,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import * as UserAction from '../../actions/user'
 
 import { connect } from "react-redux";
+// const logo = require('../../assets/img/brand/logo.png')
+
+import logo from '../../assets/img/brand/logo.png'
 
 // reactstrap components
 import {Button,Card,CardHeader,CardBody,CardTitle,Collapse,DropdownMenu,DropdownItem,UncontrolledDropdown,DropdownToggle,FormGroup,Form,Input,InputGroupAddon,InputGroupText,InputGroup,Media,NavbarBrand,Navbar,NavItem,NavLink,Nav,Progress,Table,Container,Row,Col
@@ -66,6 +69,7 @@ class Sidebar extends React.Component {
   };
   render() {
     const { bgColor, routes, logo } = this.props;
+    
     let navbarBrandProps;
     if (logo && logo.innerLink) {
       navbarBrandProps = {
@@ -99,7 +103,7 @@ class Sidebar extends React.Component {
               <img
                 alt={logo.imgAlt}
                 className="navbar-brand-img"
-                src={logo.imgSrc}
+                src={logo}
               />
             </NavbarBrand>
           ) : null}

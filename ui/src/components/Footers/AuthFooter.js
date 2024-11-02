@@ -1,37 +1,37 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.1.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2019 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-/*eslint-disable*/
 import React from "react";
+import { Link } from "react-router-dom";
 
-// reactstrap components
-import { NavItem, NavLink, Nav, Container, Row, Col } from "reactstrap";
+const AuthFooter = () => {
+  const navigationLinks = [
+    { name: "Privacy Policy", path: "/auth/privacy-policy" },
+    { name: "Refund Policy", path: "/auth/refund-policy" },
+    { name: "Terms", path: "/auth/terms-and-conditions" },
+    { name: "Contact Us", path: "/auth/contact-us" },
+  ];
 
-class Login extends React.Component {
-  render() {
-    return (
-      <>
-        <footer className="py-5">
-          <Container>
-            <Row className="align-items-center justify-content-xl-between">
-              <Col xl="6">
-                <div className="copyright text-center text-xl-left text-muted">
-                  © 2020{" "}
-                  <a
+  const socialLinks = [
+    {
+      name: "Instagram",
+      url: "https://www.instagram.com/pavanadhavofficial/",
+      external: true,
+    },
+    {
+      name: "LinkedIn",
+      url: "https://www.linkedin.com/in/pavan-adhav/",
+      external: true,
+    },
+  ];
+
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="py-5">
+      <div className="container">
+        <div className="row align-items-center justify-content-xl-between">
+          <div className="col-xl-6">
+            <div className="copyright text-center text-xl-left text-muted">
+              © {currentYear}{" "}
+              <a
                 className="font-weight-bold ml-1"
                 href="https://www.linkedin.com/in/pavan-adhav/"
                 rel="noopener noreferrer"
@@ -39,47 +39,39 @@ class Login extends React.Component {
               >
                 Adhav Pavan
               </a>
-                </div>
-              </Col>
-              <Col xl="6">
-            <Nav className="nav-footer justify-content-center justify-content-xl-end">
-              <NavItem>
-                <NavLink
-                  href="https://www.instagram.com/pavanadhavofficial/"
+            </div>
+          </div>
+          <div className="col-xl-6">
+            <nav className="nav nav-footer justify-content-center justify-content-xl-end">
+              {/* Internal Navigation Links */}
+              {navigationLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className="text-muted px-3 py-2 hover:text-gray-900"
+                >
+                  {link.name}
+                </Link>
+              ))}
+
+              {/* External Social Links */}
+              {/* {socialLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.url}
+                  className="text-muted px-3 py-2 hover:text-gray-900"
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  Contact
-                </NavLink>
-              </NavItem>
+                  {link.name}
+                </a>
+              ))} */}
+            </nav>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
 
-              <NavItem>
-                <NavLink
-                  href="https://www.linkedin.com/in/pavan-adhav/"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  About Me
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
-                <NavLink
-                  href="https://www.linkedin.com/in/pavan-adhav/"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Adhav Pavan
-                </NavLink>
-              </NavItem>
-            </Nav>
-          </Col>
-            </Row>
-          </Container>
-        </footer>
-      </>
-    );
-  }
-}
-
-export default Login;
+export default AuthFooter;
