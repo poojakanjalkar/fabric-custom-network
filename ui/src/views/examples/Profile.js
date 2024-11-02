@@ -80,10 +80,10 @@ class Profile extends React.Component {
     }
 
     const options = {
-      key: "rzp_test_0og2WBRWa80vrw",
-      // currency:'INR',
-      currency: "USD",
-      amount: 30 * 100,
+      key: "rzp_live_DghPaxyb1sOnGp",
+      currency:'INR',
+      // currency: "USD",
+      amount: 1 * 100,
       name: "Pavan Tech Academy",
       description: "Thanks for purchasing",
       customer: {
