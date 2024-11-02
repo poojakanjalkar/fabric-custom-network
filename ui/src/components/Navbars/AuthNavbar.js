@@ -32,6 +32,8 @@ import {
 
 class AdminNavbar extends React.Component {
   render() {
+  const logoImage = require("../../assets/img/brand/logo.png");
+
     return (
       <>
         <Navbar
@@ -40,7 +42,7 @@ class AdminNavbar extends React.Component {
         >
           <Container className="px-4">
             <NavbarBrand to="/" tag={Link}>
-              <img alt="..." src={require("../../assets/img/brand/argon-react-white.png")} />
+              <img alt="..." src={logoImage} />
             </NavbarBrand>
             <button className="navbar-toggler" id="navbar-collapse-main">
               <span className="navbar-toggler-icon" />
@@ -48,14 +50,15 @@ class AdminNavbar extends React.Component {
             <UncontrolledCollapse navbar toggler="#navbar-collapse-main">
               <div className="navbar-collapse-header d-md-none">
                 <Row>
-                  <Col className="collapse-brand" xs="6">
+                  {/* <Col className="collapse-brand" xs="6">
                     <Link to="/">
                       <img
                         alt="..."
-                        src={require("../../assets/img/brand/argon-react.png")}
+                        // src={require("../../assets/img/brand/logo.png")}
+                        src={logoImage}
                       />
                     </Link>
-                  </Col>
+                  </Col> */}
                   <Col className="collapse-close" xs="6">
                     <button
                       className="navbar-toggler"

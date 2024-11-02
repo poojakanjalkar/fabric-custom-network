@@ -69,7 +69,7 @@ const ContactUs = () => {
       </div> */}
       {/* Page content */}
       <Container className="mt--7" fluid>
-        
+
         <Row className="justify-content-center">
           <Col lg="8" md="10">
             <Card className="bg-secondary shadow border-0">

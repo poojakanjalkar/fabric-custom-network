@@ -38,6 +38,7 @@ var routes = [
     component: CreateRequest,
     layout: "/admin",
   },
+
   {
     path: "/Organization",
     name: "All Requests",

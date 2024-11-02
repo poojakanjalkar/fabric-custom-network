@@ -42,7 +42,7 @@ const termsAndCondition = () => {
                 <h4>Feedback</h4>
                 <p>If you submit suggestions or questions containing product feedback about any Content, you grant us rights.</p>
                 {/* Add more sections as needed based on your content */}
-                
+
               </CardText>
             </CardBody>
           </Card>
