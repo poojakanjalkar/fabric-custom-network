@@ -53,6 +53,15 @@ class Footer extends React.Component {
               </NavItem>
 
               <NavItem>
+                <NavLink 
+                  to="/about-us"
+                  className="nav-link px-3 text-muted"
+                >
+                  About Us
+                </NavLink>
+              </NavItem>
+
+              <NavItem>
                 <NavLink
                   href="https://www.linkedin.com/in/pavan-adhav/"
                   rel="noopener noreferrer"
