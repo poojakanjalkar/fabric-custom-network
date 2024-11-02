@@ -26,54 +26,50 @@ class Login extends React.Component {
     return (
       <>
         <footer className="py-5">
-          <Container>
+        <Container>
             <Row className="align-items-center justify-content-xl-between">
-              <Col xl="6">
+              {/* <Col xl="2">
                 <div className="copyright text-center text-xl-left text-muted">
                   © 2020{" "}
                   <a
-                className="font-weight-bold ml-1"
-                href="https://www.linkedin.com/in/pavan-adhav/"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Adhav Pavan
-              </a>
+                    className="font-weight-bold ml-1"
+                    href="https://www.linkedin.com/in/pavan-adhav/"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Adhav Pavan
+                  </a>
                 </div>
+              </Col> */}
+              <Col xl="12">
+                <Nav className="nav-footer justify-content-center ">
+                  <a
+                    href="/auth/contact-us"
+                    className="text-gray-600 hover:text-gray-900 mx-3"
+                  >
+                    Contact Us
+                  </a>
+
+                  <a
+                    href="/auth/privacy-policy"
+                    className="text-gray-600 hover:text-gray-900  mx-3"
+                  >
+                    Privacy Policy
+                  </a>
+                  <a
+                    href="/auth/terms-and-conditions"
+                    className="text-gray-600 hover:text-gray-900 mx-3"
+                  >
+                    Terms and Condition
+                  </a>
+                  <a
+                    href="/auth/refund-policy"
+                    className="text-gray-600 hover:text-gray-900 mx-3"
+                  >
+                    Refund Policy
+                  </a>
+                </Nav>
               </Col>
-              <Col xl="6">
-            <Nav className="nav-footer justify-content-center justify-content-xl-end">
-              <NavItem>
-                <NavLink
-                  href="https://www.instagram.com/pavanadhavofficial/"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Contact
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
-                <NavLink
-                  href="https://www.linkedin.com/in/pavan-adhav/"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  About Me
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
-                <NavLink
-                  href="https://www.linkedin.com/in/pavan-adhav/"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Adhav Pavan
-                </NavLink>
-              </NavItem>
-            </Nav>
-          </Col>
             </Row>
           </Container>
         </footer>
