@@ -7,6 +7,7 @@ import { Container, Row, Col } from "reactstrap";
 // core components
 import AuthNavbar from "../components/Navbars/AuthNavbar.js";
 import AuthFooter from "../components/Footers/AuthFooter.js";
+import CommonFooter from '../components/Footers/CommonFooter.js'
 
 import routes from "../routes.js";
 
@@ -20,7 +21,7 @@ class Auth extends React.Component {
 
   isFooterPage = () => {
     const currentPath = window.location.pathname;
-    return ['/auth/about-us', '/auth/privacy-policy', '/auth/terms-and-conditions', '/auth/refund-policy'].includes(currentPath);
+    return ['/about-us', '/privacy-policy', '/terms-and-conditions', '/refund-policy'].includes(currentPath);
   };
 
   getRoutes = routes => {
@@ -79,7 +80,8 @@ class Auth extends React.Component {
             </Row>
           </Container>
         </div>
-        <AuthFooter />
+        {/* <AuthFooter /> */}
+        <CommonFooter/>
       </>
     );
   }

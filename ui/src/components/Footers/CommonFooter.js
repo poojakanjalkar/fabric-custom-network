@@ -1,5 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+
+import { Row, Col, Nav, NavItem } from "reactstrap";
 
 const AuthFooter = () => {
   const navigationLinks = [
@@ -29,7 +31,7 @@ const AuthFooter = () => {
       <div className="container">
         <div className="row align-items-center justify-content-xl-between">
           <div className="col-xl-6">
-            <div className="copyright text-center text-xl-left text-muted">
+            {/* <div className="copyright text-center text-xl-left text-muted">
               © {currentYear}{" "}
               <a
                 className="font-weight-bold ml-1"
@@ -39,19 +41,31 @@ const AuthFooter = () => {
               >
                 Adhav Pavan
               </a>
-            </div>
+            </div> */}
           </div>
-          <div className="col-xl-6">
+          <div className="col-xl-8">
             <nav className="nav nav-footer justify-content-center justify-content-xl-end">
-              {/* Internal Navigation Links */}
               {navigationLinks.map((link) => (
-                <Link
-                  key={link.name}
+                <NavItem>
+                <NavLink
                   to={link.path}
-                  className="text-muted px-3 py-2 hover:text-gray-900"
+                  className="nav-link"
                 >
                   {link.name}
-                </Link>
+                  </NavLink>
+                </NavItem>
+              ))}
+
+              {socialLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.url}
+                  className="nav-link"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {link.name}
+                </a>
               ))}
             </nav>
           </div>

@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 
 import AdminLayout from './layouts/Admin.js';
 import AuthLayout from './layouts/Auth.js';
+import FooterLayout from './layouts/Footer.js'
 import Login from "../src/components/Login"
 import ContactUs from '../src/views/examples/Fabric-Custom-Network/ContactUs'
 import PrivacyPolicy from '../src/views/examples/Fabric-Custom-Network/PrivacyPolicy'
@@ -47,8 +48,12 @@ ReactDOM.render(
               <Route path="terms-and-conditions" element={<termsAndConditions />} />
               <Route path="refund-policy" element={<RefundPolicy />} />
             </Route> */}
+             <Route 
+              path={["/privacy-policy", "/terms-and-conditions", "/refund-policy", "/contact-us"]} 
+              component={FooterLayout} 
+            />
             <Route path='/auth' render={(props) => <AuthLayout {...props} />} />
-            <Redirect from='/' to='/auth/login' />
+            <Redirect from='*' to='/auth/login' />
           </Switch>
         </BrowserRouter>
       </ToastProvider>

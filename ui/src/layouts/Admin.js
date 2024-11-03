@@ -6,6 +6,7 @@ import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "../components/Navbars/AdminNavbar.js";
 import AdminFooter from "../components/Footers/AdminFooter.js";
+import CommonFooter from '../components/Footers/CommonFooter.js'
 import Sidebar from "../components/Sidebar/Sidebar.js";
 
 import routes from "../routes.js";
@@ -66,7 +67,8 @@ class Admin extends React.Component {
             <Redirect from="*" to="/auth/login" />
           </Switch>
           <Container fluid>
-            <AdminFooter />
+            {/* <AdminFooter /> */}
+            <CommonFooter/>
           </Container>
         </div>
       </>
