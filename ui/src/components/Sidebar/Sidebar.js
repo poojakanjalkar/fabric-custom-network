@@ -10,7 +10,7 @@ import * as UserAction from '../../actions/user'
 import { connect } from "react-redux";
 // const logo = require('../../assets/img/brand/logo.png')
 
-import logo from '../../assets/img/brand/logo.png'
+import logo2 from '../../assets/img/brand/logo.png'
 
 // reactstrap components
 import {Button,Card,CardHeader,CardBody,CardTitle,Collapse,DropdownMenu,DropdownItem,UncontrolledDropdown,DropdownToggle,FormGroup,Form,Input,InputGroupAddon,InputGroupText,InputGroup,Media,NavbarBrand,Navbar,NavItem,NavLink,Nav,Progress,Table,Container,Row,Col
@@ -43,9 +43,12 @@ class Sidebar extends React.Component {
   // creates the links that appear in the left menu / Sidebar
   createLinks = routes => {
     let userData = this.props.userData
+    // about-us', '/auth/privacy-policy', '/auth/terms-and-conditions', '/auth/refund-policy
   // const userData = useSelector((state) => state?.User?.login?.decodedData);
   console.log("===============11111===========userData===========", userData)
-    let newRoute= routes.filter(route => route.path != "/login" && route.path != "/register")
+    let newRoute= routes.filter(route => route.path != "/login" && route.path != "/register" && route.path !=`/contact-us`
+      && route.path !='/privacy-policy' && route.path !='/terms-and-conditions' && route.path !='/refund-policy'
+    )
     if(userData?.type != 'admin'){
       newRoute = newRoute.filter(route => route.name != "Admin")
     }
@@ -98,15 +101,13 @@ class Sidebar extends React.Component {
             <span className="navbar-toggler-icon" />
           </button>
           {/* Brand */}
-          {logo ? (
             <NavbarBrand className="pt-0" {...navbarBrandProps}>
               <img
                 alt={logo.imgAlt}
                 className="navbar-brand-img"
-                src={logo}
+                src={logo2}
               />
             </NavbarBrand>
-          ) : null}
           {/* User */}
           <Nav className="align-items-center d-md-none">
             <UncontrolledDropdown nav>

@@ -13,6 +13,11 @@ import { Provider } from 'react-redux';
 
 import AdminLayout from './layouts/Admin.js';
 import AuthLayout from './layouts/Auth.js';
+import Login from "../src/components/Login"
+import ContactUs from '../src/views/examples/Fabric-Custom-Network/ContactUs'
+import PrivacyPolicy from '../src/views/examples/Fabric-Custom-Network/PrivacyPolicy'
+import termsAndConditions from '../src/views/examples/Fabric-Custom-Network/termsAndConditions'
+import RefundPolicy from '../src/views/examples/Fabric-Custom-Network/RefundPolicy'
 
 import mainReducer from './reducers/main';
 import { createStore, applyMiddleware, compose } from 'redux';
@@ -35,6 +40,13 @@ ReactDOM.render(
               path='/admin'
               render={(props) => <AdminLayout {...props} />}
             />
+             {/* <Route path="/auth/*" element={<AuthLayout />}>
+              <Route path="login" element={<Login />} />
+              <Route path="contact-us" element={<ContactUs />} />
+              <Route path="privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="terms-and-conditions" element={<termsAndConditions />} />
+              <Route path="refund-policy" element={<RefundPolicy />} />
+            </Route> */}
             <Route path='/auth' render={(props) => <AuthLayout {...props} />} />
             <Redirect from='/' to='/auth/login' />
           </Switch>
