@@ -7,6 +7,8 @@ import PrivacyPolicy from "views/examples/Fabric-Custom-Network/PrivacyPolicy.js
 import termsAndCondition from "views/examples/Fabric-Custom-Network/termsAndConditions.js";
 import RefundPolicy from "views/examples/Fabric-Custom-Network/RefundPolicy.js";
 import ContactUs from "views/examples/Fabric-Custom-Network/ContactUs.js";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 const FooterLayout = () => {
     const location = useLocation();
@@ -28,6 +30,7 @@ const FooterLayout = () => {
         <AuthNavbar />
         <Container className="mt-7 pb-5">
           <Row className="justify-content-center px-3">
+         
             <Switch location={location}>
               <Route
                 path="/privacy-policy"
@@ -50,6 +53,7 @@ const FooterLayout = () => {
                 component={ContactUs}
               />
               {/* <Redirect from="*" to="/auth/login" /> */}
+             
             </Switch>
           </Row>
         </Container>

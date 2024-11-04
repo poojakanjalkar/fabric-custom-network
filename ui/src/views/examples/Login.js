@@ -102,14 +102,17 @@ function Login() {
     <>
       <Col lg='5' md='7'>
         <Card className='bg-secondary shadow border-0'>
-          <CardBody className='px-lg-5 py-lg-5'>
-            <div className='text-center text-muted mb-4'>
+          <CardBody className='px-lg-7 py-lg-5'>
+            <div className='text-center text-bold text-muted mb-4'>
             {/* <Button onClick={() => pavan()}>Sign in with Google 🚀</Button>; */}
 
-            <small>Sign in with Google
+            <small><strong>Sign in with Google</strong>
 
               
             </small>
+
+            <div style={{ marginBottom: "15px" }}></div>
+
               <GoogleLogin
                 onSuccess={(data)=> onSuccess(data)}
                 onError={(err) => {

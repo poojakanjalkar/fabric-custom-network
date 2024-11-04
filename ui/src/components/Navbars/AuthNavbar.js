@@ -18,6 +18,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
+import logo from "../../assets/img/brand/logo.png";
+
 import {
   UncontrolledCollapse,
   NavbarBrand,
@@ -40,7 +42,9 @@ class AdminNavbar extends React.Component {
         >
           <Container className="px-4">
             <NavbarBrand to="/" tag={Link}>
-              <img alt="..." src={require("../../assets/img/brand/argon-react-white.png")} />
+              {/* <img alt="..." src={require("../../assets/img/brand/logo.png")} /> */}
+              <img alt="Logo" src={logo} />
+
             </NavbarBrand>
             <button className="navbar-toggler" id="navbar-collapse-main">
               <span className="navbar-toggler-icon" />
