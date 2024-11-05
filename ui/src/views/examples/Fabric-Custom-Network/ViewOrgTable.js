@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { Table } from "antd";
+import { Table, Divider } from "antd";
 import {
   Button,
   Modal,
@@ -102,6 +102,12 @@ export default function ViewOrgTable(props) {
     },
   ];
 
+  const [selectedVersion] = useState("v2.5");
+
+  const dropdownToggle = () => setDropdownOpen(prevState => !prevState);
+
+
+
   return (
     <div>
       <Modal isOpen={modal} toggle={toggle} className={className} size={"xl"}>
@@ -113,7 +119,7 @@ export default function ViewOrgTable(props) {
                 <CardHeader className="border-0">
                   <FormGroup row>
                     <Col sm={9}>
-                      <h3 className="mb-0">Organization Details</h3>
+                      <h3 className="mb-0">Network Details</h3>
                     </Col>
                   </FormGroup>
                 </CardHeader>
@@ -121,8 +127,8 @@ export default function ViewOrgTable(props) {
                 <Card>
                   <CardBody>
                     <FormGroup row>
-                      <Label sm={3}>Project Name</Label>
-                      <Col sm={5}>
+                      <Label sm={3}>Project Name :</Label>
+                      <Col sm={6}>
                         <Input
                           value={
                             props?.selectedItem?.configuration?.projectName
@@ -132,14 +138,43 @@ export default function ViewOrgTable(props) {
                         <FormFeedback>*Required</FormFeedback>
                       </Col>
                     </FormGroup>
-                  </CardBody>
+                    
+                   <Divider></Divider>
+                    <FormGroup row>
+                        <Label sm={3}> Fabric Version :</Label>
+                       <Col sm={6}>
+                       <Input
+                          value="v2.5"
+                          disabled
+                        />
+                        <FormFeedback>*Required</FormFeedback>
+                      </Col>
+                      </FormGroup>
+
+                      <Divider></Divider>
+
+                  <FormGroup row>
+                      <Label sm={3}>Features :</Label>
+                      <Col sm={6}>
+                        <Input
+                          value="Caliper (v0.6), API (Fabric Gateway v2.5), Blockchain Explorer (v2.0.0)"
+                           
+                          disabled
+                        />
+                        <FormFeedback>*Required</FormFeedback>
+                      </Col>
+                    </FormGroup>
+
+                      </CardBody>
                 </Card>
+                  
                 <div>
                   <Card>
                     <CardBody>
                       <FormGroup row>
                         <Col sm={11}>
                           {" "}
+                          <strong><label>Organizations</label></strong>
                           <Table
                             dataSource={
                               props?.selectedItem?.configuration?.Organizations
@@ -157,6 +192,7 @@ export default function ViewOrgTable(props) {
                     <FormGroup row>
                       <Col sm={12}>
                         <div>
+                          <strong><label>Channels</label></strong>
                           <Table
                             dataSource={
                               props?.selectedItem?.configuration?.channels
