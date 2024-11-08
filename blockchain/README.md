@@ -1,84 +1,160 @@
+# Blockchain Network Setup Guide
 
+## Overview
 
-Standard Steps for creating any blockchain network
-1) CA Creation
-2) cryptomaterial creation
-3) Create artifacts
-4) Run all services
-5) Create Channel
-7) Deploy Chaincode
+This repository contains a complete blockchain network implementation with API integration, performance testing tools, and network explorer. The setup includes comprehensive tooling for development, monitoring, and testing of blockchain applications.
 
+## 📁 Repository Structure
 
+```
+.
+├── api/                 # Basic CRUD operation API structure
+├── blockchain/
+│   ├── artifacts/      # Network configuration for all services
+│   ├── Explorer/       # Blockchain Explorer implementation
+│   ├── performance-tool/# Performance testing tools
+│   └── scripts/        # Channel creation and chaincode deployment scripts
+```
 
+## 🚀 Quick Start
 
+### Prerequisites
+- Docker and Docker Compose installed (latest version)
+- Node.js and npm installed (v20)
+- MongoDB (for API integration) (latest version)
+- Hyperledger fabric: v2.5
 
-Downloaded zip have following folders
-1) api
-2) blockchain
-    1) artifacts
-    2) Explorer
-    3) performance-tool
-    4) scripts
+### Standard Network Creation Steps
 
-api        --> Basic working api structure for CRUD operation
-blockchain --> All blockchain network related files
-artifacts  --> Blockchain network configuration for all services
-Explorer   --> Blockchain Explorer running code
-performace-tools  --> Basic caliper working configuration 
-scripts    --> Blockchain script for channel creation and chaincode deployment
+1. CA Creation
+2. Cryptomaterial creation
+3. Create artifacts
+4. Run all services
+5. Create Channel
+6. Deploy Chaincode
 
-Note: Please make sure to go through my youtub video to run network and make changes as per your need.
+## 🔧 Detailed Setup Instructions
 
+### Blockchain Network Setup
 
-Steps to create network and integrate api, caliper, explorer
+1. Set appropriate permissions for home repo
+```bash
+sudo chmod -R 777 *
+```
 
-Blockchain Network
+2. Create certificates with CA
+```bash
+cd blockchain/artifacts/channel/create-certificate-with-ca
+docker compose up -d
+./create-certificate-with-ca.sh
+```
 
-    1) Go to homw folder and run --> `sudo chmod -R 777 *`
-    2) Go to folder `blockchain/artifacts/channel/create-certificate-with-ca`
-    2) run --> `docker-compose up -d`
-    4) run --> `./create-certificate-with-ca.sh`
-    5) Go back --> `cd ../`
-    6) Now we are in channel folder
-    7) run --> ./create-artifacts.sh
-    8) Go back --> `cd ../`
-    9) Now we are in artifacts folder
-    10) run --> `docker-compose up -d`
-    11) Go to script folder  --> `cd ../scripts`
-    12) You may have multiple files here as per configuration defined, let try creating one channel and deploy chaincode
-    13) run --> `./create-mychannel1.sh`
-    14) run --> `./deploy-chaincode1.sh`
-    15) You will be able to see couchdb on browser --> `http://127.0.0.1:5984/_utils/`
-    16) Use username:admin password:adminpw for accessing first org, first peer couchdb
+3. Create artifacts
+```bash
+cd ../
+./create-artifacts.sh
+```
 
-Explorer
-    1) Go to blockchain/Explorer folder --> `cd Explorer`
-    2) run --> `docker-compose up -d`
-    3) Go to browser and open localhost:8081
-    4) Use username:exploreradmin password:exploreradminpw 
-    5) You sould be able to see blockchain explorer
+4. Start network services
+```bash
+cd ../
+docker compose up -d
+```
 
-Caliper
-    1) Go to blockchain/performance-tool/caliper folder  --> cd performance-tool/caliper folder
-    2) Go to caliper-benchmarks-local folder  --> cd caliper-benchmarks-local
-    3) run --> npm install
-    4) cd back to caliper folder --> `cd ..`
-    5) run --> `docker-compose up -d`
-    6) As per basic smart contract definded, caliper will start invoking and quering transaction to blockchain network
-    7) We can check log `docker logs caliper -f`
-    8) Once done with benchmark, report.html will get created, you can check and open in browser.
+5. Create channel and deploy chaincode, here mentioning for the first channel and its chaincode
+```bash
+cd ../scripts
+./create-mychannel1.sh
+./deploy-chaincode1.sh
+```
 
-API
-    1) Go to api folder, --> `cd api`
-    2) run npm install
-    3) There is .env.sample file inside api folder, please add mongodb credential in that file
-    3) install nodemon  --> `sudo npm i -g nodemon`
-    4) run --> nodemon app.js
-    6) Server will be running on localhost:3000
-    7) After stating server, There is data seeding script in bootstrap.js, it will ingest organization and user in mongodb, parallel, it create user credentials(wallet) using CA and store user id in wallet folder.
-    7) There is postman folder at path : `api/src/postman`, inside i have added api collection for interacting with blockchain network through api
+6. You an access CouchDB here
+- URL: `http://127.0.0.1:5984/_utils/`
+- Credentials:
+  - Username: `admin`
+  - Password: `adminpw`
 
+### 🔍 Explorer Setup
 
-Note:
-    Explorer, Caliper are configured on the behalf on first channel of first organization, feel free to make any changes
-    For API, we have created connection configuration for all orgs, user can switch between orgs using different users defined in bootstrap.js file
+1. Launch Explorer
+```bash
+cd blockchain/Explorer
+docker compose up -d
+```
+
+2. Access Explorer Dashboard
+- URL: `http://localhost:8081`
+- Credentials:
+  - Username: `exploreradmin`
+  - Password: `exploreradminpw`
+
+### ⚡ Performance Testing (Caliper)
+
+1. Install dependencies
+```bash
+cd blockchain/performance-tool/caliper/caliper-benchmarks-local
+npm install
+```
+
+2. Run Caliper
+```bash
+cd ..
+docker compose up -d
+```
+
+3. Monitor progress
+```bash
+docker logs caliper -f
+```
+
+The benchmark report will be generated as `report.html` upon completion.
+
+### 🖥️ API Setup
+
+1. Install dependencies
+```bash
+cd api
+npm install
+```
+
+2. Configure environment
+- Copy `.env.sample` to `.env`
+- Add MongoDB credentials
+
+3. Install nodemon globally
+```bash
+sudo npm i -g nodemon
+```
+
+4. Start the server
+```bash
+nodemon app.js
+```
+
+The API server will run on `localhost:3000`
+
+### 📝 API Documentation
+
+- Postman collections are available at `api/src/postman/`
+- The bootstrap script (`bootstrap.js`) handles:
+  - Organization and user seeding in MongoDB
+  - User credential creation using CA
+  - Wallet storage
+
+## 📌 Important Notes
+
+- Explorer and Caliper are configured for the first channel of the first organization
+- API includes connection configurations for all organizations
+- Users can switch between organizations using different users defined in `bootstrap.js`
+
+## 🎓 Additional Resources
+
+For detailed setup instructions and configuration modifications, please refer to our YouTube video tutorial.
+
+## 💡 Customization
+
+Feel free to modify the Explorer and Caliper configurations according to your specific requirements. The API connection configurations support multiple organizations and can be customized as needed.
+
+---
+
+For questions or support, please check our video tutorial or raise an issue in the repository.
