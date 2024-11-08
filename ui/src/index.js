@@ -19,6 +19,7 @@ import ContactUs from '../src/views/examples/Fabric-Custom-Network/ContactUs'
 import PrivacyPolicy from '../src/views/examples/Fabric-Custom-Network/PrivacyPolicy'
 import termsAndConditions from '../src/views/examples/Fabric-Custom-Network/termsAndConditions'
 import RefundPolicy from '../src/views/examples/Fabric-Custom-Network/RefundPolicy'
+import WhatsAppIcon from 'views/examples/Fabric-Custom-Network/helper/WhatsAppIcon';
 
 import mainReducer from './reducers/main';
 import { createStore, applyMiddleware, compose } from 'redux';
@@ -36,6 +37,7 @@ ReactDOM.render(
     <Provider store={store}>
       <ToastProvider>
         <BrowserRouter>
+        <WhatsAppIcon/>
           <Switch>
             <Route
               path='/admin'

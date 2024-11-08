@@ -25,6 +25,7 @@ import {
   ListGroupItem,
   Row,
   Col,
+  Dropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from "reactstrap";
 
 
@@ -783,18 +784,25 @@ export default function CreateRequest(props) {
   };
 
   const instructions = [
-    "1. The organization name should be a small letter and no space",
-    "2. the channel name should be the small case and no space",
-    "3. chain code name should be the small case and no space",
-    "4. Max 20 Orgs configuration can be created",
-    "5. Explorer will be configured for the first organization",
-    "6. Caliper will be configured for the first organization",
-    "7. A basic API structure will be given for basic asset operation"
+    "1. The organization name, channel name and chaincode name should not have space",
+   
+    "2. Max 20 Orgs configuration can be created",
+    "3. Explorer and caliper will be configured for the first channel's of first organization",
+    
+    "4. A basic API structure will be given for basic asset operation"
   ];
 
   const [isOpen, setIsOpen] = useState(true);
 
   const toggle = () => setIsOpen(!isOpen);
+
+
+ 
+  const [selectedVersion] = useState("v2.5");
+
+  const dropdownToggle = () => setDropdownOpen(prevState => !prevState);
+
+  
 
 
   return (
@@ -886,7 +894,7 @@ export default function CreateRequest(props) {
                               createConfig();
                             }}
                           >
-                            Create Org Configuration
+                            Configure Orgs
                           </Button>
                         </Col>
                       </FormGroup>
@@ -938,6 +946,7 @@ export default function CreateRequest(props) {
                         <Col sm={4}>
                           <Button
                             color="primary"
+                            disabled={!data?.length}
                             onClick={() => {
                               createChannelConfig();
                             }}
@@ -968,6 +977,24 @@ export default function CreateRequest(props) {
                         </FormGroup>
                       ) : null}
                       <Divider></Divider>
+                      
+                      <FormGroup row>
+                        <Label sm={3}> Fabric Version</Label>
+                       
+                        <Dropdown isOpen={false} toggle={()=>{}}>
+                        <DropdownToggle caret disabled>
+                        {selectedVersion}
+                          </DropdownToggle>
+                          <DropdownMenu>
+                        <DropdownItem>v2.5</DropdownItem>
+                        <DropdownItem>v3.o</DropdownItem>
+                    
+                    </DropdownMenu>
+                      </Dropdown>
+                     
+                      </FormGroup>
+
+                              <Divider></Divider>
 
                       <FormGroup row  >
                         <Label sm={3}>
@@ -978,9 +1005,9 @@ export default function CreateRequest(props) {
                             onChange={handleCheckboxChange}
                             disabled={true}
                           />
-                          Caliper
+                          Caliper (v0.6)
                         </Label>
-                        <Label sm={2}>
+                        <Label sm={3}>
                           <Input
                             type="checkbox"
                             name="api"
@@ -988,7 +1015,7 @@ export default function CreateRequest(props) {
                             onChange={handleCheckboxChange}
                             disabled={true}
                           />
-                          API
+                          API (Fabric Gateway v2.5)
                         </Label>
                         <Label sm={4}>
                           <Input
@@ -998,7 +1025,7 @@ export default function CreateRequest(props) {
                             onChange={handleCheckboxChange}
                             disabled={true}
                           />
-                          Blockchain Explorer
+                          Blockchain Explorer (v2.0.0)
                         </Label>
                       </FormGroup>
                       <Button

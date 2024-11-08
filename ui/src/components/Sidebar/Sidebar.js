@@ -129,10 +129,10 @@ class Sidebar extends React.Component {
               <DropdownToggle nav>
                 <Media className="align-items-center">
                   <span className="avatar avatar-sm rounded-circle">
-                    <img
+                    {/* <img
                       alt="..."
                       src={require("../../assets/img/theme/team-1-800x800.jpg")}
-                    />
+                    /> */}
                   </span>
                 </Media>
               </DropdownToggle>
