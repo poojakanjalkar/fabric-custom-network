@@ -4,9 +4,9 @@ networks:
   test:
 
 services:
-  e-contract-api:
-    container_name: e-contract-api
-    image: e-contract-api:1.5
+  custom-fabric-api:
+    container_name: custom-fabric-api
+    image: custom-fabric-api:1.5
     build: .
     networks:
       - test
@@ -15,4 +15,4 @@ services:
     env_file: ./.env
     volumes:
       - ./wallets:/usr/src/app/wallets
-      - ./projectData:/usr/src/app/src/jobs/NetworkData
+      - ../../data-backup/:/usr/src/app/src/jobs/NetworksData

@@ -1,10 +1,10 @@
-const Org = require('../models/org.model');
+const logger = require('../logger')(module)
 const Subscription = require('../models/subscription.model');
 const Transaction = require('../models/transaction.model');
-const { REQUEST_STATUS } = require('../utils/Constants');
 
 const createPayment = async (data) => {
   console.log('--razor pay data----', data);
+  logger.info({method:'createPayment', message: "Webhook triggered", data})
 
   if(data.event !== 'payment.captured'){
     return
@@ -22,19 +22,15 @@ const createPayment = async (data) => {
       event: data?.event,
     };
     let txData = new Transaction(t);
-    console.log('-------------txData--------------', t, txData);
 
     await txData.save();
+    logger.info({method:'createPayment', message: "Transaction created", data: t})
 
     let sub = await Subscription.findOne({ email: t.email }).exec();
-    console.log('-----------cp1-----------------', sub);
     if (sub) {
-      console.log('-----------cp2 if-----------------');
       let newAmount = sub.amount + t.amount;
-      console.log('-----------cp2.1-----------------', newAmount);
       await Subscription.updateOne({ email: t.email }, { $set: { amount: newAmount, credit: sub.credit + 2 } });
     } else {
-      console.log('-----------cp3 else-----------------');
       let s = {
         email: t.email,
         name: t.name,
@@ -42,12 +38,13 @@ const createPayment = async (data) => {
         currency: t.currency,
       };
         s.credit = 2;
-      console.log('-------------subscription--------------', s);
       let subscription = new Subscription(s);
       await subscription.save();
     }
+    logger.info({method:'createPayment', message: "Subscription created-updated", data: s})
   } catch (error) {
     console.log('Error occurred---------', error);
+    logger.error({method:'createPayment', message: "error occureed", error: error?.message, stack: error?.stack})
   }
 };
 

@@ -1,8 +1,18 @@
 const config = require('../config/config');
 const Organization = require('../models/organization.model');
+const logger = require('../logger')(module)
 const User = require('../models/user.model');
 const { ORG_DEPARTMENT, USER_STATUS, USER_TYPE } = require('./Constants');
 const { registerUser } = require('./blockchainUtils');
+const ConfigurationData = require('../models/configurationData');
+const CONFIGURATION_KEY = 'CONFIGURATION'
+
+const CONFIGURATION_DATA={
+  isEnabled:true,
+  price:1000,
+  currency:'IN',
+
+}
 const staticUser = [
   {
     name: 'max',
@@ -15,6 +25,21 @@ const staticUser = [
 ];
 
 const ingestBootstrapData = async () => {
+
+  let existingData =await ConfigurationData.findOne({id:CONFIGURATION_KEY})
+  console.log("-----------existingData--------", existingData)
+  if(!existingData){
+    let conf = new ConfigurationData({
+        id:CONFIGURATION_KEY,
+        data: CONFIGURATION_DATA
+    })
+
+    await conf.save()
+
+    logger.info({method: 'ingestBootstrapData', message: "configuration data updated", data:CONFIGURATION_DATA})
+  }
+
+
   const staticOrgData = [
     { name: 'Pavan', id: 1, parentId: 1 },
   ];

@@ -13,4 +13,4 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 3000
 
-ENTRYPOINT ["nginx","-g","daemon off;"]
+ENTRYPOINT ["nginx","-g","daemon off;"] 

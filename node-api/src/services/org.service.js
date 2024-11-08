@@ -1,4 +1,5 @@
 const { initiateProjectCreation } = require('../jobs/createProject');
+const ConfigurationData = require('../models/configurationData');
 
 const Org = require('../models/org.model');
 const Subscription = require('../models/subscription.model');
@@ -62,14 +63,18 @@ let requestModel = new Org({
   status: REQUEST_STATUS.INPROGRESS,
 })
 
-  const res = await Subscription.updateOne(
-    { email: user.email, credit: { $gt: 0 } }, // Ensure there are enough credits
-    { $inc: { credit: -1 } }
-  ).exec();
-
-  console.log('+++++++geting subscription res---', res);
-
-  // const organization = new Org(requestModel);
+let config = await ConfigurationData.findOne({id: 'CONFIGURATION'})
+  console.log("-----------------", typeof config?.data, config?.data)
+  if(config?.data){
+    // let data = JSON.parse(config?.data)
+    if(config?.data.isEnabled){
+      const res = await Subscription.updateOne(
+        { email: user.email, credit: { $gt: 0 } }, // Ensure there are enough credits
+        { $inc: { credit: -1 } }
+      ).exec();
+      console.log('+++++++geting subscription res---', res);
+    }
+  }
 
   console.log("---------requestModel----------", requestModel)
 

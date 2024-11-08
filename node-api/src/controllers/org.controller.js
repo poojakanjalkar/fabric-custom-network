@@ -1,6 +1,7 @@
 const OrgService = require('../services/org.service');
 const path = require("path");
 const fs = require("fs");
+const logger = require('../logger')(module)
 const httpStatus = require('http-status');
 const { getSuccessResponse, getErrorResponse } = require('../utils/Response');
 const { getPagination } = require('../utils/pagination');
@@ -28,6 +29,7 @@ const getOrganizationById = async (req, res) => {
 
 const createOrganization = async (req, res) => {
   console.log('controller body---', req.body);
+  logger.info({method:'createOrganization', message: "request received for configuration creation", data:req.body, loggerInfo: req.loggerInfo})
   const { user } = req.loggerInfo;
   console.log('----user----', req.loggerInfo);
   const newOrganization = await OrgService.createOrganization(req.body, user);
@@ -52,6 +54,8 @@ const downloadFile = async(req, res) => {
   const { user } = req.loggerInfo;
   let org = await Org.findById(projectId)
   filename = org._id+'.zip'
+
+  logger.info({method:'downloadFile', message: "request received for downloading configuration", data: req.loggerInfo, params: req.params})
   try {
     // Get file path from the service
     const filePath = FileService.getUserFile(user.email, filename);

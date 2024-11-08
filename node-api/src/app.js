@@ -13,37 +13,19 @@ const { authLimiter, requestLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
+const logger = require('./logger')(module)
+const { requestInfo } = require('./middlewares/requestInfo');
 
-const logger = require('../src/logger')(module)
+
 
 const app = express();
 
-if (config.env !== 'test') {
-  app.use(morgan.successHandler);
-  app.use(morgan.errorHandler);
-}
+app.use(morgan.successHandler);
+app.use(morgan.errorHandler);
+app.use(requestInfo);
 
-const yaml = require('js-yaml');
-const fs = require('fs');
 
-const jsonData = {
-  name: 'John Doe',
-  age: 30,
-  email: 'john.doe@example.com',
-  hobbies: ['reading', 'hiking', 'coding'],
-  address: {
-    city: 'New York',
-    country: 'USA'
-  }
-};
-
-// Convert JSON to YAML
-const yamlData = yaml.dump(jsonData);
-
-// Write YAML data to file
-fs.writeFileSync('data.yaml', yamlData, 'utf8');
-
-console.log('Conversion complete!');
+logger.info({ message: 'This is test message' })
 
 process
   .on('unhandledRejection', (reason, p) => {
@@ -56,10 +38,6 @@ process
 logger.error("This is test message")
 // set security HTTP headers
 app.use(helmet());
-
-const { OAuth2Client } = require('google-auth-library');
-const CLIENT_ID = '199759029626-dgc3280klfq5u5r0o44kho7fnomvgspk.apps.googleusercontent.com'
-const client = new OAuth2Client(CLIENT_ID);
 
 // parse json request body
 app.use(express.json());
@@ -78,15 +56,12 @@ app.use(compression());
 app.use(cors());
 app.options('*', cors());
 
-// jwt authentication
-// app.use(passport.initialize());
-// passport.use('jwt', jwtStrategy);
 
 // limit repeated failed requests to auth endpoints
-  app.use('/v1/auth', authLimiter);
+app.use('/v1/auth', authLimiter);
 
 // v1 api routes
-app.use('/v1',requestLimiter, routes);
+app.use('/v1', requestLimiter, routes);
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
