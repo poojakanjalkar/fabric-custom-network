@@ -330,7 +330,7 @@ echo "Hello, this is a shell script created with Node.js!"
   createConnectionProfile() {
     cd ../../../../api/connection-profiles && ./generate-ccp.sh
 
-    cp connection-${firstPeerOrg.orgName}.json ../../blockchain/artifacts/channel/crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/
+    cp connection-${firstPeerOrg.orgName}-caliper.json ../../blockchain/artifacts/channel/crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/
   } 
   
   `
@@ -865,6 +865,12 @@ const copyAllStaticFiles = async (userFolder) => {
 
   copyDirectory(sourceFolder, destinationFolder);
 
+   // Readme File
+   const readmeSourceFolder = __dirname + '/' + '../../blockchain/README.md';
+   let readmeDestinationFolder = `${userFolder}/blockchain/README.md`;
+   const fsPromise = require('fs').promises
+   await fsPromise.copyFile(readmeSourceFolder, readmeDestinationFolder);
+
   // copy chaincode
   const chaincodeSourceFolder = __dirname + '/' + '../../blockchain/artifacts/chaincode/javascript';
   let chaincodeDestinationFolder = `${userFolder}/blockchain/artifacts/chaincode/javascript`;
@@ -907,13 +913,42 @@ const addAPIChanges = async (staticMasterData, userFolder) => {
           -e "s#\\\${CAPEM}#$CP#" \\
           ./ccp-template.json
   }
+
+  function json_ccp_caliper {
+      local PP=$(one_line_pem $4)
+      local CP=$(one_line_pem $5)
+      sed -e "s/\\\${ORG}/$1/" \\
+          -e "s/\\\${P0PORT}/$2/" \\
+          -e "s/\\\${CAPORT}/$3/" \\
+          -e "s#\\\${PEERPEM}#$PP#" \\
+          -e "s#\\\${CAPEM}#$CP#" \\
+          ./ccp-template-caliper.json
+  }
   `
 
   let peerOrgs = staticMasterData.Organizations.filter((elm) => elm.orgType == 'Peer');
   // console.log("----peerOrgs-----", peerOrgs)
   let varData = ''
   let caPort = 7054
+  let IsCaliperConnectionProfileAdded = false
   for (let org of peerOrgs) {
+
+    if(!IsCaliperConnectionProfileAdded){
+      varData += `
+      #------------------This section is used for Caliper connection profile---------------------------
+      ORG=${org.orgName}
+      P0PORT=${org.peerPorts[0]}
+      CAPORT=${caPort}
+      PEERPEM=../../blockchain/artifacts/channel/crypto-config/peerOrganizations/${org.orgName}.com/peers/peer1.${org.orgName}.com/tls/tlscacerts/tls-localhost-${caPort}-ca-${org.orgName}-com.pem
+      CAPEM=../../blockchain/artifacts/channel/crypto-config/peerOrganizations/${org.orgName}.com/msp/tlscacerts/ca.crt
+  
+      echo "$(json_ccp_caliper $ORG $P0PORT $CAPORT $PEERPEM $CAPEM )" > connection-${org.orgName}-caliper.json
+      #------------------This section is used for Caliper connection profile---------------------------
+
+    `
+    IsCaliperConnectionProfileAdded = true
+    }
+
     varData += `
     
     ORG=${org.orgName}
@@ -925,6 +960,8 @@ const addAPIChanges = async (staticMasterData, userFolder) => {
     echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM )" > connection-${org.orgName}.json
     
     `
+    
+
 
     caPort += 1000
 
@@ -1206,7 +1243,7 @@ const addCaliperChanges = async (staticMasterData, userFolder) => {
           ]
         },
         "connectionProfile": {
-          "path": `crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/connection-${firstPeerOrg.orgName}.json`,
+          "path": `crypto-config/peerOrganizations/${firstPeerOrg.orgName}.com/connection-${firstPeerOrg.orgName}-caliper.json`,
           "discover": true
         }
       }

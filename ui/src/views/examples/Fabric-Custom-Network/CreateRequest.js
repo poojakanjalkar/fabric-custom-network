@@ -789,7 +789,9 @@ export default function CreateRequest(props) {
     "2. Max 20 Orgs configuration can be created",
     "3. Explorer and caliper will be configured for the first channel's of first organization",
     
-    "4. A basic API structure will be given for basic asset operation"
+    "4. A basic API structure will be given for basic asset operation",
+    "5. Make sure to have odd number of orderers like 3, 5, 7 etc",
+    "6. If you are facing any issue, please connect with us on Whatsapp"
   ];
 
   const [isOpen, setIsOpen] = useState(true);

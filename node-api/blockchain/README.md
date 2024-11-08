@@ -1,81 +1,160 @@
-# reliability-poc
+# Blockchain Network Setup Guide
 
+## Overview
 
+This repository contains a complete blockchain network implementation with API integration, performance testing tools, and network explorer. The setup includes comprehensive tooling for development, monitoring, and testing of blockchain applications.
 
-1) CA Creation
-2) cryptomaterial creation
-3) Create artifacts
-4) Run all services
-5) Create Channel
-7) Deploy Chaincode
+## 📁 Repository Structure
 
+```
+.
+├── api/                 # Basic CRUD operation API structure
+├── blockchain/
+│   ├── artifacts/      # Network configuration for all services
+│   ├── Explorer/       # Blockchain Explorer implementation
+│   ├── performance-tool/# Performance testing tools
+│   └── scripts/        # Channel creation and chaincode deployment scripts
+```
 
+## 🚀 Quick Start
 
-Student: Oratile Leteane
-Project: Trusted data management in beef supply chain, case of Botswana
+### Prerequisites
+- Docker and Docker Compose installed (latest version)
+- Node.js and npm installed (v20)
+- MongoDB (for API integration) (latest version)
+- Hyperledger fabric: v2.5
 
+### Standard Network Creation Steps
 
-Cattle information
-    • Cattleid
-    • Breed
-    • DoBDate of birth
-    • Base_location
-    • Deviceid
-    • Ownerid
-    • ownerName
-    • ownerSurname
-device information
-    • Name/manufacturer
-    • Deviceid
-    • Calibration_date
-    • Calibration_expiry_date
+1. CA Creation
+2. Cryptomaterial creation
+3. Create artifacts
+4. Run all services
+5. Create Channel
+6. Deploy Chaincode
 
+## 🔧 Detailed Setup Instructions
 
-device Data
-    • type: GPS/temp
-    • Deviceid
-    • data:{}
-    • deviceMetaData:
-    • timestamp
-    • cattleId
-    • isValid:1
+### Blockchain Network Setup
 
-UI
-    • Users registration
-    • Login
-    • Cattle registration
-    • Devices registration
-    • Device update (should be done by authority organisation users). Updating devices is changing the calibration dates
-    • display OF Registered cattle (live cattle for organisation whose user is logged in)
-    • Display of devices (to a specific organisation) whose calibration date is expired and those whose expiry date is nearing
-    • Updating cattle
-    • Cattle ownership transafer
-    • Search for cattle (using cattleID)
+1. Set appropriate permissions for home repo
+```bash
+sudo chmod -R 777 *
+```
 
-Functionalities
-    • Register cattle to the ledger
-    • Register devices (GP and temperature sensors) to the ledger
-    • Device calibration date and expiry date are updated every time there is new calibration
-    • Devices send data (location and temperature) to the ledger every 10 minutes
+2. Create certificates with CA
+```bash
+cd blockchain/artifacts/channel/create-certificate-with-ca
+docker compose up -d
+./create-certificate-with-ca.sh
+```
 
-Important logic in blockchain smart contracts
-Location data form sensors
-    • Calibration of the devices sending data should be checked if it is valid. A numerical value of 1 should be issued of the calibration is valid, otherwise the value of 0 is issued
-    • Battery level and power consumption – The device will send as part of meta data battery level. The smart contract should check the battery level and issue value of 0 if the power level is below 5%. If the 5% and more, the smart contact should get the previous battery level (from data received in the previous interval) of compute amount of power consumption. If is above normal (more than 1%) then value of 0 is issued, otherwise value of 1 is issued
-    • Tempral corelation – computes the distance of coverage using the previous and current latitudes/longitudes coordinates, then check whether the distance of coverage is normal.
-        ◦ First Ry (distance of coverage is computed)
-        ◦ The previous average distance of coverage (Rx) is subtracted from current distance of coverage (|Ry – Rx|). If there is any deviation (i), then (i) is checked against normal deviations range. If within the range, the deviation is subtracted from 1 (1-i). otherwise, is multiplied by 0.5
+3. Create artifacts
+```bash
+cd ../
+./create-artifacts.sh
+```
 
-Project development phases
-Part 1 (registration and display)
-    • Cattle and devices registration
-    • Cattle update
-    • Cattle ownership transfer
-    • Cattle data display
-    • Devices data display
-    • Devices update
-    • Cattle search
+4. Start network services
+```bash
+cd ../
+docker compose up -d
+```
 
-Part 2 (data trust management)
-    • Location and temperature data registration
-    • Trust computation
+5. Create channel and deploy chaincode, here mentioning for the first channel and its chaincode
+```bash
+cd ../scripts
+./create-mychannel1.sh
+./deploy-chaincode1.sh
+```
+
+6. You an access CouchDB here
+- URL: `http://127.0.0.1:5984/_utils/`
+- Credentials:
+  - Username: `admin`
+  - Password: `adminpw`
+
+### 🔍 Explorer Setup
+
+1. Launch Explorer
+```bash
+cd blockchain/Explorer
+docker compose up -d
+```
+
+2. Access Explorer Dashboard
+- URL: `http://localhost:8081`
+- Credentials:
+  - Username: `exploreradmin`
+  - Password: `exploreradminpw`
+
+### ⚡ Performance Testing (Caliper)
+
+1. Install dependencies
+```bash
+cd blockchain/performance-tool/caliper/caliper-benchmarks-local
+npm install
+```
+
+2. Run Caliper
+```bash
+cd ..
+docker compose up -d
+```
+
+3. Monitor progress
+```bash
+docker logs caliper -f
+```
+
+The benchmark report will be generated as `report.html` upon completion.
+
+### 🖥️ API Setup
+
+1. Install dependencies
+```bash
+cd api
+npm install
+```
+
+2. Configure environment
+- Copy `.env.sample` to `.env`
+- Add MongoDB credentials
+
+3. Install nodemon globally
+```bash
+sudo npm i -g nodemon
+```
+
+4. Start the server
+```bash
+nodemon app.js
+```
+
+The API server will run on `localhost:3000`
+
+### 📝 API Documentation
+
+- Postman collections are available at `api/src/postman/`
+- The bootstrap script (`bootstrap.js`) handles:
+  - Organization and user seeding in MongoDB
+  - User credential creation using CA
+  - Wallet storage
+
+## 📌 Important Notes
+
+- Explorer and Caliper are configured for the first channel of the first organization
+- API includes connection configurations for all organizations
+- Users can switch between organizations using different users defined in `bootstrap.js`
+
+## 🎓 Additional Resources
+
+For detailed setup instructions and configuration modifications, please refer to our YouTube video tutorial.
+
+## 💡 Customization
+
+Feel free to modify the Explorer and Caliper configurations according to your specific requirements. The API connection configurations support multiple organizations and can be customized as needed.
+
+---
+
+For questions or support, please check our video tutorial or raise an issue in the repository.

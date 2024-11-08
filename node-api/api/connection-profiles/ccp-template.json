@@ -24,7 +24,7 @@
     },
     "peers": {
         "peer1.${ORG}.com": {
-            "url": "grpcs://peer1.${ORG}.com:${P0PORT}",
+            "url": "localhost:${P0PORT}",
             "tlsCACerts": {
                 "pem": "${PEERPEM}"
             },
