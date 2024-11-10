@@ -88,16 +88,16 @@ const EditableCell = ({
   const inputNode =
     dataIndex === "peerCount" ? (
       <InputNumber
-      min={1}
-      // max={10}
-placeholder="Enter a number between 1 and 10"
-onKeyPress={(e) => {
-  // Prevent non-numeric input
-  if (!/[0-9]/.test(e.key)) {
-    e.preventDefault();
-  }
-}}
-parser={(value) => (isNaN(parseInt(value)) ? "" : parseInt(value))}
+        min={1}
+        // max={10}
+        placeholder="Enter a number between 1 and 10"
+        onKeyPress={(e) => {
+          // Prevent non-numeric input
+          if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
+          }
+        }}
+        parser={(value) => (isNaN(parseInt(value)) ? "" : parseInt(value))}
       />
     ) : (
       <Input
@@ -108,7 +108,7 @@ parser={(value) => (isNaN(parseInt(value)) ? "" : parseInt(value))}
     );
   return (
     <td {...restProps}>
-      {editing  ? (
+      {editing ? (
         <Form.Item
           name={dataIndex}
           style={{
@@ -121,28 +121,28 @@ parser={(value) => (isNaN(parseInt(value)) ? "" : parseInt(value))}
             },
             ...(dataIndex === "orgName"
               ? [
-                  {
-                    pattern: /^[a-zA-Z0-9]+$/, // Alphanumeric pattern, allows uppercase letters
-                    message: `${title} should only contain letters and numbers with no spaces!`,
-                  },
-                ]
+                {
+                  pattern: /^[a-zA-Z0-9]+$/, // Alphanumeric pattern, allows uppercase letters
+                  message: `${title} should only contain letters and numbers with no spaces!`,
+                },
+              ]
               : []),
-              ...(dataIndex === "peerCount"
-                ? [
-                    {
-                      type: "number",
-                      min: 1,
-                      message: `${title} should be a positive number!`,
-                      transform: (value) => (value ? Number(value) : 0),
-                    },
-                    {
-                      type: "number",
-                      max: 10,
-                      message: `${title} should not be more than 10!`,
-                      transform: (value) => (value ? Number(value) : 0),
-                    },
-                  ]
-                : []),
+            ...(dataIndex === "peerCount"
+              ? [
+                {
+                  type: "number",
+                  min: 1,
+                  message: `${title} should be a positive number!`,
+                  transform: (value) => (value ? Number(value) : 0),
+                },
+                {
+                  type: "number",
+                  max: 10,
+                  message: `${title} should not be more than 10!`,
+                  transform: (value) => (value ? Number(value) : 0),
+                },
+              ]
+              : []),
           ]}
         >
           {inputNode}
@@ -349,7 +349,7 @@ export default function CreateRequest(props) {
 
 
     const numericValue = Number(value);
-    
+
     // Validate based on min and max
     if (value === '') {
       setTotalOrgs(value);
@@ -371,7 +371,7 @@ export default function CreateRequest(props) {
 
   const inputChangeHandlerChannel = (value) => {
     const numericValue = Number(value);
-    
+
     // Validate based on min and max
     if (value === '') {
       setTotalChannel(value);
@@ -384,7 +384,7 @@ export default function CreateRequest(props) {
       setTotalChannel(value);
       setValidationMessage(''); // Clear validation message if valid
     }
-    
+
 
     // if (value > 0) {
     //   console.log("-------input changed--------", value);
@@ -474,7 +474,7 @@ export default function CreateRequest(props) {
           ca: `orderer-ca`,
           msp: `ordererMSP`,
           peerCount: 3,
-          isEditable:false,
+          isEditable: false,
           stateDB: "NA",
           db: "Not Require",
         });
@@ -785,10 +785,10 @@ export default function CreateRequest(props) {
 
   const instructions = [
     "1. The organization name, channel name and chaincode name should not have space",
-   
+
     "2. Max 20 Orgs configuration can be created",
     "3. Explorer and caliper will be configured for the first channel's of first organization",
-    
+
     "4. A basic API structure will be given for basic asset operation",
     "5. Make sure to have odd number of orderers like 3, 5, 7 etc",
     "6. If you are facing any issue, please connect with us on Whatsapp"
@@ -799,12 +799,12 @@ export default function CreateRequest(props) {
   const toggle = () => setIsOpen(!isOpen);
 
 
- 
+
   const [selectedVersion] = useState("v2.5");
 
   const dropdownToggle = () => setDropdownOpen(prevState => !prevState);
 
-  
+
 
 
   return (
@@ -870,24 +870,42 @@ export default function CreateRequest(props) {
                       <Divider />
 
                       <FormGroup row>
+                        <Label sm={2}> Fabric Version</Label>
+
+                        <Dropdown isOpen={false} toggle={() => { }}>
+                          <DropdownToggle caret disabled>
+                            {selectedVersion}
+                          </DropdownToggle>
+                          <DropdownMenu>
+                            <DropdownItem>v2.5</DropdownItem>
+                            <DropdownItem>v3.o</DropdownItem>
+
+                          </DropdownMenu>
+                        </Dropdown>
+
+                      </FormGroup>
+
+                      <Divider></Divider>
+
+                      <FormGroup row>
                         <Label sm={2}>Number Of Orgs</Label>
                         <Col sm={2}>
-                        <div>
-      <Input
-        value={totalOrgs}
-        type="number"
-        onChange={(e) => {
-          inputChangeHandler(e.target.value);
-        }}
-        placeholder="Please enter count"
-        status={validationMessage ? 'error' : ''} // Set status based on validation message
-      />
-      {validationMessage && (
-        <FormFeedback style={{ color: 'red' }}>
-          {validationMessage}
-        </FormFeedback>
-      )}
-    </div>
+                          <div>
+                            <Input
+                              value={totalOrgs}
+                              type="number"
+                              onChange={(e) => {
+                                inputChangeHandler(e.target.value);
+                              }}
+                              placeholder="Please enter count"
+                              status={validationMessage ? 'error' : ''} // Set status based on validation message
+                            />
+                            {validationMessage && (
+                              <FormFeedback style={{ color: 'red' }}>
+                                {validationMessage}
+                              </FormFeedback>
+                            )}
+                          </div>
                         </Col>
                         <Col sm={4}>
                           <Button
@@ -939,11 +957,11 @@ export default function CreateRequest(props) {
                             status={validationMessage ? 'error' : ''} // Set status based on validation message
                           />
 
-{validationMessageChannel && (
-        <FormFeedback style={{ color: 'red' }}>
-          {validationMessage}
-        </FormFeedback>
-      )}
+                          {validationMessageChannel && (
+                            <FormFeedback style={{ color: 'red' }}>
+                              {validationMessage}
+                            </FormFeedback>
+                          )}
                         </Col>
                         <Col sm={4}>
                           <Button
@@ -979,24 +997,8 @@ export default function CreateRequest(props) {
                         </FormGroup>
                       ) : null}
                       <Divider></Divider>
-                      
-                      <FormGroup row>
-                        <Label sm={3}> Fabric Version</Label>
-                       
-                        <Dropdown isOpen={false} toggle={()=>{}}>
-                        <DropdownToggle caret disabled>
-                        {selectedVersion}
-                          </DropdownToggle>
-                          <DropdownMenu>
-                        <DropdownItem>v2.5</DropdownItem>
-                        <DropdownItem>v3.o</DropdownItem>
-                    
-                    </DropdownMenu>
-                      </Dropdown>
-                     
-                      </FormGroup>
 
-                              <Divider></Divider>
+
 
                       <FormGroup row  >
                         <Label sm={3}>

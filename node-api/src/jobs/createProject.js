@@ -1589,9 +1589,10 @@ const createDeployChaincodeScript = async (staticMasterData, userFolder) => {
   createFileIfNotExist(filePath);
   let i = 0;
 
-  let allFunctions = ''
+  let allFunctions 
 
   for (let channel of staticMasterData?.channels) {
+    allFunctions = ''
     let finalContent = `#!/bin/bash
         # imports  
         . envVar.sh
