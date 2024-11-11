@@ -1,6 +1,7 @@
 import Profile from "./views/examples/Profile.js";
 import Login from "./views/examples/Login.js";
 import Admin from "./views/examples/admin.js";
+import Product from  './views/examples/Fabric-Custom-Network/product.js'
 import Organization from "views/examples/Fabric-Custom-Network/Organization.js";
 import CreateRequest from "views/examples/Fabric-Custom-Network/CreateRequest.js";
 import ContactUs from "views/examples/Fabric-Custom-Network/ContactUs.js";
@@ -31,6 +32,7 @@ const adminRoutes = [
     component: Admin,
     layout: "/admin",
   },
+
   {
     path: "/user-profile",
     name: "User Profile",
@@ -46,6 +48,13 @@ const authRoutes = [
     name: "Login",
     icon: "ni ni-key-25 text-info",
     component: Login,
+    layout: "/auth",
+  },
+  {
+    path: "/product",
+    name: "Admin",
+    icon: "ni ni-tv-2 text-primary",
+    component: Product,
     layout: "/auth",
   },
 ];

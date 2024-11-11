@@ -51,7 +51,7 @@ ReactDOM.render(
               <Route path="refund-policy" element={<RefundPolicy />} />
             </Route> */}
              <Route 
-              path={["/privacy-policy", "/terms-and-conditions", "/refund-policy", "/contact-us"]} 
+              path={["/privacy-policy", "/terms-and-conditions", "/refund-policy", "/contact-us", "/products"]} 
               component={FooterLayout} 
             />
             <Route path='/auth' render={(props) => <AuthLayout {...props} />} />

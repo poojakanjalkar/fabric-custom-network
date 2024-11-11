@@ -63,16 +63,16 @@ class AdminNavbar extends React.Component {
                     <span className="nav-link-inner--text">Dashboard</span>
                   </NavLink>
                 </NavItem> */}
-                {/* <NavItem>
+                <NavItem>
                   <NavLink
                     className="nav-link-icon"
-                    to="/auth/register"
+                    to="/auth/product"
                     tag={Link}
                   >
-                    <i className="ni ni-circle-08" />
-                    <span className="nav-link-inner--text">Register</span>
+                    <i className="ni ni-cart" />
+                    <span className="nav-link-inner--text">Buy Product</span>
                   </NavLink>
-                </NavItem> */}
+                </NavItem>
                 <NavItem>
                   <NavLink
                     className="nav-link-icon"
