@@ -6,7 +6,7 @@ const createPayment = async (data) => {
   console.log('--razor pay data----', data);
   logger.info({method:'createPayment', message: "Webhook triggered", data})
 
-  if(data.event !== 'payment.captured'){
+  if(data.event !== 'payment.authorized'){
     return
   }
 
