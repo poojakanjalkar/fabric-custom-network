@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect , useState} from 'react';
 import {
     Container,
     Row,
@@ -9,30 +9,33 @@ import {
     CardText,
     Button,
     ListGroup,
-    ListGroupItem
+    ListGroupItem,
+    Input,
+    Form,
+    FormGroup,
+    Label
 } from 'reactstrap';
+
+// import {
+//     Container, Row, Col, Card, CardBody, CardTitle, Form, FormGroup, Label, Input, Button, FormText,
+// } from 'reactstrap';
 
 export default function Component() {
 
-    const loadScript = (src) => {
-        return new Promise((resovle) => {
-            const script = document.createElement("script");
-            script.src = src;
+    const EXCHANGE_RATES = {
+        USD: 1,
+        EUR: 0.92,
+        GBP: 0.79,
+        JPY: 151.41,
+        AUD: 1.53,
+        CAD: 1.35,
+        CHF: 0.90,
+        CNY: 7.23,
+        INR: 83.12,
+      };
+      
 
-            script.onload = () => {
-                resovle(true);
-            };
-
-            script.onerror = () => {
-                resovle(false);
-            };
-
-            document.body.appendChild(script);
-        });
-    };
-
-
-    const startPayment = async (name, email) => {
+    const startPayment = async (name, email, amount,currency) => {
         const res = await loadScript(
             "https://checkout.razorpay.com/v1/checkout.js"
         );
@@ -44,9 +47,11 @@ export default function Component() {
 
         const options = {
             key: "rzp_live_DghPaxyb1sOnGp",
-            currency: 'INR',
-            currency: "USD",
-            amount: 30 * 100,
+            // currency: 'INR',
+            currency,
+            // currency: "USD",
+            // amount: 1999 * 100,
+            amount: amount*100,
             name: "Morya Innovation",
             description: "Thanks for purchasing",
             customer: {
@@ -67,6 +72,86 @@ export default function Component() {
         const paymentObject = new window.Razorpay(options);
         paymentObject.open();
     };
+
+    const [selectedCurrency, setSelectedCurrency] = useState('USD');
+    const [price, setPrice] = useState(30);
+    const basePrice = 30;
+  
+    useEffect(() => {
+      fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+          if (EXCHANGE_RATES[data.currency]) {
+            setSelectedCurrency(data.currency);
+          }
+        })
+        .catch(() => {
+          console.log('Failed to detect location, using default USD');
+        });
+    }, []);
+  
+    useEffect(() => {
+      const newPrice = basePrice * EXCHANGE_RATES[selectedCurrency];
+      setPrice(Number(newPrice.toFixed(2)));
+    }, [selectedCurrency]);
+  
+    const handleCurrencyChange = (e) => {
+      setSelectedCurrency(e.target.value);
+    };
+  
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('en-US', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price);
+    };
+  
+    const getCurrencySymbol = (currency) => {
+      const symbols = {
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        JPY: '¥',
+        AUD: 'A$',
+        CAD: 'C$',
+        CHF: 'CHF',
+        CNY: '¥',
+        INR: '₹',
+      };
+      return symbols[currency] || currency;
+    };
+  
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const name = form.elements.name.value;
+      const email = form.elements.email.value;
+      console.log('Starting payment for:', { name, email, amount: price, currency: selectedCurrency });
+
+      startPayment(name, email, price,selectedCurrency )
+      // Implement your payment logic here
+    };
+
+    const loadScript = (src) => {
+        return new Promise((resovle) => {
+            const script = document.createElement("script");
+            script.src = src;
+
+            script.onload = () => {
+                resovle(true);
+            };
+
+            script.onerror = () => {
+                resovle(false);
+            };
+
+            document.body.appendChild(script);
+        });
+    };
+
+
+
 
     const features = [
         "1. Create custom Hyperledger Fabric networks",
@@ -107,40 +192,72 @@ export default function Component() {
                 <Col md={4}>
                     <Card className="bg-white">
                         <CardBody className="text-center">
-                            <CardTitle tag="h3">Pricing</CardTitle>
-                            <CardText className="display-4 my-4">$30</CardText>
-                            <CardText>One-time purchase</CardText>
-                            <form className="space-y-4" onSubmit={(e) => {
-                                e.preventDefault(); // Prevent default form submission
-                                const name = e.target.name.value;
-                                const email = e.target.email.value;
-                                startPayment(name. email); // Call the payment function only when validation passes
-                            }}>
-                                <div>
-                                    <input
+
+
+                            <Row className="mb-4 align-items-center">
+                                <Col>
+                                    <CardTitle tag="h2" className="text-center font-weight-bold">Premium Plan</CardTitle>
+                                </Col>
+                                <Col className="text-end">
+                                    <div className="d-flex align-items-center">
+                                        <span role="img" aria-label="globe" className="me-2">🌐</span>
+                                        <Input
+                                            type="select"
+                                            value={selectedCurrency}
+                                            onChange={handleCurrencyChange}
+                                            className="form-control-sm"
+                                        >
+                                            {Object.keys(EXCHANGE_RATES).map((currency) => (
+                                                <option key={currency} value={currency}>
+                                                    {currency}
+                                                </option>
+                                            ))}
+                                        </Input>
+                                    </div>
+                                </Col>
+                            </Row>
+
+                            <div className="text-center my-4">
+                                <h1 className="display-4 font-weight-bold">
+                                    {getCurrencySymbol(selectedCurrency)}{formatPrice(price)}
+                                </h1>
+                            </div>
+                            <p className="text-center text-muted">One-time purchase</p>
+
+                            <Form onSubmit={handleSubmit} className="mt-4">
+                                <FormGroup>
+                                    <Label for="name" className="sr-only">Name</Label>
+                                    <Input
                                         type="text"
                                         id="name"
                                         name="name"
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                         placeholder="Your Name"
                                         required
                                     />
-                                </div>
-                                <div>
-                                    <input
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="email" className="sr-only">Email</Label>
+                                    <Input
                                         type="email"
                                         id="email"
                                         name="email"
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                         placeholder="you@example.com"
                                         required
                                     />
-                                </div>
-                                <Button type="submit" color="primary" size="lg" className="mt-3">
+                                </FormGroup>
+                                <Button
+                                    color="primary"
+                                    type="submit"
+                                    className="w-100"
+                                >
                                     Buy Now
                                 </Button>
-                            </form>
+                            </Form>
 
+                            <div className="mt-4 text-center text-muted small">
+                                <p>Price shown in {selectedCurrency}</p>
+                                {/* <p>Secure payment processing</p> */}
+                            </div>
 
                         </CardBody>
                     </Card>
@@ -166,7 +283,7 @@ export default function Component() {
                 </Col>
             </Row>
 
-            <Row className="mt-5">
+            <Row className="mt-4">
                 <Col className="text-center text-white">
                     <h2 className="display-4 text-center text-white mb-4">Ready to build your Hyperledger Fabric network?</h2>
                     <Button color="success" size="lg" className="mt-3" >
