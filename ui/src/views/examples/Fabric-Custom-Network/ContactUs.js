@@ -164,15 +164,15 @@ const ContactUs = () => {
             <Card className="bg-secondary shadow border-0">
               <CardBody className="p-lg-5">
                 <h4 className="mb-4">Contact Information</h4>
-                {/* <div className="mb-4">
+                <div className="mb-4">
                   <h6 className="text-primary">Office Address</h6>
                   <p className="text-muted mb-0">
-                    123 Business Street<br />
-                    Suite 100<br />
-                    City, State 12345<br />
-                    In
+                    C-101 Green County<br />
+                   
+                    Pune, Maharashtra 412308<br />
+                    India
                   </p>
-                </div> */}
+                </div>
                 <div className="mb-4">
                   <h6 className="text-primary">Contact Details</h6>
                   <p className="text-muted mb-0">

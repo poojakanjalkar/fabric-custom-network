@@ -27,8 +27,8 @@ class AdminNavbar extends React.Component {
           <Container className="px-4">
             <NavbarBrand to="/" tag={Link}>
               {/* <img alt="..." src={require("../../assets/img/brand/logo.png")} /> */}
-              {/* <img alt="..." src={require("../../assets/img/brand/logo.png")} /> */}
-              <img alt="Logo" src={logo} />
+              {/* <img alt="Logo" src={require("../../assets/img/brand/logo.png")} /> */}
+              <img alt="Logo" src="/logo.png" />
 
             </NavbarBrand>
             <button className="navbar-toggler" id="navbar-collapse-main">
@@ -70,7 +70,7 @@ class AdminNavbar extends React.Component {
                     tag={Link}
                   >
                     <i className="ni ni-cart" />
-                    <span className="nav-link-inner--text">Buy Product</span>
+                    <span className="nav-link-inner--text">Courses</span>
                   </NavLink>
                 </NavItem>
                 <NavItem>

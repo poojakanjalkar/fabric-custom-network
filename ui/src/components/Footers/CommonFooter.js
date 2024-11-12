@@ -30,8 +30,8 @@ const AuthFooter = () => {
     <footer className="py-5">
       <div className="container">
         <div className="row align-items-center justify-content-xl-between">
-          <div className="col-xl-6">
-            {/* <div className="copyright text-center text-xl-left text-muted">
+          <div className="col-xl-4">
+            <div className="copyright text-center text-xl-left text-muted">
               © {currentYear}{" "}
               <a
                 className="font-weight-bold ml-1"
@@ -39,9 +39,9 @@ const AuthFooter = () => {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Adhav Pavan
+                Moraya Innovation
               </a>
-            </div> */}
+            </div>
           </div>
           <div className="col-xl-8">
             <nav className="nav nav-footer justify-content-center justify-content-xl-end">
