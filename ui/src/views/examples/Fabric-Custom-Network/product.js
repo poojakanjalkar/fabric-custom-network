@@ -46,7 +46,7 @@ export default function Component() {
         }
 
         const options = {
-            key: "rzp_live_DghPaxyb1sOnGp",
+            key: "rzp_live_vQB9BF739hlsCx",
             // currency: 'INR',
             currency,
             // currency: "USD",
