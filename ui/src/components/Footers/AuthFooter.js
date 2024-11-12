@@ -33,11 +33,11 @@ const AuthFooter = () => {
               © {currentYear}{" "}
               <a
                 className="font-weight-bold ml-1"
-                href="https://www.linkedin.com/in/pavan-adhav/"
-                rel="noopener noreferrer"
-                target="_blank"
+                // href="https://www.linkedin.com/in/pavan-adhav/"
+                // rel="noopener noreferrer"
+                // target="_blank"
               >
-                Adhav Pavan
+                Moraya Innovation
               </a>
             </div>
           </div>

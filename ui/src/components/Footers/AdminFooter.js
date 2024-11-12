@@ -35,7 +35,7 @@ class Footer extends React.Component {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Adhav Pavan
+                Moraya Innovation
               </a>
             </div>
           </Col>
@@ -64,11 +64,11 @@ class Footer extends React.Component {
 
               <NavItem>
                 <NavLink
-                  href="https://www.linkedin.com/in/pavan-adhav/"
-                  rel="noopener noreferrer"
-                  target="_blank"
+                  // href="https://www.linkedin.com/in/pavan-adhav/"
+                  // rel="noopener noreferrer"
+                  // target="_blank"
                 >
-                  Adhav Pavan
+                  Moraya Innovation
                 </NavLink>
               </NavItem>
             </Nav>
