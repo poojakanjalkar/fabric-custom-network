@@ -35,7 +35,7 @@ class Footer extends React.Component {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Moraya Innovation
+                Morya Innovations
               </a>
             </div>
           </Col>
@@ -68,7 +68,7 @@ class Footer extends React.Component {
                   // rel="noopener noreferrer"
                   // target="_blank"
                 >
-                  Moraya Innovation
+                  Morya Innovations
                 </NavLink>
               </NavItem>
             </Nav>

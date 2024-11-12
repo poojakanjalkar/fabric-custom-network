@@ -39,7 +39,7 @@ const AuthFooter = () => {
                 // rel="noopener noreferrer"
                 // target="_blank"
               >
-                Moraya Innovation
+                Morya Innovations
               </a>
             </div>
           </div>

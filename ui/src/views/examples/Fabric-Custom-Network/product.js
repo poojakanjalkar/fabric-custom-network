@@ -61,8 +61,8 @@ export default function Component() {
             handler: async function (response) {
             },
             notes: {
-                name: JSON.parse(localStorage.getItem("user-data")).name,
-                email: JSON.parse(localStorage.getItem("user-data")).email,
+                name:name,
+                email:email,
             },
             prefill: {
                 name: "Morya Innovation",
