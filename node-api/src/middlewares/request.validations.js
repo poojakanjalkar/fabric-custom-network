@@ -16,9 +16,15 @@ const organizationSchema = Joi.object({
 // Define the schema for the channels
 const channelSchema = Joi.object({
     key: Joi.string().required(),
-    channelName: Joi.string().alphanum().max(50).required(), // Alphanumeric, max 50 characters
+    channelName: Joi.string()
+        .pattern(/^[a-z][a-z0-9-]*$/) // Must start with a lowercase letter and can contain lowercase letters, digits, dots, and dashes
+        .max(50) // Maximum length of 50 characters
+        .required(), // Required field
+    chaincodeName: Joi.string()
+        .pattern(/^[a-z][a-z0-9-]*$/) // Same pattern as channel name
+        .max(50) // Maximum length of 50 characters
+        .required(), // Required field
     orgName: Joi.array().items(Joi.string()).required(), // Array of organization names
-    ChaincodeName: Joi.string().alphanum().max(50).required(), // Alphanumeric, max 50 characters
     endorsement: Joi.string().required(),
     dataType: Joi.string().valid('Channel').required()
 });
