@@ -25,7 +25,8 @@ const envVarsSchema = Joi.object()
     CA_ADMIN_SECRET: Joi.string().required().description('ca admin password'),
     COMMON_PASSWORD:Joi.string().required().description("Add common password"),
     RAZORPAY_WEBHOOK_SECRET: Joi.string().required().description("Please provide razorpaywebhook secret"),
-    
+    RAZORPAY_KEY_ID:Joi.string().required().description("Razorpay Key is required"),
+    RAZORPAY_SECRET: Joi.string().required().description("Please provide razorpay secret"),
   })
   .unknown();
 
@@ -48,6 +49,8 @@ module.exports = {
   caAdminSecret: envVars.CA_ADMIN_SECRET,
   commonPassword:envVars.COMMON_PASSWORD,
   razorPayWebhookSecret: envVars.RAZORPAY_WEBHOOK_SECRET,
+  razorPayKey:envVars.RAZORPAY_KEY_ID,
+  razorPaySecret:envVars.RAZORPAY_SECRET,
   mongoose: {
     url: `mongodb${srv}://${envVars.MONGODB_USERNAME}:${envVars.MONGODB_PASSWORD}@${envVars.MONGODB_HOST}/${envVars.MONGODB_NAME}?retryWrites=true&w=majority&authSource=admin`,
     options: {

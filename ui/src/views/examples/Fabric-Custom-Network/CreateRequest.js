@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faFileAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
-// import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   Button,
   Card,
@@ -65,7 +62,6 @@ const EditableCell = ({
   ...restProps
 }) => {
 
-  // console.log("--------record------------", record)
 
   // const isEditableRow = record && record.isEditable
   const handleInputChange = (e) => {
@@ -153,7 +149,6 @@ const EditableCell = ({
     </td>
   );
 };
-
 const EditableCellChannel = ({
   editing,
   dataIndex,
@@ -168,14 +163,14 @@ const EditableCellChannel = ({
   const tagRender = (props) => {
     const { label, value, closable, onClose } = props;
 
-    const color = "violet"; //getColorForOption(value); // Your function to get color for option value
+    const color = "violet"; // Define the color for the tags
 
     return (
       <div
         style={{
           color: "white",
-          backgroundColor: color, // Apply background color
-          border: `1px solid ${color}`, // Apply border color
+          backgroundColor: color,
+          border: `1px solid ${color}`,
           borderRadius: "4px",
           padding: "2px 8px",
           display: "inline-flex",
@@ -194,13 +189,13 @@ const EditableCellChannel = ({
     );
   };
 
+  // Handle input for channel and chaincode names, enforcing lowercase, no spaces, only specific characters
   const handleInputChange = (e) => {
-    const value = e.target.value.toLowerCase(); // Convert to lowercase
-    e.target.value = value.replace(/[^a-zA-Z0-9]/g, ""); // Remove non-alphanumeric characters
+    const value = e.target.value.toLowerCase();
+    e.target.value = value.replace(/[^a-z0-9.-]/g, "");
   };
 
   const preventInvalidKeys = (e) => {
-    // Block spacebar and uppercase letters
     if (e.key === " ") {
       e.preventDefault();
     }
@@ -209,37 +204,39 @@ const EditableCellChannel = ({
   const inputNode =
     dataIndex === "orgName" ? (
       <Select
-        // options={orgNameList}
-        mode="multiple" // Set mode to 'multiple' for multi-select
-        style={{ width: "100%" }} // Set width as per your requirement
+        mode="multiple"
+        style={{ width: "100%" }}
         placeholder="Select orgs"
         tagRender={tagRender}
-      // value={record.orgName}
-      // onChange={(value) => handleOrgChange(value, record.key)}
       >
-        {orgNameList?.map((e) => {
-          return (
-            <Option value={e} style={{ color: "green" }}>
-              {e}
-            </Option>
-          );
-        })}
+        {orgNameList?.map((e) => (
+          <Option key={e} value={e} style={{ color: "green" }}>
+            {e}
+          </Option>
+        ))}
       </Select>
     ) : (
-      <Input onChange={(dataIndex === "channelName" || dataIndex === "ChaincodeName") ? handleInputChange : undefined}
-        onKeyPress={(dataIndex === "channelName" || dataIndex === "ChaincodeName") ? preventInvalidKeys : undefined}
-        placeholder="Enter lowercase, no spaces" />
+      <Input
+        onChange={
+          dataIndex === "channelName" || dataIndex === "ChaincodeName"
+            ? handleInputChange
+            : undefined
+        }
+        onKeyPress={
+          dataIndex === "channelName" || dataIndex === "ChaincodeName"
+            ? preventInvalidKeys
+            : undefined
+        }
+        placeholder="Enter lowercase, no spaces"
+      />
     );
 
-  // console.log('-----------ssssssssssssssssssss-----', orgNameList);
   return (
     <td {...restProps}>
       {editing ? (
         <Form.Item
           name={dataIndex}
-          style={{
-            margin: 0,
-          }}
+          style={{ margin: 0 }}
           rules={[
             {
               required: true,
@@ -247,11 +244,11 @@ const EditableCellChannel = ({
             },
             ...(dataIndex === "channelName" || dataIndex === "ChaincodeName"
               ? [
-                {
-                  pattern: /^[a-zA-Z0-9]+$/, // Alphanumeric pattern, allows uppercase letters
-                  message: `${title} should only contain letters and numbers with no spaces!`,
-                },
-              ]
+                  {
+                    pattern: /^[a-z0-9-]*$/,
+                    message: `${title} should only contain lowercase letters, numbers, or hyphens, with no spaces!`,
+                  },
+                ]
               : []),
           ]}
         >
@@ -259,20 +256,18 @@ const EditableCellChannel = ({
         </Form.Item>
       ) : dataIndex === "orgName" ? (
         <Select
-          mode="tags" // Set mode to 'multiple' for multi-select
-          style={{ width: "100%" }} // Set width as per your requirement
+          mode="tags"
+          style={{ width: "100%" }}
           placeholder="Select orgs"
           value={record.orgName}
           tagRender={tagRender}
-          disabled={true}
+          disabled
         >
-          {orgNameList?.map((e) => {
-            return (
-              <Option value={e} style={{ color: "green" }}>
-                {e}
-              </Option>
-            );
-          })}
+          {orgNameList?.map((e) => (
+            <Option key={e} value={e} style={{ color: "green" }}>
+              {e}
+            </Option>
+          ))}
         </Select>
       ) : (
         children
@@ -784,14 +779,13 @@ export default function CreateRequest(props) {
   };
 
   const instructions = [
-    "1. The organization name, channel name and chaincode name should not have space",
-
+    "1. The organization name, should not have space",
     "2. Max 20 Orgs configuration can be created",
     "3. Explorer and caliper will be configured for the first channel's of first organization",
-
     "4. A basic API structure will be given for basic asset operation",
     "5. Make sure to have odd number of orderers like 3, 5, 7 etc",
-    "6. If you are facing any issue, please connect with us on Whatsapp"
+    "6. If you are facing any issue, please connect with us on Whatsapp",
+    "7. Channel Name and Chaincode Name should only contain lowercase letters, numbers, or hyphens, with no spaces!"
   ];
 
   const [isOpen, setIsOpen] = useState(true);
@@ -803,9 +797,6 @@ export default function CreateRequest(props) {
   const [selectedVersion] = useState("v2.5");
 
   const dropdownToggle = () => setDropdownOpen(prevState => !prevState);
-
-
-
 
   return (
     <>

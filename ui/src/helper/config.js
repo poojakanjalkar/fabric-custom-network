@@ -10,6 +10,7 @@ export const routes = {
     request: `${BASE_URL}/org`,
     download: `${BASE_URL}/org/download`,
     getRequests: `${BASE_URL}/org`,
+    getOrderId: `${BASE_URL}/razorpay/order-id`,
 
 
     login: `${BASE_URL}/auth/login`,

@@ -33,7 +33,7 @@ class Profile extends React.Component {
 
   componentDidMount() {
 
-    axios.get(`${routes.credits}`, headers())
+  axios.get(`${routes.credits}`, headers())
       .then(response => {
         // Set the response data to the component state
         this.setState({ data: response.data, loading: false });
@@ -79,56 +79,74 @@ class Profile extends React.Component {
       return;
     }
 
-    const options = {
-      key: "rzp_live_vQB9BF739hlsCx",
-      currency:'INR',
-      // currency: "USD",
-      amount: 1 * 100,
-      name: "Pavan Tech Academy",
-      description: "Thanks for purchasing",
-      customer: {
-        name: JSON.parse(localStorage.getItem("user-data")).name,
-        email: JSON.parse(localStorage.getItem("user-data")).email,
-      },
-      handler: async function (response) {
-        // alert(response.razorpay_payment_id);
-        // alert("Payment Successfully");
-        // routes
-        console.log("++++++++++*******+++++*****+++++");
-        let subscription = await axios.get(
-          `${routes.credits}`,
-          headers()
-        );
-        console.log(
-          "_______get subscription creditttt_____________",
-          subscription.data
-        );
+    let payload = {
+      // currency:'INR',
+      currency: "USD",
+      amount: 29 ,
+      receipt:"Reciept-122"
+    }
 
-        let userdata = JSON.parse(localStorage.getItem("user-data"))
-        userdata.subscription = subscription?.data?.payload
-        // localStorage.setItem()
-        localStorage.setItem('user-data',JSON.stringify(userdata))
+    try {
+      const orderResponse = await axios.post(`${routes.getOrderId}`,payload, headers())
 
-        this.setState({credit: subscription?.data?.payload?.credit || 0 })
+      let order = orderResponse.data.payload
 
-        useEffect(() => {
+      console.log("---------orderResponse---------", orderResponse)
+      // return
+
+      const options = {
+        key:orderResponse.key,
+        // currency:'INR',
+        currency: orderResponse?.currency || "USD",
+        amount: orderResponse?.amount || 30,
+        name: "Morya Innovations",
+        description: "Thanks for purchasing",
+        order_id: order.orderId,
+        customer: {
+          name: JSON.parse(localStorage.getItem("user-data")).name,
+          email: JSON.parse(localStorage.getItem("user-data")).email,
+        },
+        handler: async  (response) => {
+          // alert(response.razorpay_payment_id);
+          // alert("Payment Successfully");
+          // routes
+          console.log("++++++++++*******+++++*****+++++");
+          let subscription = await axios.get(
+            `${routes.credits}`,
+            headers()
+          );
           console.log(
-            "++++++++subscription user creditt++++++ ",
+            "_______get subscription creditttt_____________",
             subscription.data
           );
-        }, [subscription.data]);
-      },
-      notes: {
-        name: JSON.parse(localStorage.getItem("user-data")).name,
-        email: JSON.parse(localStorage.getItem("user-data")).email,
-      },
-      prefill: {
-        name: "Pavan Tech Academy",
-      },
-    };
+  
+          let userdata = JSON.parse(localStorage.getItem("user-data"))
+          userdata.subscription = subscription?.data?.payload
+          localStorage.setItem('user-data',JSON.stringify(userdata))
+  
+          this.setState({credit: subscription?.data?.payload?.credit || 0 })
+  
 
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
+        },
+        notes: {
+          name: JSON.parse(localStorage.getItem("user-data")).name,
+          email: JSON.parse(localStorage.getItem("user-data")).email,
+        },
+        prefill: {
+          name: "Morya Innovations",
+        },
+      };
+  
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+
+      
+    } catch (error) {
+      
+    }
+
+
+
   };
 
   render() {

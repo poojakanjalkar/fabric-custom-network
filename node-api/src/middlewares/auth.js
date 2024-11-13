@@ -20,8 +20,7 @@ const auth = catchAsync(async(req, res, next) => {
     user: {
       id: decodedData?.email,
       email: decodedData?.email,
-      orgId: decodedData?.orgId?.toString(),
-      department: decodedData?.department
+      orgId: decodedData?.orgName,
     },
   };
   return next();

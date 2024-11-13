@@ -6,7 +6,7 @@ const createPayment = async (data) => {
   console.log('--razor pay data----', data);
   logger.info({method:'createPayment', message: "Webhook triggered", data})
 
-  if(data.event !== 'payment.authorized'){
+  if(data.event !== 'payment.captured'){
     return
   }
 
@@ -40,8 +40,9 @@ const createPayment = async (data) => {
         s.credit = 2;
       let subscription = new Subscription(s);
       await subscription.save();
+      logger.info({method:'createPayment', message: "Subscription created-updated", data: s})
     }
-    logger.info({method:'createPayment', message: "Subscription created-updated", data: s})
+    logger.info({method:'createPayment', message: "Subscription created-updated"})
   } catch (error) {
     console.log('Error occurred---------', error);
     logger.error({method:'createPayment', message: "error occureed", error: error?.message, stack: error?.stack})
