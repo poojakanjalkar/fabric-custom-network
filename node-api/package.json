@@ -81,7 +81,7 @@
     "razorpay": "^2.9.5",
     "swagger-jsdoc": "^6.0.8",
     "swagger-ui-express": "^4.1.6",
-    "uuid": "^8.3.2",
+    "uuid": "^11.0.3",
     "validator": "^13.0.0",
     "winston": "^3.16.0",
     "winston-daily-rotate-file": "^4.7.1",

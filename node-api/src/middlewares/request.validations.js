@@ -20,7 +20,7 @@ const channelSchema = Joi.object({
         .pattern(/^[a-z][a-z0-9-]*$/) // Must start with a lowercase letter and can contain lowercase letters, digits, dots, and dashes
         .max(50) // Maximum length of 50 characters
         .required(), // Required field
-    chaincodeName: Joi.string()
+    ChaincodeName: Joi.string()
         .pattern(/^[a-z][a-z0-9-]*$/) // Same pattern as channel name
         .max(50) // Maximum length of 50 characters
         .required(), // Required field

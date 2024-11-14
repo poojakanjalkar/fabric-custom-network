@@ -75,7 +75,7 @@ export default function Component() {
 
     const [selectedCurrency, setSelectedCurrency] = useState('USD');
     const [price, setPrice] = useState(30);
-    const basePrice = 30;
+    const basePrice = 99;
   
     useEffect(() => {
       fetch('https://ipapi.co/json/')
@@ -177,7 +177,7 @@ export default function Component() {
             </Row>
 
             <Row className="mb-5">
-                <Col md={8}>
+                <Col md={10}>
                     <Card>
                         <CardBody>
                             <CardTitle tag="h3">Platform Features</CardTitle>
@@ -189,7 +189,7 @@ export default function Component() {
                         </CardBody>
                     </Card>
                 </Col>
-                <Col md={4}>
+                {/* <Col md={4}>
                     <Card className="bg-white">
                         <CardBody className="text-center">
 
@@ -256,12 +256,11 @@ export default function Component() {
 
                             <div className="mt-4 text-center text-muted small">
                                 <p>Price shown in {selectedCurrency}</p>
-                                {/* <p>Secure payment processing</p> */}
                             </div>
 
                         </CardBody>
                     </Card>
-                </Col>
+                </Col> */}
             </Row>
 
             <Row>
