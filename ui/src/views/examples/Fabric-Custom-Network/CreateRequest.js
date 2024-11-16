@@ -436,7 +436,7 @@ export default function CreateRequest(props) {
       // }
 
       let message = result?.data?.message;
-      if (message == "Insufficient balance, please buy credit") {
+      if (message == "Insufficient balance, please buy credit on profile page") {
         addToast(message, { appearance: "error", autoDismiss: false });
       } else {
         addToast("Request created successfully", {

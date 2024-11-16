@@ -12,11 +12,15 @@ const validateSubscription = catchAsync(async (req, res, next) => {
   let subscription = await Subscription.findOne({ email: email }).exec();
 
   let config = await ConfigurationData.findOne({id: 'CONFIGURATION'})
+  let data = JSON.parse(config?.data)
   console.log("-----------------", typeof config?.data, config?.data)
-  if(config?.data){
+  if(data){
     // let data = JSON.parse(config?.data)
-    if(!config?.data.isEnabled){
+    if(!data.isEnabled){
+      console.log("-------config?.data-------------", data.isEnabled)
       return next()
+    }else{
+      console.log("-------config?.data-------------", data.isEnabled)
     }
   }
 
