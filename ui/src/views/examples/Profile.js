@@ -20,6 +20,7 @@ import UserHeader from "../../components/Headers/UserHeader.js";
 import { connect } from "react-redux";
 import axios from "axios";
 import { routes, headers } from "../../helper/config.js";
+import ProgressBar from "./ProgressBar.js";
 // import Razorpay from 'razorpay';
 
 class Profile extends React.Component {
@@ -27,7 +28,8 @@ class Profile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      credit: 'Loading...'
+      credit: 'Loading...',
+      isLoading:false
     };
   }
 
@@ -70,6 +72,10 @@ class Profile extends React.Component {
   // razorpay = new Razorpay();
 
   startPayment = async () => {
+    this.setState((prevState) => ({
+      ...prevState, // Spread the existing state
+      isLoading: true, // Update isLoading
+    }));
     const res = await this.loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
@@ -124,7 +130,12 @@ class Profile extends React.Component {
           userdata.subscription = subscription?.data?.payload
           localStorage.setItem('user-data',JSON.stringify(userdata))
   
-          this.setState({credit: subscription?.data?.payload?.credit || 0 })
+          // this.setState({credit: subscription?.data?.payload?.credit || 0 })
+
+          this.setState((prevState) => ({
+            ...prevState, // Spread the existing state
+            credit: subscription?.data?.payload?.credit || 0, // Update isLoading
+          }));
   
 
         },
@@ -136,12 +147,22 @@ class Profile extends React.Component {
           name: "Morya Innovations",
         },
       };
+
+      this.setState((prevState) => ({
+        ...prevState, // Spread the existing state
+        isLoading: false, // Update isLoading
+      }));
   
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
 
       
     } catch (error) {
+
+      this.setState((prevState) => ({
+        ...prevState, // Spread the existing state
+        isLoading: false, // Update isLoading
+      }));
       
     }
 
@@ -155,6 +176,7 @@ class Profile extends React.Component {
         <UserHeader />
         {/* Page content */}
         <Container className="mt--7" fluid>
+        {this.state.isLoading? <ProgressBar/> :
           <Row>
             <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
               <Card className="card-profile shadow">
@@ -215,14 +237,7 @@ class Profile extends React.Component {
                       <h3 className="mb-0">My account</h3>
                     </Col>
                     <Col className="text-right" xs="4">
-                      {/* <Button
-                        color="primary"
-                        href="#pablo"
-                        onClick={e => e.preventDefault()}
-                        size="sm"
-                      >
-                        Settings
-                      </Button> */}
+
                     </Col>
                   </Row>
                 </CardHeader>
@@ -277,42 +292,6 @@ class Profile extends React.Component {
                           </FormGroup>
                         </Col>
                       </Row>
-                      {/* <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-first-name"
-                            >
-                              First name
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="Lucky"
-                              id="input-first-name"
-                              placeholder="First name"
-                              type="text"
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-last-name"
-                            >
-                              Last name
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="Jesse"
-                              id="input-last-name"
-                              placeholder="Last name"
-                              type="text"
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row> */}
                     </div>
                     <hr className="my-4" />
                     {/* Address */}
@@ -321,6 +300,7 @@ class Profile extends React.Component {
               </Card>
             </Col>
           </Row>
+          }
         </Container>
       </>
     );
