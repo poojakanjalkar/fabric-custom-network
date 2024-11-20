@@ -15,7 +15,16 @@ const auth = catchAsync(async(req, res, next) => {
   if (!token) {
     return res.status(httpStatus.UNAUTHORIZED).send(getErrorResponse(httpStatus.UNAUTHORIZED, 'Missing token in request'));
   }
-  const decodedData = jwt.verify(token, config.jwt.secret);
+  let decodedData;
+  try {
+    decodedData = jwt.verify(token, config.jwt.secret);
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(httpStatus.UNAUTHORIZED).send(getErrorResponse(httpStatus.UNAUTHORIZED, 'token expired'));
+
+  }
+  
   req.loggerInfo = {
     user: {
       id: decodedData?.email,
