@@ -1,5 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
+const os = require('os');
+const process = require('process');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
@@ -15,7 +17,7 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const logger = require('./logger')(module)
 const { requestInfo } = require('./middlewares/requestInfo');
-
+const { getAllMemoryInfo } = require('./utils/utils');
 
 
 const app = express();
@@ -62,6 +64,24 @@ app.use('/v1/auth', authLimiter);
 
 // v1 api routes
 app.use('/v1', requestLimiter, routes);
+app.get('/health', (req, res) => {
+  const healthcheck = {
+      uptime: process.uptime(),
+      message: 'OK',
+      timestamp: Date.now()
+  };
+  res.status(200).send(healthcheck);
+});
+
+app.get('/health-details', (req, res) => {
+  const healthcheck = {
+      uptime: process.uptime(),
+      message: 'OK',
+      timestamp: Date.now(),
+      memoryInfo: getAllMemoryInfo()
+  };
+  res.status(200).send(healthcheck);
+});
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

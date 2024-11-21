@@ -65,9 +65,10 @@ let requestModel = new Org({
 
 let config = await ConfigurationData.findOne({id: 'CONFIGURATION'})
   console.log("-----------------", typeof config?.data, config?.data)
-  if(config?.data){
+  let configData = JSON.parse(config?.data)
+  if(configData){
     // let data = JSON.parse(config?.data)
-    if(config?.data.isEnabled){
+    if(configData?.isEnabled){
       const res = await Subscription.updateOne(
         { email: user.email, credit: { $gt: 0 } }, // Ensure there are enough credits
         { $inc: { credit: -1 } }
