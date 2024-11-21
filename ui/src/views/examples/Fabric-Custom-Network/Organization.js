@@ -19,7 +19,9 @@ import {
   Col,
 } from "reactstrap";
 import ReactPaginate from "react-paginate";
+import { useToasts } from "react-toast-notifications";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 import Header from "components/Headers/Header";
 import AddOrganization from "./AddOrganization";
 // import { headers } from "helper/config";
@@ -41,6 +43,9 @@ export default function Organization() {
       currentStateDb: "tets",
     },
   ]);
+
+  let history=useHistory();
+  const{addToast}=useToasts();
 
   const [requestList, setRequestList] = useState([]);
 
@@ -100,16 +105,26 @@ export default function Organization() {
     getData(0);
   }, []);
   const getData = async (page) => {
-    let result = await axios.get(
-      `${routes.request}?page=${page}&size=5`,
-      headers()
-    );
-    console.log(
-      "----------------dsfgdsrfgdfhdfhdhdthdthjjjjjjjjjjjjjj-----------",
-      result.data
-    );
-
-    setRequestList(result?.data?.payload);
+    try {
+      
+      let result = await axios.get(
+        `${routes.request}?page=${page}&size=5`,
+        headers()
+      );
+  
+      setRequestList(result?.data?.payload);
+    } catch (error) {
+      if(error?.response?.data?.message==
+        "token expired"){
+          addToast(`Session expired, please login `, {
+            appearance: "error",
+            autoDismiss: true,
+          });
+          localStorage.removeItem("token")
+          history.push("/auth/login")
+        }
+    }
+   
   };
 
   // const handleDropdownSelect = (selectedItem) => {
